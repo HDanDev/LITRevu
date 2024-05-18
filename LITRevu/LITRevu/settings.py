@@ -25,8 +25,8 @@ SECRET_KEY = "django-insecure-33!$6k(*mz)v+fc_($%9%8m7j6dmiq@96#-9-44fx680f6g26e
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -50,12 +50,14 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+LOGIN_URL = '/login/'
+
 ROOT_URLCONF = "LITRevu.urls"
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / 'app/templates'],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -122,7 +124,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    BASE_DIR / "app/static",
 ]
 
 # Default primary key field type
