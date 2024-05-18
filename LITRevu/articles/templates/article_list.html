@@ -1,0 +1,21 @@
+{% extends 'base_template.html' %}
+{% load static %}
+
+{% block title %}Articles{% endblock %}
+{% block optional_css %}
+<link rel="stylesheet" href="{% static 'css/articles_styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1>Articles</h1>
+<ul>
+    {% for article in articles %}
+    <li>
+        <a href="{% url 'article_detail' article.pk %}">{{ article.title }}</a> by {{ article.author }} {{ article.created_at|date:"F j, Y" }}
+        <a href="{% url 'article_update' article.pk %}">Edit</a>
+        <a href="{% url 'article_delete' article.pk %}">Delete</a>
+    </li>
+    {% endfor %}
+</ul>
+<a href="{% url 'article_create' %}">New Article</a>
+{% endblock %}

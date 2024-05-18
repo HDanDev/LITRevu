@@ -1,13 +1,10 @@
+{% extends 'base_template.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-</head>
-<body>
+{% block title %}LITRevu - Login{% endblock %}
+{% block optional_css %}
+<link rel="stylesheet" href="{% static 'css/users_styles.css' %}">
+{% endblock %}
+{% block content %}
     <h1>Login</h1>
     <form method="post">
         {% csrf_token %}
@@ -17,5 +14,4 @@
         <input type="password" id="password" name="password"><br>
         <button type="submit">Login</button>
     </form>
-</body>
-</html>
+{% endblock %}

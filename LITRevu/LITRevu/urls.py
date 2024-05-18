@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from app import views as app_views
+from app.views import home as app_views_home
 from django.conf.urls import handler404, handler500
 from django.shortcuts import render
 
@@ -31,6 +31,7 @@ handler500 = 'LITRevu.urls.custom_error_view'
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('', app_views.home_view, name='home'),
+    path('', app_views_home.home_view, name='home'),
     path("", include("users.urls")),
+    path("", include("articles.urls")),
 ]

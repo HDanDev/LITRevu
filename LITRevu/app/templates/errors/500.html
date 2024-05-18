@@ -1,13 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Server Error</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}LITRevu - 500{% endblock %}
+{% block optional_css %}
+<link rel="stylesheet" href="{% static 'css/errors_styles.css' %}">
+{% endblock %}
+{% block content %}
     <h1>500 - Server Error</h1>
     <p>Sorry, something went wrong on our end.</p>
     <a href="/">Go to Home</a>
-</body>
-</html>
+{% endblock %}

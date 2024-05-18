@@ -1,0 +1,16 @@
+{% extends 'base_template.html' %}
+{% load static %}
+
+{% block title %}{{ article.title }}{% endblock %}
+{% block optional_css %}
+<link rel="stylesheet" href="{% static 'css/articles_styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1>{{ article.title }}</h1>
+<p>{{ article.content }}</p>
+<p>By {{ article.author }} on {{ article.created_at }}</p>
+<a href="{% url 'article_update' article.pk %}">Edit</a>
+<a href="{% url 'article_delete' article.pk %}">Delete</a>
+<a href="{% url 'article_list' %}">Back to Articles</a>
+{% endblock %}
