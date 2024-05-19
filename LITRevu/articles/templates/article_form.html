@@ -8,7 +8,7 @@
 
 {% block content %}
 <h1>{% if form.instance.pk %}Edit{% else %}New{% endif %} Article</h1>
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">{% if form.instance.pk %}Update{% else %}Create{% endif %}</button>

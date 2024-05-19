@@ -6,20 +6,36 @@
 {% endblock %}
 {% block content %}
     <h2>User Registration</h2>
-    <form id="registration-form" action="/register/" method="post">
+    <form id="registration-form" action="{% url 'register' %}" method="post">
         {% csrf_token %}
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
-        <span class="error-message" id="username-error"></span>
-
-        <label for="password1">Password:</label>
-        <input type="password" id="password1" name="password1" required>
-
-        <label for="password2">Confirm Password:</label>
-        <input type="password" id="password2" name="password2" required>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" value="{{ form.email.value|default:'' }}" required>
+            {% if form.email.errors %}
+                <div class="error">{{ form.email.errors }}</div>
+            {% endif %}
+        </div>
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" value="{{ form.username.value|default:'' }}" required>
+            {% if form.username.errors %}
+                <div class="error">{{ form.username.errors }}</div>
+            {% endif %}
+        </div>
+        <div>
+            <label for="password1">Password:</label>
+            <input type="password" id="password1" name="password1" required>
+            {% if form.password1.errors %}
+                <div class="error">{{ form.password1.errors }}</div>
+            {% endif %}
+        </div>
+        <div>
+            <label for="password2">Confirm Password:</label>
+            <input type="password" id="password2" name="password2" required>
+            {% if form.password2.errors %}
+                <div class="error">{{ form.password2.errors }}</div>
+            {% endif %}
+        </div>
 
         <input type="submit" value="Register">
     </form>

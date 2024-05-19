@@ -37,8 +37,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "app",
     "users",
+    "app",
     "articles",
 ]
 
@@ -52,6 +52,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
 LOGIN_URL = '/login/'
 
 ROOT_URLCONF = "LITRevu.urls"
@@ -59,7 +61,9 @@ ROOT_URLCONF = "LITRevu.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / 'app/templates'],
+        "DIRS": [BASE_DIR / 'app/templates',
+                 BASE_DIR / 'users/templates',
+                 ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -113,6 +117,8 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+# AUTH_USER_MODEL = 'users.CustomUser'
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -124,11 +130,15 @@ USE_I18N = True
 
 USE_TZ = True
 
+SESSION_COOKIE_AGE = 1209600  # Two weeks, in seconds
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = "static/"
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
 
 STATICFILES_DIRS = [
     BASE_DIR / "app/static",
@@ -140,3 +150,7 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025  
