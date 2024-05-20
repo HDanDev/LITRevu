@@ -36,6 +36,13 @@
                 <div class="error">{{ form.password2.errors }}</div>
             {% endif %}
         </div>
+        {% comment %} <div>
+            <label for="birth-date">Date of birth:</label>
+            <input type="date" id="birth-date" name="birth-date">
+            {% if form.date_of_birth.errors %}
+                <div class="error">{{ form.date_of_birth.errors }}</div>
+            {% endif %}
+        </div> {% endcomment %}
 
         <input type="submit" value="Register">
     </form>

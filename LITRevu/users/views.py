@@ -1,6 +1,5 @@
 from django.contrib.auth import login, logout
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.models import User
 from django.contrib import messages
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_str, force_bytes
@@ -8,7 +7,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth.tokens import default_token_generator
 from users.form import CustomUserCreationForm, CustomAuthenticationForm
 from users.email_utils import EmailUtils
-from users.models import UserActivation
+from users.models import UserActivation, CustomUser
 
 def login_view(request):
     if request.method == 'POST':
@@ -55,7 +54,7 @@ def register_view(request):
 def resend_activation_email(request, uidb64, token):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
-        user = get_object_or_404(User, pk=uid)
+        user = get_object_or_404(CustomUser, pk=uid)
         
         if default_token_generator.check_token(user, token):
             if not user.is_active:
@@ -72,15 +71,15 @@ def resend_activation_email(request, uidb64, token):
                 messages.info(request, 'Already activated')
         else:
             messages.error(request, 'Invalid activation link')
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+    except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
         messages.error(request, 'Failed to resend email')
     return redirect('home')
 
 def activate(request, uidb64, token):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = CustomUser.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
         user = None
     if user is not None and default_token_generator.check_token(user, token):
         user.is_active = True
