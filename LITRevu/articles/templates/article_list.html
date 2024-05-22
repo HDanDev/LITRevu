@@ -12,8 +12,12 @@
     {% for article in articles %}
     <li>
         <a href="{% url 'article_detail' article.pk %}">{{ article.title }}</a> by {{ article.author }} {{ article.created_at|date:"F j, Y" }}
-        <a href="{% url 'article_update' article.pk %}">Edit</a>
-        <a href="{% url 'article_delete' article.pk %}">Delete</a>
+        {% if request.user.is_authenticated %}
+            {% if request.user == article.author or request.user.is_superuser %}
+                <a href="{% url 'article_update' article.pk %}">Edit</a>
+                <a href="{% url 'article_delete' article.pk %}">Delete</a>
+            {% endif %}
+        {% endif %}
     </li>
     {% endfor %}
 </ul>
