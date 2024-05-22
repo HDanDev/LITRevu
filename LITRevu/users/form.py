@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.auth import authenticate
 from django.utils import timezone
 from users.models import CustomUser
@@ -45,6 +45,28 @@ class CustomUserCreationForm(UserCreationForm):
             user.save()
         return user
     
+class CustomUserEditForm(UserCreationForm):
+    date_of_birth = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date', 'min': '1910-01-01', 'max': timezone.now().strftime('%Y-%m-%d')}))
+    
+    class Meta:
+        model = CustomUser
+        fields = ("date_of_birth", "profile_picture")
+
+    def clean_date_of_birth(self):
+        birth_date = self.cleaned_data.get('date_of_birth')
+        today = timezone.now().date()
+        min_birth_date = today - timezone.timedelta(days=12*365)  # 12 years ago
+        max_birth_date = today - timezone.timedelta(days=200*365)  # 200 years ago
+
+        if birth_date:
+            if birth_date > today:
+                raise ValidationError('Birth date cannot be in the future.')
+            if birth_date < min_birth_date:
+                raise ValidationError('You must be at least 12 years old to register.')
+            if birth_date > max_birth_date:
+                raise ValidationError('You must be younger than 200 years old to register.')
+        return birth_date
+    
 class CustomAuthenticationForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super(CustomAuthenticationForm, self).__init__(*args, **kwargs)
@@ -71,3 +93,37 @@ class CustomAuthenticationForm(AuthenticationForm):
 
         return self.cleaned_data
     
+class UpdateEmailForm(forms.ModelForm):
+    current_password = forms.CharField(widget=forms.PasswordInput, required=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ['email', 'current_password']
+
+    def clean_current_password(self):
+        current_password = self.cleaned_data['current_password']
+        if not self.instance.check_password(current_password):
+            raise forms.ValidationError('Incorrect password.')
+        return current_password
+
+class UpdateUsernameForm(forms.ModelForm):
+    current_password = forms.CharField(widget=forms.PasswordInput, required=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'current_password']
+
+    def clean_current_password(self):
+        current_password = self.cleaned_data['current_password']
+        if not self.instance.check_password(current_password):
+            raise forms.ValidationError('Incorrect password.')
+        return current_password
+
+class UpdatePasswordForm(PasswordChangeForm):
+    old_password = forms.CharField(widget=forms.PasswordInput, required=True)
+    new_password1 = forms.CharField(widget=forms.PasswordInput, required=True)
+    new_password2 = forms.CharField(widget=forms.PasswordInput, required=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ['old_password', 'new_password1', 'new_password2']

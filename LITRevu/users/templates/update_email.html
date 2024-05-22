@@ -1,0 +1,15 @@
+{% extends 'base_template.html' %}
+{% load static %}
+{% block title %}LITRevu - Edit Email{% endblock %}
+{% block optional_css %}
+<link rel="stylesheet" href="{% static 'css/users_styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<h2>Edit Email</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Update Email</button>
+</form>
+{% endblock %}

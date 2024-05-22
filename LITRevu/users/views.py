@@ -1,11 +1,12 @@
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, update_session_auth_hash
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_str, force_bytes
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth.tokens import default_token_generator
-from users.form import CustomUserCreationForm, CustomAuthenticationForm
+from users.form import CustomUserCreationForm, CustomAuthenticationForm, CustomUserEditForm, UpdateEmailForm, UpdateUsernameForm, UpdatePasswordForm
 from users.email_utils import EmailUtils
 from users.models import UserActivation, CustomUser
 
@@ -89,4 +90,54 @@ def activate(request, uidb64, token):
     else:
         messages.error(request, 'Failed to activate account')
     return redirect('home')
-        
+        # users/views.py
+
+@login_required
+def profile_view(request):
+    if request.method == 'POST':
+        form = CustomUserEditForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your profile has been successfully updated")
+            return redirect('profile')
+    else:
+        form = CustomUserEditForm(instance=request.user)
+        messages.error(request, 'An error occurered while updating your profile')
+    return render(request, 'profile.html', {'form': form})
+
+@login_required
+def update_email(request):
+    if request.method == 'POST':
+        form = UpdateEmailForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your email was successfully updated!')
+            return redirect('profile')
+    else:
+        form = UpdateEmailForm(instance=request.user)
+    return render(request, 'update_email.html', {'form': form})
+
+@login_required
+def update_username(request):
+    if request.method == 'POST':
+        form = UpdateUsernameForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your username was successfully updated!')
+            return redirect('profile')
+    else:
+        form = UpdateUsernameForm(instance=request.user)
+    return render(request, 'update_username.html', {'form': form})
+
+@login_required
+def update_password(request):
+    if request.method == 'POST':
+        form = UpdatePasswordForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('profile')
+    else:
+        form = UpdatePasswordForm(request.user)
+    return render(request, 'update_password.html', {'form': form})

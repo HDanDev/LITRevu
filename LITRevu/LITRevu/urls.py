@@ -18,7 +18,9 @@ from django.contrib import admin
 from django.urls import path, include
 from app.views import home as app_views_home
 from django.conf.urls import handler404, handler500
+from django.conf import settings
 from django.shortcuts import render
+from django.conf.urls.static import static
 
 def custom_page_not_found_view(request, exception):
     return render(request, 'errors/404.html', status=404)
@@ -35,3 +37,6 @@ urlpatterns = [
     path("", include("users.urls")),
     path("", include("articles.urls")),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
