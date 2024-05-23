@@ -25,9 +25,8 @@
     <!-- Navigation menu -->
     <nav>
         <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/article/">Article</a></li>
             {% if user.is_authenticated %}
+            <li><a href="/">Home</a></li>
             <li><a href="/profile/">Profile</a></li>
             <li><a href="/logout/">Logout</a></li>
             {% else %}
