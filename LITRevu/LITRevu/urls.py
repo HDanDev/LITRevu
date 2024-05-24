@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 # from app.views import home as app_views_home
-from articles.views import TicketListView
+from tickets.views import TicketListView
 from django.conf.urls import handler404, handler500
 from django.conf import settings
 from django.shortcuts import render
@@ -36,7 +36,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path('', TicketListView.as_view(), name='home'),
     path("", include("users.urls")),
-    path("", include("articles.urls")),
+    path("", include("tickets.urls")),
+    path("", include("reviews.urls")),
 ]
 
 if settings.DEBUG:

@@ -40,7 +40,12 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "users",
     "app",
-    "articles",
+    "reviews",
+    "comments",
+    "feed",
+    "follows",
+    "tags",
+    "tickets"
 ]
 
 MIDDLEWARE = [
@@ -147,7 +152,8 @@ SESSION_COOKIE_HTTPONLY = True
 STATICFILES_DIRS = [
     BASE_DIR / "app/static",
     BASE_DIR / "users/static",
-    BASE_DIR / "articles/static",
+    BASE_DIR / "reviews/static",
+    BASE_DIR / "tickets/static",
 ]
 
 # Default primary key field type

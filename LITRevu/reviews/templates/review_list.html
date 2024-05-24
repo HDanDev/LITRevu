@@ -1,0 +1,25 @@
+{% extends 'base_template.html' %}
+{% load static %}
+
+{% block title %}Reviews{% endblock %}
+{% block optional_css %}
+<link rel="stylesheet" href="{% static 'css/reviews_styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1>Reviews</h1>
+<ul>
+    {% for review in reviews %}
+    <li>
+        <a href="{% url 'review_detail' review.pk %}">{{ review.title }}</a> by {{ review.author }} {{ review.created_at|date:"F j, Y" }}
+        {% if request.user.is_authenticated %}
+            {% if request.user == review.author or request.user.is_superuser %}
+                <a href="{% url 'review_update' review.pk %}">Edit</a>
+                <a href="{% url 'review_delete' review.pk %}">Delete</a>
+            {% endif %}
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+<a href="{% url 'review_create' %}">New Review</a>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base_template.html' %}
+{% load static %}
+
+{% block title %}{{ review.title }}{% endblock %}
+{% block optional_css %}
+<link rel="stylesheet" href="{% static 'css/reviews_styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1>{{ review.title }}</h1>
+<p>{{ review.content }}</p>
+<p>By {{ review.author.username|default:"Anonymous" }} on {{ review.created_at }}</p>
+{% if request.user.is_authenticated %}
+  {% if request.user == review.author or request.user.is_superuser %}
+    <a href="{% url 'review_update' review.pk %}">Edit</a>
+    <a href="{% url 'review_delete' review.pk %}">Delete</a>
+  {% endif %}
+{% endif %}
+<a href="{% url 'review_list' %}">Back to Reviews</a>
+{% endblock %}

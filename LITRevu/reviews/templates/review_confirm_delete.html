@@ -1,0 +1,17 @@
+{% extends 'base_template.html' %}
+{% load static %}
+
+{% block title %}Delete Review{% endblock %}
+{% block optional_css %}
+<link rel="stylesheet" href="{% static 'css/reviews_styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1>Delete Review</h1>
+<p>Are you sure you want to delete "{{ review.title }}"?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Confirm</button>
+</form>
+<a href="{% url 'review_list' %}">Cancel</a>
+{% endblock %}

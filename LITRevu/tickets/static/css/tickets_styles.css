@@ -1,0 +1,77 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #76d673;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #343a40;
+    color: white;
+    padding: 1em;
+    text-align: center;
+}
+
+nav {
+    margin: 0 auto;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 0.5em;
+}
+
+h1 {
+    font-size: 1.5em;
+    text-align: center;
+    margin-top: 1em;
+}
+
+.review-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 1em;
+}
+
+.review-item {
+    background-color: white;
+    padding: 1em;
+    margin-bottom: 1em;
+    border-radius: 0.5em;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.review-item a {
+    text-decoration: none;
+    color: #007bff;
+    font-size: 1.2em;
+}
+
+.review-item a:hover {
+    text-decoration: underline;
+}
+
+.review-item p {
+    margin: 0.5em 0 0;
+    color: #6c757d;
+}
+
+@media (min-width: 600px) {
+    .review-list {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .review-item {
+        flex: 1 1 calc(50% - 2em);
+        margin: 1em;
+    }
+}
+
+@media (min-width: 900px) {
+    .review-item {
+        flex: 1 1 calc(33% - 2em);
+    }
+}
