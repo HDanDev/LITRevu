@@ -7,37 +7,54 @@
 <h2>Tickets</h2>
   <ul>
     {% for ticket in tickets %}
-      <li>
-        <h3>{{ ticket.title }}</h3>
-        <p>{{ ticket.description }}</p>
-        <p>Created at: {{ ticket.created_at }}</p>
-        {% if request.user == review.author or request.user.is_superuser %}
-          <a href="{% url 'ticket_update' ticket.pk %}">Edit</a>
-          <a href="{% url 'ticket_delete' ticket.pk %}">Delete</a>
-        {% endif %}
-        <div>
-          <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-          <button class="like-btn" data-ticket-id="{{ ticket.pk }}" data-ticket-url="{% url 'ticket_like' ticket.pk %}">Like</button>
-          <span class="likes-count" data-ticket-id="{{ ticket.pk }}">{{ ticket.likes_count }}</span>
-          <button class="dislike-btn" data-ticket-id="{{ ticket.pk }}" data-ticket-url="{% url 'ticket_dislike' ticket.pk %}">Dislike</button>
-          <span class="dislikes-count" data-ticket-id="{{ ticket.pk }}">{{ ticket.dislikes_count }}</span>
+    {% if not ticket.is_archived %}
+    <li>
+        <a href="{% url 'review_list' ticket.pk %}">
+          <h3>{{ ticket.title }}</h3>
+          <p>{{ ticket.description }}</p>
+          <p>Created at: {{ ticket.created_at }}</p>
+          {% if request.user == ticket.author or request.user.is_superuser %}
+            <a href="{% url 'ticket_update' ticket.pk %}">Edit</a>
+            <a href="#" id="delete-ticket-btn" data-ticket-id="{{ ticket.pk }}">Delete</a>
+          {% endif %}
+          <div>
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            <button class="like-btn" data-ticket-id="{{ ticket.pk }}" data-ticket-url="{% url 'ticket_like' ticket.pk %}">Like</button>
+            <span class="likes-count" data-ticket-id="{{ ticket.pk }}">{{ ticket.likes_count }}</span>
+            <button class="dislike-btn" data-ticket-id="{{ ticket.pk }}" data-ticket-url="{% url 'ticket_dislike' ticket.pk %}">Dislike</button>
+            <span class="dislikes-count" data-ticket-id="{{ ticket.pk }}">{{ ticket.dislikes_count }}</span>
+        </a>
         </div>
         <ul>
           {% for review in ticket.reviews.all %}
+          {% if not review.is_archived %}
             <li>
               <h4>{{ review.title }}</h4>
               <p>{{ review.content }}</p>
               <a href="{% url 'review_detail' review.pk %}">Read more</a>
             </li>
+          {% endif %}
           {% endfor %}
         </ul>
       </li>
+    {% endif %}
     {% endfor %}
   </ul>
   <a href="{% url 'ticket_form' %}">New ticket</a>
+
+  <div id="delete-ticket-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Delete Ticket</h2>
+        <p>Are you sure you want to delete this ticket?</p>
+        <form id="delete-ticket-form">
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            <button type="submit">Delete</button>
+        </form>
+    </div>
+  </div>
 {% endif %}
 {% endblock %}
 {% block js %}
-{% comment %} <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> {% endcomment %}
 <script src="{% static 'js/tickets_script.js' %}"></script>
 {% endblock%}

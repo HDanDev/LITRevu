@@ -17,6 +17,11 @@ class Review(models.Model):
     is_archived = models.BooleanField(default=False)
     rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
     followed_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reviews')
+    
+    def save(self, *args, **kwargs):
+        if self.is_archived and not self.pk:
+            self.comments.all().update(is_archived=True)
+        super().save(*args, **kwargs)
         
     def __str__(self):
         return self.title

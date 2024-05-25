@@ -41,3 +41,31 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
+
+var modal = document.getElementById("delete-ticket-modal");
+var btn = document.getElementById("delete-ticket-btn");
+var span = modal.querySelector(".close");
+var form = modal.querySelector("#delete-ticket-form");
+
+btn.onclick = function() {
+    var ticketId = this.dataset.ticketId;
+    form.action = `/ticket/${ticketId}/delete/`;
+    modal.style.display = "block";
+}
+
+form.addEventListener("submit", function(event) {
+    event.preventDefault();
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", form.action, true);
+    var csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+    xhr.setRequestHeader("X-CSRFToken", csrfToken);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+            } else {
+            }
+        }
+    };
+    xhr.send();
+});

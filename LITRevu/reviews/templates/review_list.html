@@ -1,15 +1,16 @@
 {% extends 'base_template.html' %}
 {% load static %}
 
-{% block title %}Reviews{% endblock %}
+{% block title %}{{ ticket.title }} Reviews{% endblock %}
 {% block optional_css %}
 <link rel="stylesheet" href="{% static 'css/reviews_styles.css' %}">
 {% endblock %}
 
 {% block content %}
-<h1>Reviews</h1>
+<h1>Reviews for {{ ticket.title }}</h1>
 <ul>
     {% for review in reviews %}
+    {% if not review.is_archived %}
     <li>
         <a href="{% url 'review_detail' review.pk %}">{{ review.title }}</a> by {{ review.author }} {{ review.created_at|date:"F j, Y" }}
         {% if request.user.is_authenticated %}
@@ -18,7 +19,19 @@
                 <a href="{% url 'review_delete' review.pk %}">Delete</a>
             {% endif %}
         {% endif %}
+        <ul>
+          {% for comment in review.comments.all %}
+          {% if not comment.is_archived %}
+            <li>
+              <h4>{{ comment.author }}</h4>
+              <p>{{ comment.content }}</p>
+              <p>{{ comment.created_at }}</p>
+            </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
     </li>
+    {% endif %}
     {% endfor %}
 </ul>
 <a href="{% url 'review_create' %}">New Review</a>

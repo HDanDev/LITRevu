@@ -6,6 +6,8 @@
 {% endblock %}
 
 {% block content %}
+<input type="text" id="searchInput" oninput="searchUsers()">
+<ul id="searchResults"></ul>
 <ul>
     {% for user in users %}
     <li>
@@ -25,4 +27,5 @@
 
 {% block js %}
 <script src="{% static 'js/users.js' %}"></script>
+<script src="{% static 'js/user_search.js' %}"></script>
 {% endblock %}

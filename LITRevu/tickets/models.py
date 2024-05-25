@@ -15,6 +15,8 @@ class Ticket(models.Model):
     is_archived = models.BooleanField(default=False) 
     
     def save(self, *args, **kwargs):
+        if self.is_archived and not self.pk:
+            self.reviews.all().update(is_archived=True)
         super().save(*args, **kwargs)
         Tag.objects.get_or_create(name=self.title)
         

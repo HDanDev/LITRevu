@@ -4,15 +4,23 @@ from django.views.generic.edit import CreateView
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from reviews.models import Review
+from tickets.models import Ticket
 from reviews.forms import ReviewForm
 from users.models import CustomUser
 from django.contrib import messages
 from django.utils import timezone
+from django.http import HttpResponseRedirect
 
 class ReviewListView(LoginRequiredMixin, ListView):
     model = Review
     template_name = 'review_list.html'
     context_object_name = 'reviews'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ticket_pk = self.kwargs.get('pk')
+        context['ticket'] = Ticket.objects.get(pk=ticket_pk)
+        return context
     
 class ReviewDetailView(LoginRequiredMixin, DetailView):
     model = Review
@@ -60,3 +68,9 @@ class ReviewDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         review = self.get_object()
         return self.request.user.is_superuser or self.request.user == review.author
+    
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.is_archived = True
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())

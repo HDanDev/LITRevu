@@ -14,6 +14,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView
 from django.db.models import Exists, OuterRef
 from django.db.models import Case, When, BooleanField
+from django.http import JsonResponse
+from django.db.models import Q
 
 def login_view(request):
     if request.method == 'POST':
@@ -191,3 +193,14 @@ class UserDetailView(LoginRequiredMixin, DetailView):
     def get_object(self):
         queryset = self.get_queryset()
         return get_object_or_404(queryset, pk=self.kwargs['pk'])
+
+def search_users(request):
+    query = request.GET.get('query', '')
+    if query:
+        users = CustomUser.objects.filter(
+            Q(username__icontains=query) | Q(email__icontains=query)
+        )
+        data = [{'username': user.username, 'email': user.email} for user in users]
+        return JsonResponse(data, safe=False)
+    else:
+        return JsonResponse([], safe=False)
