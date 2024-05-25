@@ -20,11 +20,3 @@ class LikeDislike(models.Model):
 
     class Meta:
         unique_together = ('user', 'content_type', 'object_id')
-
-    @classmethod
-    def get_like_count(cls, content_type, object_id):
-        return cls.objects.filter(content_type=content_type, object_id=object_id, vote=cls.LIKE).count()
-
-    @classmethod
-    def get_dislike_count(cls, content_type, object_id):
-        return cls.objects.filter(content_type=content_type, object_id=object_id, vote=cls.DISLIKE).count()

@@ -39,6 +39,7 @@ urlpatterns = [
     path("", include("tickets.urls")),
     path("", include("reviews.urls")),
     path("", include("likedislikes.urls")),
+    path("", include("follows.urls")),
 ]
 
 if settings.DEBUG:

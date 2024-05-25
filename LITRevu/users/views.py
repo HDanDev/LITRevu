@@ -8,7 +8,12 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth.tokens import default_token_generator
 from users.form import CustomUserCreationForm, CustomAuthenticationForm, CustomUserEditForm, UpdateEmailForm, UpdateUsernameForm, UpdatePasswordForm
 from users.email_utils import EmailUtils
-from users.models import UserActivation, CustomUser, UserFollow
+from users.models import UserActivation, CustomUser
+from follows.models import UserFollow
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView, DetailView
+from django.db.models import Exists, OuterRef
+from django.db.models import Case, When, BooleanField
 
 def login_view(request):
     if request.method == 'POST':
@@ -100,23 +105,25 @@ def profile_view(request):
             form.save()
             messages.success(request, "Your profile has been successfully updated")
             return redirect('profile')
+        else:
+            messages.error(request, 'An error occurred while updating your profile')
     else:
         form = CustomUserEditForm(instance=request.user)
-        messages.error(request, 'An error occurered while updating your profile')
-    return render(request, 'profile.html', {'form': form})
 
-@login_required
-def user_profile_view(request):
-    if request.method == 'POST':
-        form = CustomUserEditForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Your profile has been successfully updated")
-            return redirect('profile')
-    else:
-        form = CustomUserEditForm(instance=request.user)
-        messages.error(request, 'An error occurered while updating your profile')
-    return render(request, 'profile.html', {'form': form})
+    followers_status = Case(
+        When(followers__follower=request.user, followers__status=True, then=True),
+        default=False,
+        output_field=BooleanField()
+    )
+       
+    followed_users = CustomUser.objects.filter(
+        followers__follower=request.user,
+        followers__status=True
+    ).annotate(
+        followers_status=followers_status
+    )
+
+    return render(request, 'profile.html', {'form': form, 'followed_users': followed_users})
 
 @login_required
 def update_email(request):
@@ -155,20 +162,32 @@ def update_password(request):
         form = UpdatePasswordForm(request.user)
     return render(request, 'update_password.html', {'form': form})
 
-@login_required
-def follow_user(request, user_id):
-    followed_user = get_object_or_404(CustomUser, pk=user_id)
-    user_follow, created = UserFollow.objects.get_or_create(
-        follower=request.user,
-        followed=followed_user
-    )
-    return redirect('user_profile', user_id=followed_user.pk)
+class UserListView(LoginRequiredMixin, ListView):
+    model = CustomUser
+    template_name = 'user_list.html'
+    context_object_name = 'users'
 
-@login_required
-def unfollow_user(request, user_id):
-    followed_user = get_object_or_404(CustomUser, pk=user_id)
-    UserFollow.objects.filter(
-        follower=request.user,
-        followed=followed_user
-    ).delete()
-    return redirect('user_profile', user_id=followed_user.pk)
+    def get_queryset(self):
+        current_user = self.request.user
+        return CustomUser.objects.exclude(id=current_user.id).annotate(
+            is_followed_by_current_user=Exists(
+                UserFollow.objects.filter(followed=OuterRef('pk'), follower=current_user, status=True)
+            )
+        )
+
+class UserDetailView(LoginRequiredMixin, DetailView):
+    model = CustomUser
+    template_name = 'user_detail.html'
+    context_object_name = 'user'
+
+    def get_queryset(self):
+        current_user = self.request.user
+        return CustomUser.objects.exclude(id=current_user.id).annotate(
+            is_followed_by_current_user=Exists(
+                UserFollow.objects.filter(followed=OuterRef('pk'), follower=current_user, status=True)
+            )
+        )
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        return get_object_or_404(queryset, pk=self.kwargs['pk'])

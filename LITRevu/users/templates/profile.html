@@ -42,6 +42,24 @@
     </div>
     <button type="submit">Save changes</button>
 </form>
+<div>
+{% for user in followed_users %}
+<li>
+    <a href="{% url 'user_detail' user.pk %}">{{ user.username }}</a>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <button class="follow-btn" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}">
+        {% if user.followers_status %}
+            Unfollow
+        {% else %}
+            Follow
+        {% endif %}
+    </button>
+</li>
+{% endfor %}
+</div>
 {% endblock %}
 
-{% block js %}<script src="{% static 'js/profile_picture_script.js' %}"></script>{% endblock %}
+{% block js %}
+<script src="{% static 'js/profile_picture_script.js' %}"></script>
+<script src="{% static 'js/users.js' %}"></script>
+{% endblock %}

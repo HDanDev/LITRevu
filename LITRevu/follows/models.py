@@ -1,9 +1,12 @@
 from django.db import models
 from users.models import CustomUser
 
-class UserFollows(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='following')
-    followed_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='followed_by')
+class UserFollow(models.Model):
+    follower = models.ForeignKey(CustomUser, related_name='following', on_delete=models.CASCADE)
+    followed = models.ForeignKey(CustomUser, related_name='followers', on_delete=models.CASCADE)
+    status = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ('user', 'followed_user')
+        unique_together = ('follower', 'followed')

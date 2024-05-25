@@ -1,0 +1,28 @@
+{% extends 'base_template.html' %}
+{% load static %}
+{% block title %}LITRevu - Users{% endblock %}
+{% block optional_css %}
+<link rel="stylesheet" href="{% static 'css/users_styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<ul>
+    {% for user in users %}
+    <li>
+        <a href="{% url 'user_detail' user.pk %}">{{ user.username }}</a>
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        <button class="follow-btn" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}">
+            {% if user.is_followed_by_current_user %}
+                Unfollow
+            {% else %}
+                Follow
+            {% endif %}
+        </button>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'js/users.js' %}"></script>
+{% endblock %}
