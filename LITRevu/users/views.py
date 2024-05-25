@@ -8,7 +8,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth.tokens import default_token_generator
 from users.form import CustomUserCreationForm, CustomAuthenticationForm, CustomUserEditForm, UpdateEmailForm, UpdateUsernameForm, UpdatePasswordForm
 from users.email_utils import EmailUtils
-from users.models import UserActivation, CustomUser
+from users.models import UserActivation, CustomUser, UserFollow
 
 def login_view(request):
     if request.method == 'POST':
@@ -106,6 +106,19 @@ def profile_view(request):
     return render(request, 'profile.html', {'form': form})
 
 @login_required
+def user_profile_view(request):
+    if request.method == 'POST':
+        form = CustomUserEditForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your profile has been successfully updated")
+            return redirect('profile')
+    else:
+        form = CustomUserEditForm(instance=request.user)
+        messages.error(request, 'An error occurered while updating your profile')
+    return render(request, 'profile.html', {'form': form})
+
+@login_required
 def update_email(request):
     if request.method == 'POST':
         form = UpdateEmailForm(request.POST, instance=request.user)
@@ -141,3 +154,21 @@ def update_password(request):
     else:
         form = UpdatePasswordForm(request.user)
     return render(request, 'update_password.html', {'form': form})
+
+@login_required
+def follow_user(request, user_id):
+    followed_user = get_object_or_404(CustomUser, pk=user_id)
+    user_follow, created = UserFollow.objects.get_or_create(
+        follower=request.user,
+        followed=followed_user
+    )
+    return redirect('user_profile', user_id=followed_user.pk)
+
+@login_required
+def unfollow_user(request, user_id):
+    followed_user = get_object_or_404(CustomUser, pk=user_id)
+    UserFollow.objects.filter(
+        follower=request.user,
+        followed=followed_user
+    ).delete()
+    return redirect('user_profile', user_id=followed_user.pk)
