@@ -38,6 +38,7 @@ urlpatterns = [
     path("", include("users.urls")),
     path("", include("tickets.urls")),
     path("", include("reviews.urls")),
+    path("", include("likedislikes.urls")),
 ]
 
 if settings.DEBUG:

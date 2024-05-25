@@ -14,8 +14,12 @@ class TicketListView(LoginRequiredMixin, ListView):
     context_object_name = 'tickets'
     
     def get_queryset(self):
-        return Ticket.objects.prefetch_related('reviews').filter(is_archived=False).distinct()
-
+        tickets = Ticket.objects.prefetch_related('reviews').filter(is_archived=False).distinct()
+        for ticket in tickets:
+            ticket.likes_count = ticket.get_likes_count()
+            ticket.dislikes_count = ticket.get_dislikes_count()
+        return tickets
+    
 class TicketCreateView(LoginRequiredMixin, CreateView):
     model = Ticket
     form_class = TicketForm

@@ -3,15 +3,25 @@
 
 {% block title %}Ticket List{% endblock %}
 {% block content %}
-  <h2>Tickets</h2>
+{% if request.user.is_authenticated %}
+<h2>Tickets</h2>
   <ul>
     {% for ticket in tickets %}
       <li>
         <h3>{{ ticket.title }}</h3>
         <p>{{ ticket.description }}</p>
         <p>Created at: {{ ticket.created_at }}</p>
-        <a href="{% url 'ticket_update' ticket.pk %}">Edit</a>
-        <a href="{% url 'ticket_delete' ticket.pk %}">Delete</a>
+        {% if request.user == review.author or request.user.is_superuser %}
+          <a href="{% url 'ticket_update' ticket.pk %}">Edit</a>
+          <a href="{% url 'ticket_delete' ticket.pk %}">Delete</a>
+        {% endif %}
+        <div>
+          <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+          <button class="like-btn" data-ticket-id="{{ ticket.pk }}" data-ticket-url="{% url 'ticket_like' ticket.pk %}">Like</button>
+          <span class="likes-count" data-ticket-id="{{ ticket.pk }}">{{ ticket.likes_count }}</span>
+          <button class="dislike-btn" data-ticket-id="{{ ticket.pk }}" data-ticket-url="{% url 'ticket_dislike' ticket.pk %}">Dislike</button>
+          <span class="dislikes-count" data-ticket-id="{{ ticket.pk }}">{{ ticket.dislikes_count }}</span>
+        </div>
         <ul>
           {% for review in ticket.reviews.all %}
             <li>
@@ -25,4 +35,9 @@
     {% endfor %}
   </ul>
   <a href="{% url 'ticket_form' %}">New ticket</a>
+{% endif %}
 {% endblock %}
+{% block js %}
+{% comment %} <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> {% endcomment %}
+<script src="{% static 'js/tickets_script.js' %}"></script>
+{% endblock%}
