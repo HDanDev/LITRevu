@@ -34,5 +34,5 @@
     {% endif %}
     {% endfor %}
 </ul>
-<a href="{% url 'review_create' %}">New Review</a>
+<a href="{% url 'review_create' ticket.pk %}">New Review</a>
 {% endblock %}

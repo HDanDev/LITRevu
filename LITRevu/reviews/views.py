@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.contrib.auth import login, logout
+from django.shortcuts import get_object_or_404
 from django.views.generic.edit import CreateView
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
@@ -26,6 +27,12 @@ class ReviewDetailView(LoginRequiredMixin, DetailView):
     model = Review
     template_name = 'review_detail.html'
     context_object_name = 'review'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        review = self.get_object()
+        context['ticket'] = review.ticket
+        return context
     
 class ReviewCreateView(LoginRequiredMixin, CreateView):
     model = Review
@@ -34,21 +41,28 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('review_list')  
     guest_user = None
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ticket_pk = self.kwargs.get('pk')
+        context['ticket'] = Ticket.objects.get(pk=ticket_pk)
+        return context
+
     def dispatch(self, request, *args, **kwargs):
-        if request.method == 'POST':
-            if not request.user.is_authenticated:
-                self.guest_user = CustomUser.objects.get_or_create(username='guest')[0]
-                login(request, self.guest_user)
+        if request.method == 'POST' and not request.user.is_authenticated:
+            self.guest_user = CustomUser.objects.get_or_create(username='guest')[0]
+            login(request, self.guest_user)
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         form.instance.author = self.request.user if self.request.user.is_authenticated else self.guest_user
+        form.instance.ticket = get_object_or_404(Ticket, pk=self.kwargs['pk'])
         return super().form_valid(form)
 
     def get_success_url(self):
+        ticket_pk = self.kwargs['pk']
         if self.guest_user:
             logout(self.request)
-        return super().get_success_url()
+        return reverse_lazy('review_list', kwargs={'pk': ticket_pk})
     
 class ReviewUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Review

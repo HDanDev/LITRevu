@@ -16,5 +16,5 @@
     <a href="{% url 'review_delete' review.pk %}">Delete</a>
   {% endif %}
 {% endif %}
-<a href="{% url 'review_list' %}">Back to Reviews</a>
+<a href="{% url 'review_list' ticket.pk %}">Back to Reviews</a>
 {% endblock %}

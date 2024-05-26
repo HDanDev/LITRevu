@@ -6,10 +6,12 @@ from comments.models import Comment
 
 class ReviewForm(forms.ModelForm):
     tags = forms.CharField(required=False, help_text='Enter tags separated by commas.')
-        
+    RATING_CHOICES = [(i, str(i)) for i in range(1, 6)]  
+    rating = forms.ChoiceField(choices=RATING_CHOICES, widget=forms.RadioSelect)
+    
     class Meta:
         model = Review
-        fields = ['title', 'content', 'cover_image', 'miniature_image', 'tags']
+        fields = ['title', 'content', 'rating','cover_image', 'miniature_image', 'tags']
         
     def save(self, *args, **kwargs):
         instance = super().save(*args, **kwargs)

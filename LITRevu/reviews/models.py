@@ -16,7 +16,6 @@ class Review(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='reviews')
     is_archived = models.BooleanField(default=False)
     rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
-    followed_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reviews')
     
     def save(self, *args, **kwargs):
         if self.is_archived and not self.pk:
