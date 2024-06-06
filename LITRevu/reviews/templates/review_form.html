@@ -5,9 +5,11 @@
 {% block optional_css %}
 <link rel="stylesheet" href="{% static 'css/reviews_styles.css' %}">
 {% endblock %}
+{% block content_title %}
+{% if form.instance.pk %}Edit{% else %}New{% endif %} Review
+{% endblock %}
 
 {% block content %}
-<h1>{% if form.instance.pk %}Edit{% else %}New{% endif %} Review</h1>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.non_field_errors }}

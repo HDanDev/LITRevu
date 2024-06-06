@@ -5,9 +5,11 @@
 {% block optional_css %}
 <link rel="stylesheet" href="{% static 'css/reviews_styles.css' %}">
 {% endblock %}
+{% block content_title %}
+Reviews for {{ ticket.title }}
+{% endblock %}
 
 {% block content %}
-<h1>Reviews for {{ ticket.title }}</h1>
 <ul>
     {% for review in reviews %}
     {% if not review.is_archived %}

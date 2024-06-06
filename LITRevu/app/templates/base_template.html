@@ -12,6 +12,7 @@
     <meta property="og:url" content="https://litrevu.dhannay.com/">
     <meta property="og:type" content="website">
     <title>{% block title %}LITRevu{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/variables-wt.css' %}">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     {% block optional_css %}{% endblock %}
     <link rel="apple-touch-icon" href="{% static 'images/litrevulogotitleless.PNG' %}">
@@ -24,37 +25,45 @@
 <header>
     <!-- Navigation menu -->
     <nav>
-        <ul>
+        <ul class="naviagtion-menu">
             {% if user.is_authenticated %}
-            <li><a href="/">Home</a></li>
+            <li class="navigation-menu-left-item"><a href="/">Home</a></li>
             <li><a href="/profile/">Profile</a></li>
             <li><a href="/logout/">Logout</a></li>
             <li><a href="/users/">Users</a></li>
             {% else %}
-            <li><a href="/login/">Login</a></li>
+            <li class="navigation-menu-right-item"><a href="/login/">Login</a></li>
             <li><a href="/register/">Register</a></li>
             {% endif %}
         </ul>
     </nav>
 </header>
 
-<main>
+<div class="main-layout">
     {% if messages %}
         <ul class="messages">
             {% for message in messages %}
                 <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
             {% endfor %}
         </ul>
-    {% endif %}
-    <!-- Content specific to each page will be inserted here -->
-    {% block content %}
-    {% endblock %}
-</main>
+    {% endif %}   
+    <main class="main-container">
+        <!-- Content specific to each page will be inserted here -->
+        <h2 class="main-title">
+            {% block content_title %}
+            {% endblock %}
+        </h2>
+        <div class="main-content">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
 
-<footer>
-    <!-- Footer content -->
-    <p>&copy; 2024 My Website</p>
-</footer>
+    <footer>
+        <!-- Footer content -->
+        <p>&copy; LITRevu Powered by Django, HDanDev 2024</p>
+    </footer>
+</div>
 
 <!-- Scripts --> 
 <Scripts></Scripts>

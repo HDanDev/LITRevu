@@ -3,11 +3,13 @@
 
 {% block title %}New Ticket{% endblock %}
 {% block optional_css %}
-<link rel="stylesheet" href="{% static 'css/reviews_styles.css' %}">
+<link rel="stylesheet" href="{% static 'css/tickets_styles.css' %}">
+{% endblock %}
+{% block content_title %}
+Create Ticket
 {% endblock %}
 
 {% block content %}
-  <h2>Create Ticket</h2>
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.non_field_errors }}

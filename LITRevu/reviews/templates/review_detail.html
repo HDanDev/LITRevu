@@ -5,9 +5,11 @@
 {% block optional_css %}
 <link rel="stylesheet" href="{% static 'css/reviews_styles.css' %}">
 {% endblock %}
+{% block content_title %}
+{{ review.title }}
+{% endblock %}
 
 {% block content %}
-<h1>{{ review.title }}</h1>
 <p>{{ review.content }}</p>
 <p>By {{ review.author.username|default:"Anonymous" }} on {{ review.created_at }}</p>
 {% if request.user.is_authenticated %}

@@ -4,9 +4,11 @@
 {% block optional_css %}
 <link rel="stylesheet" href="{% static 'css/users_styles.css' %}">
 {% endblock %}
+{% block content_title %}
+{{ user.username }}
+{% endblock %}
 
 {% block content %}
-<h2>{{ user.username }}</h2>
 <p>Email: {{ user.email }}</p>
 {% if user != request.user %}
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">

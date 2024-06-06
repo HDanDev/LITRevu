@@ -4,9 +4,11 @@
 {% block optional_css %}
 <link rel="stylesheet" href="{% static 'css/users_styles.css' %}">
 {% endblock %}
+{% block content_title %}
+Edit Profile
+{% endblock %}
 
 {% block content %}
-<h2>Edit Profile</h2>
 <div class="profile-section">
     <span>Email: {{ user.email }}</span>
     <a href="{% url 'update_email' %}">Change Email</a>

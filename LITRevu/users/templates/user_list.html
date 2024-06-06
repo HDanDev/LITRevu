@@ -4,6 +4,9 @@
 {% block optional_css %}
 <link rel="stylesheet" href="{% static 'css/users_styles.css' %}">
 {% endblock %}
+{% block content_title %}
+Users
+{% endblock %}
 
 {% block content %}
 <input type="text" id="searchInput" oninput="searchUsers()">
