@@ -14,6 +14,7 @@
     <title>{% block title %}LITRevu{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/variables-wt.css' %}">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/icomoon.css' %}">
     {% block optional_css %}{% endblock %}
     <link rel="apple-touch-icon" href="{% static 'images/litrevulogotitleless.PNG' %}">
     <link rel="icon" href="{% static 'images/litrevulogotitleless.PNG' %}" type="image/x-icon">
@@ -27,13 +28,13 @@
     <nav>
         <ul class="naviagtion-menu">
             {% if user.is_authenticated %}
-            <li class="navigation-menu-left-item"><a href="/">Home</a></li>
-            <li><a href="/profile/">Profile</a></li>
-            <li><a href="/logout/">Logout</a></li>
-            <li><a href="/users/">Users</a></li>
+            <li class="navigation-menu-left-item"><a href="/"><i class="icon-books"></i>Home</a></li>
+            <li><a href="/profile/"><i class="icon-user"></i>Profile</a></li>
+            <li><a href="/logout/"><i class="icon-switch"></i>Logout</a></li>
+            <li><a href="/users/"><i class="icon-users"></i>Users</a></li>
             {% else %}
-            <li class="navigation-menu-right-item"><a href="/login/">Login</a></li>
-            <li><a href="/register/">Register</a></li>
+            <li class="navigation-menu-right-item"><a href="/login/"><i class="icon-unlocked"></i>Login</a></li>
+            <li><a href="/register/"><i class="icon-quill"></i>Register</a></li>
             {% endif %}
         </ul>
     </nav>
@@ -47,23 +48,20 @@
             {% endfor %}
         </ul>
     {% endif %}   
-    <main class="main-container">
-        <!-- Content specific to each page will be inserted here -->
-        <h2 class="main-title">
-            {% block content_title %}
-            {% endblock %}
-        </h2>
-        <div class="main-content">
-            {% block content %}
-            {% endblock %}
-        </div>
-    </main>
+    {% block main_content %}
+    {% endblock %}
 
     <footer>
+        {% block credits %}
+        <p>Illustration made by macrovector&copy; </p>
+        {% endblock %}
         <!-- Footer content -->
         <p>&copy; LITRevu Powered by Django, HDanDev 2024</p>
     </footer>
 </div>
+
+{% block modals %}
+{% endblock %}
 
 <!-- Scripts --> 
 <Scripts></Scripts>

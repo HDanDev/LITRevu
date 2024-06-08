@@ -1,4 +1,4 @@
-{% extends 'base_template.html' %}
+{% extends 'single_page_template.html' %}
 {% load static %}
 {% block title %}LITRevu - Login{% endblock %}
 {% block optional_css %}
@@ -28,6 +28,6 @@ Login
         {% if form.non_field_errors %}
             <div class="error">{{ form.non_field_errors }}</div>
         {% endif %}
-        <button type="submit">Login</button>
+        <button type="submit"><i class="icon-checkmark"></i></button>
     </form>
 {% endblock %}

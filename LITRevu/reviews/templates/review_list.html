@@ -1,4 +1,4 @@
-{% extends 'base_template.html' %}
+{% extends 'single_page_template.html' %}
 {% load static %}
 
 {% block title %}{{ ticket.title }} Reviews{% endblock %}
@@ -17,8 +17,8 @@ Reviews for {{ ticket.title }}
         <a href="{% url 'review_detail' review.pk %}">{{ review.title }}</a> by {{ review.author }} {{ review.created_at|date:"F j, Y" }}
         {% if request.user.is_authenticated %}
             {% if request.user == review.author or request.user.is_superuser %}
-                <a href="{% url 'review_update' review.pk %}">Edit</a>
-                <a href="{% url 'review_delete' review.pk %}">Delete</a>
+                <a href="{% url 'review_update' review.pk %}"><i class="icon-pencil"></i></a>
+                <a href="{% url 'review_delete' review.pk %}"><i class="icon-bin"></i></a>
             {% endif %}
         {% endif %}
         <ul>
@@ -36,5 +36,5 @@ Reviews for {{ ticket.title }}
     {% endif %}
     {% endfor %}
 </ul>
-<a href="{% url 'review_create' ticket.pk %}">New Review</a>
+<a href="{% url 'review_create' ticket.pk %}"><i class="icon-plus"></i><i class="icon-pen"></i></a>
 {% endblock %}

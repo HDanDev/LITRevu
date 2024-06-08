@@ -1,4 +1,4 @@
-{% extends 'base_template.html' %}
+{% extends 'single_page_template.html' %}
 {% load static %}
 {% block title %}LITRevu - Edit Email{% endblock %}
 {% block optional_css %}
@@ -12,6 +12,6 @@ Edit Email
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Update Email</button>
+    <button type="submit"><i class="icon-checkmark"></i></button>
 </form>
 {% endblock %}

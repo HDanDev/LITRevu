@@ -1,5 +1,6 @@
 :root {
     --menu-background-colour: #333;
-    --main-text-colour: white;
+    --menu-text-colour: white;
+    --main-text-colour: #333;
     --main-background-colour: wheat;
 }

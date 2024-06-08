@@ -1,4 +1,4 @@
-{% extends 'base_template.html' %}
+{% extends 'single_page_template.html' %}
 {% load static %}
 {% block title %}LITRevu - Users{% endblock %}
 {% block optional_css %}
@@ -18,9 +18,9 @@ Users
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
         <button class="follow-btn" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}">
             {% if user.is_followed_by_current_user %}
-                Unfollow
+                <i class="icon-user-minus"></i>
             {% else %}
-                Follow
+                <i class="icon-user-plus"></i>
             {% endif %}
         </button>
     </li>

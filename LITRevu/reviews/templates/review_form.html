@@ -1,4 +1,4 @@
-{% extends 'base_template.html' %}
+{% extends 'single_page_template.html' %}
 {% load static %}
 
 {% block title %}New Review{% endblock %}
@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="{% static 'css/reviews_styles.css' %}">
 {% endblock %}
 {% block content_title %}
-{% if form.instance.pk %}Edit{% else %}New{% endif %} Review
+{% if form.instance.pk %}<i class="icon-pencil"></i><i class="icon-newspaper"></i>{% else %}<i class="icon-plus"></i><i class="icon-newspaper">{% endif %} Review
 {% endblock %}
 
 {% block content %}
@@ -59,7 +59,7 @@
         {{ form.tags }}
         {{ form.tags.errors }}
     </div>
-    <button type="submit">{% if form.instance.pk %}Update{% else %}Create{% endif %}</button>
+    <button type="submit"><i class="icon-checkmark"></i></button>
 </form>
-<a href="{% url 'review_list' ticket.pk %}">Back to Reviews</a>
+<a href="{% url 'review_list' ticket.pk %}"><i class="icon-arrow-left2"></i><i class="icon-file-text"></i></a>
 {% endblock %}

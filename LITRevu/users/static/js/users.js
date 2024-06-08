@@ -16,9 +16,9 @@ document.addEventListener("DOMContentLoaded", function() {
             .then(response => response.json())
             .then(data => {
                 if (data.status) {
-                    this.textContent = 'Unfollow';
+                    this.innerHTML = '<i class="icon-user-minus"></i>';
                 } else {
-                    this.textContent = 'Follow';
+                    this.innerHTML = '<i class="icon-user-plus"></i>';
                 }
             })
             .catch(error => console.error('Error:', error));

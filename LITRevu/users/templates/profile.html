@@ -1,9 +1,10 @@
-{% extends 'base_template.html' %}
+{% extends 'double_page_template.html' %}
 {% load static %}
 {% block title %}LITRevu - Profile{% endblock %}
 {% block optional_css %}
 <link rel="stylesheet" href="{% static 'css/users_styles.css' %}">
 {% endblock %}
+
 {% block content_title %}
 Edit Profile
 {% endblock %}
@@ -11,14 +12,21 @@ Edit Profile
 {% block content %}
 <div class="profile-section">
     <span>Email: {{ user.email }}</span>
-    <a href="{% url 'update_email' %}">Change Email</a>
+    <a href="{% url 'update_email' %}"><i class="icon-pencil"></i></a>
 </div>
 
 <div class="profile-section">
     <span>Username: {{ user.username }}</span>
-    <a href="{% url 'update_username' %}">Change Username</a>
+    <a href="{% url 'update_username' %}"><i class="icon-pencil"></i></a>
 </div>
-<li><a href="{% url 'update_password' %}">Change Password</a></li>
+
+<div class="profile-section">
+    <a href="{% url 'update_password' %}">
+        <span>Change Password</span>
+        <i class="icon-pencil"></i>
+    </a>
+</div>
+
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="form-group">
@@ -35,15 +43,22 @@ Edit Profile
             <div class="error">{{ form.profile_picture.errors }}</div>
         {% endif %}
     </div>
-    <div class="form-group">
+    {% comment %} <div class="form-group">
         <label for="{{ form.date_of_birth.id_for_label }}">Date of Birth:</label>
         {{ form.date_of_birth }}
         {% if form.date_of_birth.errors %}
             <div class="error">{{ form.date_of_birth.errors }}</div>
         {% endif %}
-    </div>
-    <button type="submit">Save changes</button>
+    </div> {% endcomment %}
+    <button type="submit"><i class="icon-checkmark"></i></button>
 </form>
+{% endblock %}
+
+{% block second_page_title %}
+People you follow
+{% endblock %}
+
+{% block second_page_content %}
 <div>
 {% for user in followed_users %}
 <li>
@@ -51,9 +66,9 @@ Edit Profile
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
     <button class="follow-btn" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}">
         {% if user.followers_status %}
-            Unfollow
+            <i class="icon-user-minus"></i>
         {% else %}
-            Follow
+            <i class="icon-user-plus"></i>
         {% endif %}
     </button>
 </li>

@@ -1,4 +1,4 @@
-{% extends 'base_template.html' %}
+{% extends 'single_page_template.html' %}
 {% load static %}
 
 {% block title %}Delete Ticket{% endblock %}
@@ -11,7 +11,7 @@
 <p>Are you sure you want to delete "{{ ticket.title }}"?</p>
 <form method="post">
     {% csrf_token %}
-    <button type="submit">Confirm</button>
+    <button type="submit"><i class="icon-checkmark"></i></button>
 </form>
-<a href="{% url 'ticket_list' %}">Cancel</a>
+<a href="{% url 'ticket_list' %}"><i class="icon-cross"></i></a>
 {% endblock %}

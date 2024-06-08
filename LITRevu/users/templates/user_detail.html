@@ -1,4 +1,4 @@
-{% extends 'base_template.html' %}
+{% extends 'double_page_template.html' %}
 {% load static %}
 {% block title %}LITRevu - {{ user.username }}{% endblock %}
 {% block optional_css %}
@@ -14,13 +14,36 @@
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
     <button class="follow-btn" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}">
         {% if user.is_followed_by_current_user %}
-            Unfollow
+            <i class="icon-user-minus"></i>
         {% else %}
-            Follow
+            <i class="icon-user-plus"></i>
         {% endif %}
     </button>
 {% endif %}
 {% endblock %}
+
+{% block second_page_title %}
+People {{ user.username }} follows
+{% endblock %}
+
+{% block second_page_content %}
+<div>
+{% for user in followed_users %}
+<li>
+    <a href="{% url 'user_detail' user.pk %}">{{ user.username }}</a>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <button class="follow-btn" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}">
+        {% if user.followers_status %}
+            <i class="icon-user-minus"></i>
+        {% else %}
+            <i class="icon-user-minus"></i>
+        {% endif %}
+    </button>
+</li>
+{% endfor %}
+</div>
+{% endblock %}
+
 {% block js %}
 <script src="{% static 'js/users.js' %}"></script>
 {% endblock %}
