@@ -16,7 +16,7 @@ Users
     <li>
         <a href="{% url 'user_detail' user.pk %}">{{ user.username }}</a>
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-        <button class="follow-btn" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}">
+        <button class="follow-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}">
             {% if user.is_followed_by_current_user %}
                 <i class="icon-user-minus"></i>
             {% else %}

@@ -13,7 +13,7 @@ Delete Review
 <p>Are you sure you want to delete "{{ review.title }}"?</p>
 <form method="post">
     {% csrf_token %}
-    <button type="submit"><i class="icon-checkmark"></i></button>
+    <button type="submit" class="icon-hover-box"><i class="icon-checkmark"></i></button>
 </form>
 <a href="{% url 'review_list' %}">Cancel</a>
 {% endblock %}

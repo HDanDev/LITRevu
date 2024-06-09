@@ -11,23 +11,29 @@ Edit Profile
 
 {% block content %}
 <div class="profile-section">
-    <span>Email: {{ user.email }}</span>
-    <button type="button" onclick="openModal('updateEmailModal')"><i class="icon-pencil"></i></button>
+    <span>
+        Email: {{ user.email }}
+        <button type="button" onclick="openModal('updateEmailModal')" class="icon-hover-box"><i class="icon-pencil"></i></button>
+    </span>
 </div>
 
 <div class="profile-section">
-    <span>Username: {{ user.username }}</span>
-    <button type="button" onclick="openModal('updateUsernameModal')"><i class="icon-pencil"></i></button>
+    <span>
+        Username: {{ user.username }}
+        <button type="button" onclick="openModal('updateUsernameModal')" class="icon-hover-box"><i class="icon-pencil"></i></button>
+    </span>
 </div>
 
 <div class="profile-section">
-    <button type="button" onclick="openModal('updatePasswordModal')">
-        <span>Change Password</span>
-        <i class="icon-pencil"></i>
+    <button type="button" onclick="openModal('updatePasswordModal')" class="icon-hover-box">
+        <span>
+            Change Password
+            <i class="icon-pencil"></i>
+        </span>
     </button>
 </div>
 
-<form method="post" id="updateProfileForm" method="post" onsubmit="submitForm(event, 'updateProfileForm', false)" action="{% url 'update_profile' %}">
+<form method="post" id="updateProfileForm" method="post" action="{% url 'update_profile' %}">
     {% csrf_token %}
     <div class="form-group">
         <label for="{{ form.profile_picture.id_for_label }}">Profile Picture:</label>
@@ -50,7 +56,7 @@ Edit Profile
             <div class="error">{{ form.date_of_birth.errors }}</div>
         {% endif %}
     </div> {% endcomment %}
-    <button type="submit"><i class="icon-checkmark"></i></button>
+    <button type="submit" class="icon-hover-box"><i class="icon-checkmark"></i></button>
 </form>
 {% endblock %}
 
@@ -64,7 +70,7 @@ People you follow
 <li>
     <a href="{% url 'user_detail' user.pk %}">{{ user.username }}</a>
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-    <button class="follow-btn" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}">
+    <button class="follow-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}">
         {% if user.followers_status %}
             <i class="icon-user-minus"></i>
         {% else %}
@@ -78,46 +84,66 @@ People you follow
 
 {% block modals %}
 <div id="updateEmailModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal('updateEmailModal')">&times;</span>
-        <h2>Edit Email</h2>
-        <form id="updateEmailForm" method="post" onsubmit="submitForm(event, 'updateEmailForm')" action="{% url 'update_email' %}">
-            {% csrf_token %}
-            {{ email_form.as_p }}
-            <button type="submit" name="update_email">Submit</button>
-        </form>
+    <div class="notepad margin-auto">
+        <div class="page right">
+            <div class="page-content">
+                <h2 class="main-title">Edit Email</h2>
+                <div class="main-content">
+                    <form id="updateEmailForm" method="post" onsubmit="submitForm(event, 'updateEmailForm', callbackCloseModal)" action="{% url 'update_email' %}">
+                        {% csrf_token %}
+                        {{ email_form.as_p }}
+                        <button type="submit" name="update_email" class="icon-hover-box"><i class="icon-checkmark"></i></button>
+                    </form>
+                </div>
+            </div>
+            <i class="icon-cross close icon-hover-box" onclick="closeModal('updateEmailModal')"></i>
+        </div>
+        <div class="spiral single-page-spiral"></div>
     </div>
 </div>
 
-<!-- Username Modal -->
 <div id="updateUsernameModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal('updateUsernameModal')">&times;</span>
-        <h2>Edit Username</h2>
-        <form id="updateUsernameForm" method="post" onsubmit="submitForm(event, 'updateUsernameForm')" action="{% url 'update_username' %}">
-            {% csrf_token %}
-            {{ username_form.as_p }}
-            <button type="submit" name="update_username">Submit</button>
-        </form>
+    <div class="notepad margin-auto">
+        <div class="page right">
+            <div class="page-content">
+                <h2 class="main-title">Edit Username</h2>
+                <div class="main-content">
+                    <form id="updateUsernameForm" method="post" onsubmit="submitForm(event, 'updateUsernameForm', callbackCloseModal, '{% url 'update_username' %}')" >
+                        {% csrf_token %}
+                        {{ username_form.as_p }}
+                        <button type="submit" name="update_username" class="icon-hover-box"><i class="icon-checkmark"></i></button>
+                    </form>
+                </div>
+            </div>
+            <i class="icon-cross close icon-hover-box" onclick="closeModal('updateUsernameModal')"></i>
+        </div>
+        <div class="spiral single-page-spiral"></div>
     </div>
 </div>
 
-<!-- Password Modal -->
 <div id="updatePasswordModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal('updatePasswordModal')">&times;</span>
-        <h2>Edit Password</h2>
-        <form id="updatePasswordForm" method="post" onsubmit="submitForm(event, 'updatePasswordForm')" action="{% url 'update_password' %}">
-            {% csrf_token %}
-            {{ password_form.as_p }}
-            <button type="submit" name="update_password">Submit</button>
-        </form>
+    <div class="notepad margin-auto">
+        <div class="page right">
+            <div class="page-content">
+                <h2 class="main-title">Edit Password</h2>
+                <div class="main-content">
+                    <form id="updatePasswordForm" method="post" onsubmit="submitForm(event, 'updatePasswordForm', callbackCloseModal)" action="{% url 'update_password' %}">
+                        {% csrf_token %}
+                        {{ password_form.as_p }}
+                        <button type="submit" name="update_password" class="icon-hover-box"><i class="icon-checkmark"></i></button>
+                    </form>
+                </div>
+            </div>
+            <i class="icon-cross close icon-hover-box" onclick="closeModal('updatePasswordModal')"></i>
+        </div>
+        <div class="spiral single-page-spiral"></div>
     </div>
 </div>
 {% endblock %}
 
 {% block js %}
 <script src="{% static 'js/profile_picture_script.js' %}"></script>
+<Script src="{% static 'js/main_app_scripts.js' %}"></Script>
 <script src="{% static 'js/users.js' %}"></script>
-<script src="{% static 'js/users_script.js' %}"></script>
+<script src="{% static 'js/user_profile_script.js' %}"></script>
 {% endblock %}

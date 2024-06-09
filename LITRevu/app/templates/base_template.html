@@ -15,7 +15,8 @@
     <link rel="stylesheet" href="{% static 'css/variables-wt.css' %}">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/icomoon.css' %}">
-    {% block optional_css %}{% endblock %}
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+{% block optional_css %}{% endblock %}
     <link rel="apple-touch-icon" href="{% static 'images/litrevulogotitleless.PNG' %}">
     <link rel="icon" href="{% static 'images/litrevulogotitleless.PNG' %}" type="image/x-icon">
     <meta name="robots" content="index, follow">
@@ -64,7 +65,6 @@
 {% endblock %}
 
 <!-- Scripts --> 
-<Scripts></Scripts>
 {% block js %}
 {% endblock %}
 </body>

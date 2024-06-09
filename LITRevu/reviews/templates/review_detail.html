@@ -9,8 +9,8 @@
 {{ review.title }}
 {% if request.user.is_authenticated %}
   {% if request.user == review.author or request.user.is_superuser %}
-    <a href="{% url 'review_update' review.pk %}"><i class="icon-pencil"></i></a>
-    <a href="{% url 'review_delete' review.pk %}"><i class="icon-bin"></i></a>
+    <a href="{% url 'review_update' review.pk %}" class="icon-hover-box"><i class="icon-pencil"></i></a>
+    <a href="{% url 'review_delete' review.pk %}" class="icon-hover-box"><i class="icon-bin"></i></a>
   {% endif %}
 {% endif %}
 {% endblock %}
@@ -18,5 +18,5 @@
 {% block content %}
 <p>{{ review.content }}</p>
 <p>By {{ review.author.username|default:"Anonymous" }} on {{ review.created_at }}</p>
-<a href="{% url 'review_list' ticket.pk %}"><i class="icon-arrow-left2"></i><i class="icon-file-text"></i></a>
+<a href="{% url 'review_list' ticket.pk %}" class="icon-hover-box"><i class="icon-arrow-left2"></i><i class="icon-file-text"></i></a>
 {% endblock %}

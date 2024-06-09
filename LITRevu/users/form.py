@@ -13,6 +13,28 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
         fields = ("email", "username", "password1", "password2")
+        widgets = {
+            'email': forms.EmailInput(
+                attrs={
+                    'class': 'form-control',
+                    'id': 'create-email-field'
+                    }),
+            'username': forms.TextInput(
+                attrs={
+                    'class': 'form-control',
+                    'id': 'create-username-field'
+                }),
+            'password1': forms.PasswordInput(
+                attrs={
+                    'class': 'form-control', 
+                    'id': 'create-password-field'
+                }),
+            'password2': forms.PasswordInput(
+                attrs={
+                    'class': 'form-control', 
+                    'id': 'create-password-field'
+                }),
+        }
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -46,7 +68,17 @@ class CustomUserCreationForm(UserCreationForm):
         return user
     
 class CustomUserEditForm(UserCreationForm):
-    date_of_birth = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date', 'min': '1910-01-01', 'max': timezone.now().strftime('%Y-%m-%d')}))
+    date_of_birth = forms.DateField(
+        required=False,
+        widget=forms.DateInput(
+            attrs={
+                'type': 'date',
+                'min': '1910-01-01',
+                'max': timezone.now().strftime('%Y-%m-%d'),
+                'id': 'edit-date-field',
+                'class': 'form-control',
+                'label': 'Date of birth'
+            }))
     
     class Meta:
         model = CustomUser
@@ -70,8 +102,8 @@ class CustomUserEditForm(UserCreationForm):
 class CustomAuthenticationForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super(CustomAuthenticationForm, self).__init__(*args, **kwargs)
-        self.fields['username'].widget.attrs['class'] = 'form-control'
-        self.fields['password'].widget.attrs['class'] = 'form-control'
+        self.fields['username'].widget.attrs.update({'class': 'form-control', 'id': 'auth-username-field'})
+        self.fields['password'].widget.attrs.update({'class': 'form-control', 'id': 'auth-password-field'})
 
     def confirm_login_allowed(self, user):
         if not user.is_active:
@@ -94,12 +126,26 @@ class CustomAuthenticationForm(AuthenticationForm):
         return self.cleaned_data
     
 class UpdateEmailForm(forms.ModelForm):
-    current_password = forms.CharField(widget=forms.PasswordInput, required=True)
+    current_password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                'class': 'form-control', 
+                'id': 'update-email-password-field'
+                }),
+        required=True
+        )
 
     class Meta:
-        model = CustomUser
-        fields = ['email', 'current_password']
-
+        model = CustomUser        
+        fields = ['email']
+        widgets = {
+            'email': forms.EmailInput(
+                attrs={
+                    'class': 'form-control',
+                    'id': 'update-email-field'
+                    })
+        }
+        
     def clean_current_password(self):
         current_password = self.cleaned_data['current_password']
         if not self.instance.check_password(current_password):
@@ -107,11 +153,25 @@ class UpdateEmailForm(forms.ModelForm):
         return current_password
 
 class UpdateUsernameForm(forms.ModelForm):
-    current_password = forms.CharField(widget=forms.PasswordInput, required=True)
+    current_password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                'class': 'form-control', 
+                'id': 'update-username-password-field'
+                }),
+        required=True
+        )
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'current_password']
+        fields = ['username']
+        widgets = {
+            'username': forms.TextInput(
+                attrs={
+                    'class': 'form-control',
+                    'id': 'update-username-field'
+                    })
+        }
 
     def clean_current_password(self):
         current_password = self.cleaned_data['current_password']
@@ -120,9 +180,32 @@ class UpdateUsernameForm(forms.ModelForm):
         return current_password
 
 class UpdatePasswordForm(PasswordChangeForm):
-    old_password = forms.CharField(widget=forms.PasswordInput, required=True)
-    new_password1 = forms.CharField(widget=forms.PasswordInput, required=True)
-    new_password2 = forms.CharField(widget=forms.PasswordInput, required=True)
+    old_password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                'class': 'form-control', 
+                'id': 'update-password-old-field'
+                }),
+        required=True
+        )
+    new_password1 = forms.CharField(
+        label='New password',
+        widget=forms.PasswordInput(
+            attrs={
+                'class': 'form-control', 
+                'id': 'update-password-new-field'
+                }),
+        required=True
+        )
+    new_password2 = forms.CharField(
+        label='Confirm new password',
+        widget=forms.PasswordInput(
+            attrs={
+                'class': 'form-control', 
+                'id': 'update-password-new-repeat-field'
+                }), 
+        required=True
+        )
 
     class Meta:
         model = CustomUser
