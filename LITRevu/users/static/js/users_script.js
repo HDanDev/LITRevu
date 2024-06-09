@@ -48,3 +48,40 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    window.openModal = function(modalId) {
+        document.getElementById(modalId).style.display = 'block';
+    }
+
+    window.closeModal = function(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    window.submitForm = function(event, formId, isModal=true) {
+        event.preventDefault();
+        let form = document.getElementById(formId);
+        let xhr = new XMLHttpRequest();
+        let formData = new FormData(form);
+        xhr.open('POST', form.action, true);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                let response = JSON.parse(xhr.responseText);
+                if (response.success) {
+                    if (isModal) closeModal(formId.replace('Form', 'Modal'));
+                    alert(response.message);
+                } else {
+                    let errors = '';
+                    for (let field in response.errors) {
+                        errors += response.errors[field][0] + '\n';
+                    }
+                    alert(errors);
+                }
+            } else {
+                alert('An error occurred while processing your request.');
+            }
+        };
+        xhr.send(formData);
+    }
+});

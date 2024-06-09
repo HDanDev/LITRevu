@@ -8,6 +8,7 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
     path('user/<int:pk>/', views.UserDetailView.as_view(), name='user_detail'),
     path('users/', views.UserListView.as_view(), name='users'),
+    path('profile/update-profile/', views.update_profile, name='update_profile'),
     path('profile/update-email/', views.update_email, name='update_email'),
     path('profile/update-username/', views.update_username, name='update_username'),
     path('profile/update-password/', views.update_password, name='update_password'),

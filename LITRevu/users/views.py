@@ -101,16 +101,10 @@ def activate(request, uidb64, token):
 
 @login_required
 def profile_view(request):
-    if request.method == 'POST':
-        form = CustomUserEditForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Your profile has been successfully updated")
-            return redirect('profile')
-        else:
-            messages.error(request, 'An error occurred while updating your profile')
-    else:
-        form = CustomUserEditForm(instance=request.user)
+    form = CustomUserEditForm(instance=request.user)
+    email_form = UpdateEmailForm(instance=request.user)
+    username_form = UpdateUsernameForm(instance=request.user)
+    password_form = UpdatePasswordForm(request.user)
 
     followers_status = Case(
         When(followers__follower=request.user, followers__status=True, then=True),
@@ -125,7 +119,25 @@ def profile_view(request):
         followers_status=followers_status
     )
 
-    return render(request, 'profile.html', {'form': form, 'followed_users': followed_users})
+    return render(request, 'profile.html', {
+        'form': form, 
+        'email_form': email_form, 
+        'username_form': username_form, 
+        'password_form': password_form, 
+        'followed_users': followed_users
+    })
+    
+@login_required
+def update_profile(request):
+    if request.method == 'POST':
+        form = CustomUserEditForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your profile has been successfully updated")
+            return JsonResponse({'success': True, 'message': 'Your profile was successfully updated!'})
+        else:
+            messages.error(request, 'An error occurred while updating your profile')
+            return JsonResponse({'success': False, 'errors': form.errors})
 
 @login_required
 def update_email(request):
@@ -134,10 +146,10 @@ def update_email(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Your email was successfully updated!')
-            return redirect('profile')
-    else:
-        form = UpdateEmailForm(instance=request.user)
-    return render(request, 'update_email.html', {'form': form})
+            return JsonResponse({'success': True, 'message': 'Your email was successfully updated!'})
+        else:
+            messages.error(request, 'An error occurred while updating your email')
+            return JsonResponse({'success': False, 'errors': form.errors})
 
 @login_required
 def update_username(request):
@@ -146,10 +158,10 @@ def update_username(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Your username was successfully updated!')
-            return redirect('profile')
-    else:
-        form = UpdateUsernameForm(instance=request.user)
-    return render(request, 'update_username.html', {'form': form})
+            return JsonResponse({'success': True, 'message': 'Your username was successfully updated!'})
+        else:
+            messages.error(request, 'An error occurred while updating your username')
+            return JsonResponse({'success': False, 'errors': form.errors})
 
 @login_required
 def update_password(request):
@@ -159,10 +171,10 @@ def update_password(request):
             user = form.save()
             update_session_auth_hash(request, user)
             messages.success(request, 'Your password was successfully updated!')
-            return redirect('profile')
-    else:
-        form = UpdatePasswordForm(request.user)
-    return render(request, 'update_password.html', {'form': form})
+            return JsonResponse({'success': True, 'message': 'Your password was successfully updated!'})
+        else:
+            messages.error(request, 'An error occurred while updating your password')
+            return JsonResponse({'success': False, 'errors': form.errors})
 
 class UserListView(LoginRequiredMixin, ListView):
     model = CustomUser
