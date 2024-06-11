@@ -7,11 +7,12 @@
 {% endblock %}
 {% block content_title %}
 {% if form.instance.pk %}
-<span class="icon-hover-box"><i class="icon-pencil"></i><i class="icon-newspaper"></i></span>
+<i class="icon-pencil"></i>
 {% else %}
-<span class="icon-hover-box"><i class="icon-plus"></i><i class="icon-newspaper"></span>
+<i class="icon-plus"></i>
 {% endif %} 
 Review
+<i class="icon-newspaper"></i>
 {% endblock %}
 
 {% block content %}
@@ -33,17 +34,17 @@ Review
 
     <div class="fieldWrapper">
         <label for="id_rating">Rating:</label>
-        <div class="stars">
-            <input class="star star-5" id="star-5" type="radio" name="rating" value="5">
-            <label class="star star-5" for="star-5"></label>
-            <input class="star star-4" id="star-4" type="radio" name="rating" value="4">
-            <label class="star star-4" for="star-4"></label>
-            <input class="star star-3" id="star-3" type="radio" name="rating" value="3">
-            <label class="star star-3" for="star-3"></label>
-            <input class="star star-2" id="star-2" type="radio" name="rating" value="2">
-            <label class="star star-2" for="star-2"></label>
-            <input class="star star-1" id="star-1" type="radio" name="rating" value="1">
-            <label class="star star-1" for="star-1"></label>
+        <div class="rating">
+            <input type="radio" name="star" id="star1" value="5">
+            <label for="star1" title="5 stars">☆</label>
+            <input type="radio" name="star" id="star2" value="4">
+            <label for="star2" title="4 stars">☆</label>
+            <input type="radio" name="star" id="star3" value="3">
+            <label for="star3" title="3 stars">☆</label>
+            <input type="radio" name="star" id="star4" value="2">
+            <label for="star4" title="2 stars">☆</label>
+            <input type="radio" name="star" id="star5" value="1">
+            <label for="star5" title="1 star">☆</label>
         </div>
     </div>
 

@@ -1,71 +1,55 @@
-document.addEventListener("DOMContentLoaded", function() {
-    var likeBtns = document.querySelectorAll(".like-btn");
-    var dislikeBtns = document.querySelectorAll(".dislike-btn");
+document.addEventListener("DOMContentLoaded", () => {
+    const deletionModal = document.getElementById("deleteTicketModal");
+    const confirmButton = document.getElementById("deleteTicketModalConfirmBtn");
+    const cancelButton = document.getElementById("deleteTicketModalCancelBtn");
+    const closeDeletionModalBtn = document.getElementById("deleteTicketModalCloseBtn");
+    const ticketsDeleteButtons = document.getElementsByClassName("ticket-delete-btn");
 
-    function handleVote(event, type) {
-        event.preventDefault();
-        var btn = event.target;
-        var ticketId = btn.getAttribute("data-ticket-id");
-        var url = btn.getAttribute("data-ticket-url");
+    const likeBtns = document.querySelectorAll(".like-btn");
+    const dislikeBtns = document.querySelectorAll(".dislike-btn");
     
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": document.querySelector('input[name="csrfmiddlewaretoken"]').value
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            var likesCount = document.querySelector('.likes-count[data-ticket-id="' + ticketId + '"]');
-            var dislikesCount = document.querySelector('.dislikes-count[data-ticket-id="' + ticketId + '"]');
-            if (likesCount && dislikesCount) {
-                likesCount.textContent = data.likes_count;
-                dislikesCount.textContent = data.dislikes_count;
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    }
+    closeDeletionModalBtn.addEventListener("click", () => {closeModal(deletionModal) ;});
 
-    likeBtns.forEach(function(btn) {
-        btn.addEventListener("click", function(event) {
-            handleVote(event, "like");
-        });
-    });
+    deletionValidationInit(ticketsDeleteButtons, deletionModal);
+    deletionCancel(cancelButton);
+    deletionConfirm(confirmButton);
 
-    dislikeBtns.forEach(function(btn) {
-        btn.addEventListener("click", function(event) {
-            handleVote(event, "dislike");
-        });
-    });
-});
-
-var modal = document.getElementById("delete-ticket-modal");
-var btn = document.getElementById("delete-ticket-btn");
-var span = modal.querySelector(".close");
-var form = modal.querySelector("#delete-ticket-form");
-
-btn.onclick = function() {
-    var ticketId = this.dataset.ticketId;
-    form.action = `/ticket/${ticketId}/delete/`;
-    modal.style.display = "block";
-}
-
-form.addEventListener("submit", function(event) {
-    event.preventDefault();
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", form.action, true);
-    var csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
-    xhr.setRequestHeader("X-CSRFToken", csrfToken);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-            } else {
+    function handleVoteCallback(formId, responseData) {
+        let likeFormId = formId;
+        let dislikeFormId = formId;
+        if (formId.startsWith('like')) dislikeFormId = 'dis' + dislikeFormId;
+        else likeFormId = likeFormId.substring(3);
+        console.log('like id = ' + likeFormId);
+        console.log('dislike id = ' + dislikeFormId);
+        let likeForm = document.getElementById(likeFormId);
+        let dislikeForm = document.getElementById(dislikeFormId);
+        if (likeForm) {
+            let likesCountSpan = likeForm.querySelector('.likes-count');
+            if (likesCountSpan) {
+                likesCountSpan.textContent = responseData.likes_count;
             }
         }
-    };
-    xhr.send();
+        if (dislikeForm) {
+            let dislikesCountSpan = dislikeForm.querySelector('.dislikes-count');
+            if (dislikesCountSpan) {
+                dislikesCountSpan.textContent = responseData.dislikes_count;
+            }
+        }
+    }
+
+    likeBtns.forEach((btn) => {
+        btn.addEventListener("click", (event) => {
+            let formId = btn.closest('form').id;
+            let url = btn.closest('form').action;
+            submitForm(event, formId, handleVoteCallback, url);
+        });
+    });
+
+    dislikeBtns.forEach((btn) => {
+        btn.addEventListener("click", (event) => {
+            let formId = btn.closest('form').id;
+            let url = btn.closest('form').action;
+            submitForm(event, formId, handleVoteCallback, url);
+        });
+    });
 });

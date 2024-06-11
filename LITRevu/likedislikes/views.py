@@ -37,6 +37,7 @@ class LikeDislikeView(View):
         dislikes_count = sum(item['count'] for item in like_counts if item['vote'] == LikeDislike.DISLIKE)
 
         return JsonResponse({
+            'success': True,
             'likes_count': likes_count,
             'dislikes_count': dislikes_count,
         })

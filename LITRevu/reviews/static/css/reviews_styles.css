@@ -1,22 +1,22 @@
-body {
-    background-color: #cfbdec;
+.rating {
+    direction: rtl;
+    unicode-bidi: bidi-override;
+    display: inline-flex;
 }
 
-.stars {
-    display: flex;
-    flex-direction: row-reverse;
-    justify-content: flex-end;
+.rating input {
+    display: none;
 }
 
-.star + label {
-    font-size: 1.5em;
+.rating label {
+    font-size: 2rem;
     color: #ddd;
-    transition: color 0.2s;
     cursor: pointer;
+    transition: color 0.2s;
 }
 
-.star:checked + label:before {
-    content: '\f005';
-    font-family: 'Font Awesome 5 Free';
-    color: #ffcc00;
+.rating label:hover,
+.rating label:hover ~ label,
+.rating input:checked ~ label {
+    color: #f5b301;
 }

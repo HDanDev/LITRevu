@@ -10,31 +10,59 @@ Reviews for {{ ticket.title }}
 {% endblock %}
 
 {% block content %}
-<ul>
-    {% for review in reviews %}
-    {% if not review.is_archived %}
-    <li>
-        <a href="{% url 'review_detail' review.pk %}">{{ review.title }}</a> by {{ review.author }} {{ review.created_at|date:"F j, Y" }}
-        {% if request.user.is_authenticated %}
-            {% if request.user == review.author or request.user.is_superuser %}
-                <a href="{% url 'review_update' review.pk %}" class="icon-hover-box"><i class="icon-pencil"></i></a>
-                <a href="{% url 'review_delete' review.pk %}" class="icon-hover-box"><i class="icon-bin"></i></a>
-            {% endif %}
+  {% if request.user.is_authenticated %}
+    <a href="{% url 'review_create' ticket.pk %}" class="icon-hover-box"><i class="icon-plus"></i><i class="icon-pen"></i></a>
+    <ul>
+      {% for review in reviews %}
+        {% if not review.is_archived %}
+          <li>
+            <a href="{% url 'review_detail' review.pk %}">
+              <h3 class="aligned">
+                {{ review.title }}
+                {% if request.user == review.author or request.user.is_superuser %}
+                  <a href="{% url 'review_update' review.pk %}" class="icon-hover-box"><i class="icon-pencil"></i></a>
+                  <a href="#" id="delete-review-btn" data-ticket-id="{{ review.pk }}" class="icon-hover-box"><i class="icon-bin"></i></a>
+                {% endif %}
+              </h3>
+              <p>{{ review.description }}</p>
+              <p>Created at: {{ review.created_at|date:"F j, Y" }} by <a>{{ review.author }}</a></p>
+            </a>
+            <div>
+              {% comment %}
+              <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+              <button class="like-btn icon-hover-box" data-ticket-id="{{ ticket.pk }}" data-ticket-url="{% url 'ticket_like' ticket.pk %}"><i class="icon-heart"></i></button>
+              <span class="likes-count" data-ticket-id="{{ ticket.pk }}">{{ ticket.likes_count }}</span>
+              <button class="dislike-btn icon-hover-box" data-ticket-id="{{ ticket.pk }}" data-ticket-url="{% url 'ticket_dislike' ticket.pk %}"><i class="icon-heart-broken"></i></button>
+              <span class="dislikes-count" data-ticket-id="{{ ticket.pk }}">{{ ticket.dislikes_count }}</span> 
+              {% endcomment %}
+            </div>
+            <ul>
+              {% for comment in review.comments.all %}
+                {% if not comment.is_archived %}
+                  <li>
+                    <h4><a>{{ comment.author }}</a> on {{ comment.created_at|date:"F j, Y" }}</h4>
+                    <p>{{ comment.content }}</p>
+                  </li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+          </li>
         {% endif %}
-        <ul>
-          {% for comment in review.comments.all %}
-          {% if not comment.is_archived %}
-            <li>
-              <h4>{{ comment.author }}</h4>
-              <p>{{ comment.content }}</p>
-              <p>{{ comment.created_at }}</p>
-            </li>
-            {% endif %}
-          {% endfor %}
-        </ul>
-    </li>
-    {% endif %}
-    {% endfor %}
-</ul>
-<a href="{% url 'review_create' ticket.pk %}" class="icon-hover-box"><i class="icon-plus"></i><i class="icon-pen"></i></a>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}
+
+{% block modals %}
+<div id="delete-ticket-modal" class="modal">
+  <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Delete Ticket</h2>
+      <p>Are you sure you want to delete this ticket?</p>
+      <form id="delete-ticket-form">
+          <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+          <button type="submit" class="icon-hover-box"><i class="icon-bin"></i></button>
+      </form>
+  </div>
+</div>
 {% endblock %}

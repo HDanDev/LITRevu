@@ -13,19 +13,19 @@ Edit Profile
 <div class="profile-section">
     <span>
         Email: {{ user.email }}
-        <button type="button" onclick="openModal('updateEmailModal')" class="icon-hover-box"><i class="icon-pencil"></i></button>
+        <button type="button" class="icon-hover-box" id="openEditEmailModalBtn"><i class="icon-pencil"></i></button>
     </span>
 </div>
 
 <div class="profile-section">
     <span>
         Username: {{ user.username }}
-        <button type="button" onclick="openModal('updateUsernameModal')" class="icon-hover-box"><i class="icon-pencil"></i></button>
+        <button type="button" class="icon-hover-box" id="openEditUsernameModalBtn"><i class="icon-pencil"></i></button>
     </span>
 </div>
 
 <div class="profile-section">
-    <button type="button" onclick="openModal('updatePasswordModal')" class="icon-hover-box">
+    <button type="button" class="icon-hover-box" id="openEditPasswordModalBtn">
         <span>
             Change Password
             <i class="icon-pencil"></i>
@@ -89,14 +89,14 @@ People you follow
             <div class="page-content">
                 <h2 class="main-title">Edit Email</h2>
                 <div class="main-content">
-                    <form id="updateEmailForm" method="post" onsubmit="submitForm(event, 'updateEmailForm', callbackCloseModal)" action="{% url 'update_email' %}">
+                    <form id="updateEmailForm" method="post" onsubmit="submitForm(event, 'updateEmailForm', callbackCloseModal, '{% url 'update_email' %}')">
                         {% csrf_token %}
                         {{ email_form.as_p }}
                         <button type="submit" name="update_email" class="icon-hover-box"><i class="icon-checkmark"></i></button>
                     </form>
                 </div>
             </div>
-            <i class="icon-cross close icon-hover-box" onclick="closeModal('updateEmailModal')"></i>
+            <i class="icon-cross close icon-hover-box" id="closeEditEmailModalBtn"></i>
         </div>
         <div class="spiral single-page-spiral"></div>
     </div>
@@ -115,7 +115,7 @@ People you follow
                     </form>
                 </div>
             </div>
-            <i class="icon-cross close icon-hover-box" onclick="closeModal('updateUsernameModal')"></i>
+            <i class="icon-cross close icon-hover-box" id="closeEditUsernameModalBtn"></i>
         </div>
         <div class="spiral single-page-spiral"></div>
     </div>
@@ -127,14 +127,14 @@ People you follow
             <div class="page-content">
                 <h2 class="main-title">Edit Password</h2>
                 <div class="main-content">
-                    <form id="updatePasswordForm" method="post" onsubmit="submitForm(event, 'updatePasswordForm', callbackCloseModal)" action="{% url 'update_password' %}">
+                    <form id="updatePasswordForm" method="post" onsubmit="submitForm(event, 'updatePasswordForm', callbackCloseModal, '{% url 'update_password' %}')">
                         {% csrf_token %}
                         {{ password_form.as_p }}
                         <button type="submit" name="update_password" class="icon-hover-box"><i class="icon-checkmark"></i></button>
                     </form>
                 </div>
             </div>
-            <i class="icon-cross close icon-hover-box" onclick="closeModal('updatePasswordModal')"></i>
+            <i class="icon-cross close icon-hover-box" id="closeEditPasswordModalBtn"></i>
         </div>
         <div class="spiral single-page-spiral"></div>
     </div>
@@ -143,7 +143,7 @@ People you follow
 
 {% block js %}
 <script src="{% static 'js/profile_picture_script.js' %}"></script>
-<Script src="{% static 'js/main_app_scripts.js' %}"></Script>
+<Script src="{% static 'js/modal_ajax_query.js' %}"></Script>
 <script src="{% static 'js/users.js' %}"></script>
 <script src="{% static 'js/user_profile_script.js' %}"></script>
 {% endblock %}
