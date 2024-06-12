@@ -33,14 +33,14 @@ Tickets you might like
           </h3>
           <a href="{% url 'review_list' ticket.pk %}"><p>{{ ticket.description }}</p></a>
           <p>Created at: {{ ticket.created_at|date:"F j, Y" }} by {{ ticket.author }}</p>
-          <div>
+          <div class="like-container">
             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-            <form id="like-form-{{ ticket.pk }}" method="post" action="{% url 'ticket_like' ticket.pk %}" class"aligned">
+            <form id="like-form-{{ ticket.pk }}" method="post" action="{% url 'ticket_like' ticket.pk %}" class="like-block">
               {% csrf_token %}
               <button class="like-btn icon-hover-box"><i class="icon-heart"></i></button>
               <span class="likes-count">{{ ticket.likes_count }}</span>
             </form>
-            <form id="dislike-form-{{ ticket.pk }}" method="post" action="{% url 'ticket_dislike' ticket.pk %}" class"aligned">
+            <form id="dislike-form-{{ ticket.pk }}" method="post" action="{% url 'ticket_dislike' ticket.pk %}" class="like-block">
               {% csrf_token %}
               <button class="dislike-btn icon-hover-box"><i class="icon-heart-broken"></i></button>
               <span class="dislikes-count">{{ ticket.dislikes_count }}</span>

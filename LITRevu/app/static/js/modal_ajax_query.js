@@ -5,8 +5,9 @@ window.deletionValidationInit = (deleteButtons, modal) => {
     for (let i = 0; i < deleteButtons.length; i++) {
         deleteButtons[i].addEventListener("click", (event) => {
             event.preventDefault();
-            formToSubmit = this.closest('form');
-            let itemName = this.getAttribute("data-item-name");
+            let button = event.target;
+            formToSubmit = button.closest('form');
+            let itemName = button.getAttribute("data-item-name");
             document.getElementById("itemName").textContent = itemName;
             openModal(modal);
         });
@@ -89,3 +90,52 @@ window.submitForm = async (event, formId, callback, url) => {
         console.error('Fetch error:', error);
     }
 };
+
+window.handleVoteCallback = (formId, responseData) => {
+    let likeFormId = formId;
+    let dislikeFormId = formId;
+    if (formId.startsWith('like')) dislikeFormId = 'dis' + dislikeFormId;
+    else likeFormId = likeFormId.substring(3);
+    let likeForm = document.getElementById(likeFormId);
+    let dislikeForm = document.getElementById(dislikeFormId);
+    if (likeForm) {
+        let likesCountSpan = likeForm.querySelector('.likes-count');
+        if (likesCountSpan) {
+            likesCountSpan.textContent = responseData.likes_count;
+        }
+    }
+    if (dislikeForm) {
+        let dislikesCountSpan = dislikeForm.querySelector('.dislikes-count');
+        if (dislikesCountSpan) {
+            dislikesCountSpan.textContent = responseData.dislikes_count;
+        }
+    }
+}
+
+window.callbackCloseModal = (formId) => {
+    closeModal(document.getElementById(formId.replace('Form', 'Modal')));
+}
+
+window.callbackUpdatedProfile = (formId) => {
+    console.log("Successfully updated profile");
+}
+
+window.likeListener = (likeBtns) => {
+    likeBtns.forEach((btn) => {
+            btn.addEventListener("click", (event) => {
+            let formId = btn.closest('form').id;
+            let url = btn.closest('form').action;
+            submitForm(event, formId, handleVoteCallback, url);
+        });
+    });
+}
+
+window.dislikeListener = (dislikeBtns) => {
+    dislikeBtns.forEach((btn) => {
+            btn.addEventListener("click", (event) => {
+            let formId = btn.closest('form').id;
+            let url = btn.closest('form').action;
+            submitForm(event, formId, handleVoteCallback, url);
+        });
+    });
+}

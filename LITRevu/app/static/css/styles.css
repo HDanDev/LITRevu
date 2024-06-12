@@ -1,13 +1,22 @@
 body {
     font-family: 'Quicksand', sans-serif, 'Roboto Mono', monospace, 'Courier New', Courier, 'Comfortaa', sans-serif, "Times New Roman", Times, serif;
-    background-color: #ff71ff;
+    margin: 0;
+    padding: 0;
+}
+
+.background {
+    position: fixed;
+    z-index: -1;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #eeb2df;
     background-image: url('../images/library illustration.jpg');
     background-blend-mode: luminosity;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    margin: 0;
-    padding: 0;
 }
 
 h1 {
@@ -217,6 +226,17 @@ footer p {
     background-repeat: repeat-y;
     background-size: 100% auto;
     background-position: top center;
+}
+
+.like-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.like-block {
+    display: flex;
+    flex-direction: row;
+    gap: 0;
 }
 
 .single-page-spiral {
