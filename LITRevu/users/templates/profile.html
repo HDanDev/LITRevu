@@ -11,25 +11,28 @@ Edit Profile
 
 {% block content %}
 <div class="profile-section">
-    <span>
-        Email: {{ user.email }}
+    <div class="profile-info">
+        <div id="userProfileEmail">Email: {{ user.email }}</div>
         <button type="button" class="icon-hover-box" id="openEditEmailModalBtn"><i class="icon-pencil"></i></button>
-    </span>
+    </div>
+    <div id="feedbackProfileEmailDiv"></div>
 </div>
 
 <div class="profile-section">
-    <span>
-        Username: {{ user.username }}
+    <div class="profile-info">
+        <div id="userProfileUsername">Username: {{ user.username }}</div>
         <button type="button" class="icon-hover-box" id="openEditUsernameModalBtn"><i class="icon-pencil"></i></button>
-    </span>
+    </div>
+    <div id="feedbackProfileUsernameDiv"></div>
 </div>
 
 <div class="profile-section">
-    <button type="button" class="icon-hover-box" id="openEditPasswordModalBtn">
-        <span>
-            Change Password
+    <button type="button" class="icon-hover-box no-margin" id="openEditPasswordModalBtn">
+        <div class="profile-info">
+            <div id="userProfilePassword" class="button-exception">Change Password</div>
             <i class="icon-pencil"></i>
-        </span>
+        </div>
+        <div id="feedbackProfilePasswordDiv"></div>
     </button>
 </div>
 
@@ -56,7 +59,7 @@ Edit Profile
             <div class="error">{{ form.date_of_birth.errors }}</div>
         {% endif %}
     </div> {% endcomment %}
-    <button type="submit" class="icon-hover-box"><i class="icon-checkmark"></i></button>
+    <button type="submit" class="icon-hover-box feedback validation-btn"><i class="icon-checkmark"></i></button>
 </form>
 {% endblock %}
 
@@ -89,10 +92,10 @@ People you follow
             <div class="page-content">
                 <h2 class="main-title">Edit Email</h2>
                 <div class="main-content">
-                    <form id="updateEmailForm" method="post" onsubmit="submitForm(event, 'updateEmailForm', callbackCloseModal, '{% url 'update_email' %}')">
+                    <form id="updateEmailForm" method="post" action="{% url 'update_email' %}">
                         {% csrf_token %}
                         {{ email_form.as_p }}
-                        <button type="submit" name="update_email" class="icon-hover-box"><i class="icon-checkmark"></i></button>
+                        <button type="submit" name="update_email" id="updateEmailFormValidationBtn" class="icon-hover-box feedback validation-btn"><i class="icon-checkmark"></i></button>
                     </form>
                 </div>
             </div>
@@ -108,10 +111,10 @@ People you follow
             <div class="page-content">
                 <h2 class="main-title">Edit Username</h2>
                 <div class="main-content">
-                    <form id="updateUsernameForm" method="post" onsubmit="submitForm(event, 'updateUsernameForm', callbackCloseModal, '{% url 'update_username' %}')" >
+                    <form id="updateUsernameForm" method="post" action="{% url 'update_username' %}">
                         {% csrf_token %}
                         {{ username_form.as_p }}
-                        <button type="submit" name="update_username" class="icon-hover-box"><i class="icon-checkmark"></i></button>
+                        <button type="submit" name="update_username" id="updateUsernameFormValidationBtn" class="icon-hover-box feedback validation-btn"><i class="icon-checkmark"></i></button>
                     </form>
                 </div>
             </div>
@@ -127,10 +130,10 @@ People you follow
             <div class="page-content">
                 <h2 class="main-title">Edit Password</h2>
                 <div class="main-content">
-                    <form id="updatePasswordForm" method="post" onsubmit="submitForm(event, 'updatePasswordForm', callbackCloseModal, '{% url 'update_password' %}')">
+                    <form id="updatePasswordForm" method="post" action="{% url 'update_password' %}">
                         {% csrf_token %}
                         {{ password_form.as_p }}
-                        <button type="submit" name="update_password" class="icon-hover-box"><i class="icon-checkmark"></i></button>
+                        <button type="submit" name="update_password" id="updatePasswordFormValidationBtn" class="icon-hover-box feedback validation-btn"><i class="icon-checkmark"></i></button>
                     </form>
                 </div>
             </div>

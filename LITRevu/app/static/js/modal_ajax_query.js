@@ -116,13 +116,52 @@ window.callbackCloseModal = (formId) => {
     closeModal(document.getElementById(formId.replace('Form', 'Modal')));
 }
 
-window.callbackUpdatedProfile = (formId) => {
-    console.log("Successfully updated profile");
+window.callbackUpdateEmail = (formId, responseData) => {
+    ProfileUpdateFeedback(formId, responseData, "feedbackProfileEmailDiv", "Email", "userProfileEmail");
+}
+
+window.callbackUpdatedUsername = (formId, responseData) => {
+    ProfileUpdateFeedback(formId, responseData, "feedbackProfileUsernameDiv", "Username", "userProfileUsername");
+}
+
+window.callbackUpdatedPassword = (formId, responseData) => {
+    ProfileUpdateFeedback(formId, responseData, "feedbackProfilePasswordDiv", "Password", "userProfilePassword");
+}
+
+window.ProfileUpdateFeedback = (formId, responseData, divId, innerHtmlText, targetInfo) => {
+    clearProfileFeedbacks();
+    const targetElem = document.getElementById(targetInfo);
+    targetElem.innerHTML = "";
+    if (divId == "feedbackProfileEmailDiv") {
+        targetElem.innerHTML = responseData.email;
+    }
+    else if (divId == "feedbackProfileUsernameDiv"){
+        targetElem.innerHTML = responseData.username;
+    }
+    const div = document.getElementById(divId);
+    div.className = "profile-info feedback success";
+    const icon = document.createElement('i');
+    icon.classList.add('icon-checkmark');
+    div.appendChild(icon);
+    div.innerHTML += innerHtmlText + " updated successfully";
+    closeModal(document.getElementById(formId.replace('Form', 'Modal')));
+}
+
+window.clearProfileFeedbacks = () => {
+    const feedbackProfileEmailDiv = document.getElementById("feedbackProfileEmailDiv");
+    const feedbackProfileUsernameDiv = document.getElementById("feedbackProfileUsernameDiv");
+    const feedbackProfilePasswordDiv = document.getElementById("feedbackProfilePasswordDiv");
+    feedbackProfileEmailDiv.innerHTML = "";
+    feedbackProfileUsernameDiv.innerHTML = "";
+    feedbackProfilePasswordDiv.innerHTML = "";
+    feedbackProfileEmailDiv.className = "";
+    feedbackProfileUsernameDiv.className = "";
+    feedbackProfilePasswordDiv.className = "";
 }
 
 window.likeListener = (likeBtns) => {
     likeBtns.forEach((btn) => {
-            btn.addEventListener("click", (event) => {
+        btn.addEventListener("click", (event) => {
             let formId = btn.closest('form').id;
             let url = btn.closest('form').action;
             submitForm(event, formId, handleVoteCallback, url);
@@ -132,10 +171,18 @@ window.likeListener = (likeBtns) => {
 
 window.dislikeListener = (dislikeBtns) => {
     dislikeBtns.forEach((btn) => {
-            btn.addEventListener("click", (event) => {
+        btn.addEventListener("click", (event) => {
             let formId = btn.closest('form').id;
             let url = btn.closest('form').action;
             submitForm(event, formId, handleVoteCallback, url);
         });
+    });
+}
+
+window.uniqueBtnListener = (btn, callbackFunction) => {
+    btn.addEventListener("click", (event) => {
+        let formId = btn.closest('form').id;
+        let url = btn.closest('form').action;
+        submitForm(event, formId, callbackFunction, url);
     });
 }

@@ -3,4 +3,7 @@
     --menu-text-colour: white;
     --main-text-colour: #333;
     --main-background-colour: wheat;
+    --success-colour: #a8dfa5;
+    --main-font-style: 'Quicksand', sans-serif, 'Roboto Mono', monospace, 'Courier New', Courier, 'Comfortaa', sans-serif, "Times New Roman", Times, serif;
+    --main-font-size: 16px;
 }

@@ -2,11 +2,32 @@
     background-color: #a3d6f3;
 }
 
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+.profile-section {
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;    
+    min-width: max-content;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.button-exception {
+    font-family: var(--main-font-style);
+    font-size: var(--main-font-size);
+    transition: color 0.3s ease-in;
+}
+
+.button-exception:hover {
+    color: rgb(87, 87, 87);
+}
+
+.no-margin {
+    margin: 0;
 }

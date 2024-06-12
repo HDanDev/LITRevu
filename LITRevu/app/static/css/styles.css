@@ -1,5 +1,5 @@
 body {
-    font-family: 'Quicksand', sans-serif, 'Roboto Mono', monospace, 'Courier New', Courier, 'Comfortaa', sans-serif, "Times New Roman", Times, serif;
+    font-family: var(--main-font-style);
     margin: 0;
     padding: 0;
 }
@@ -243,6 +243,35 @@ footer p {
     left: 0;
 }
 
+.feedback {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-top: 4px;
+    padding: 8px;
+    font-size: 12px;
+    border-radius: 8px;
+    color: white;
+}
+
+.feedback i {
+    margin: 0;
+    margin-right: 8px;
+}
+
+.success {
+    background-color: var(--success-colour);
+}
+
+.validation-btn {
+    transition: background-color 0.3s ease-in;
+}
+
+.validation-btn:hover {
+    background-color: var(--success-colour);
+}
+
 .icon-hover-box:hover {
     cursor: pointer;
 }
@@ -271,10 +300,14 @@ footer p {
     color: rgb(94, 165, 94);
 }
 
-.icon-hover-box:hover .icon-user-plus,
-.icon-hover-box:hover .icon-checkmark {
+.icon-hover-box:hover .icon-user-plus {
     color: rgb(160, 236, 160);
     transform: scale(1.2);
+}
+
+.icon-hover-box:hover .icon-checkmark {
+    color: rgb(235, 250, 235);
+    transform: scale(1.5);
 }
 
 .icon-heart-broken {

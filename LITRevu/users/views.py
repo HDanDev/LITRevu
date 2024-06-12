@@ -146,10 +146,17 @@ def update_email(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Your email was successfully updated!')
-            return JsonResponse({'success': True, 'message': 'Your email was successfully updated!'})
+            return JsonResponse({
+                'success': True,
+                'message': 'Your email was successfully updated!',
+                'email': request.user.email
+                })
         else:
             messages.error(request, 'An error occurred while updating your email')
-            return JsonResponse({'success': False, 'errors': form.errors})
+            return JsonResponse({
+                'success': False,
+                'errors': form.errors
+            })
 
 @login_required
 def update_username(request):
@@ -158,10 +165,17 @@ def update_username(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Your username was successfully updated!')
-            return JsonResponse({'success': True, 'message': 'Your username was successfully updated!'})
+            return JsonResponse({
+                'success': True,
+                'message': 'Your username was successfully updated!',
+                'username': request.user.username
+            })
         else:
             messages.error(request, 'An error occurred while updating your username')
-            return JsonResponse({'success': False, 'errors': form.errors})
+            return JsonResponse({
+                'success': False,
+                'errors': form.errors
+            })
 
 @login_required
 def update_password(request):

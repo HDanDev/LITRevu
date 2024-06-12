@@ -6,6 +6,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const updateEmailModalOpenBtn = document.getElementById("openEditEmailModalBtn");
     const updateUsernameModalOpenBtn = document.getElementById("openEditUsernameModalBtn");
     const updatePasswordModalOpenBtn = document.getElementById("openEditPasswordModalBtn");
+    const updateEmailFormValidationBtn = document.getElementById("updateEmailFormValidationBtn");
+    const updateUsernameFormValidationBtn = document.getElementById("updateUsernameFormValidationBtn");
+    const updatePasswordFormValidationBtn = document.getElementById("updatePasswordFormValidationBtn");
     const updateEmailModalCloseBtn = document.getElementById("closeEditEmailModalBtn");
     const updateUsernameModalCloseBtn = document.getElementById("closeEditUsernameModalBtn");
     const updatePasswordModalCloseBtn = document.getElementById("closeEditPasswordModalBtn");
@@ -16,5 +19,9 @@ document.addEventListener("DOMContentLoaded", function() {
     updateEmailModalCloseBtn.addEventListener("click", () => {closeModal(updateEmailModal) ;});
     updateUsernameModalCloseBtn.addEventListener("click", () => {closeModal(updateUsernameModal) ;});
     updatePasswordModalCloseBtn.addEventListener("click", () => {closeModal(updatePasswordModal) ;});
+
+    uniqueBtnListener(updateEmailFormValidationBtn, callbackUpdateEmail);
+    uniqueBtnListener(updateUsernameFormValidationBtn, callbackUpdatedUsername);
+    uniqueBtnListener(updatePasswordFormValidationBtn, callbackUpdatedPassword);
 
 });
