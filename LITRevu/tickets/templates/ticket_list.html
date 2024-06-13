@@ -12,12 +12,12 @@ Tickets
 {% endblock %}
 
 {% block second_page_title %}
-Tickets you might like
+<span class="colour-{{ col1 }}">Tickets</span> you might like
 {% endblock %}
 {% block second_page_content %}
   {% if request.user.is_authenticated %}
     <a href="{% url 'ticket_form' %}" class="icon-hover-box"><i class="icon-plus"></i><i class="icon-pen"></i></a>
-    <ul>
+    <ul id="tickets-list">
       {% for ticket in tickets %}
         {% if not ticket.is_archived %}
         <li id="ticket-{{ ticket.pk }}">

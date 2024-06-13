@@ -5,8 +5,10 @@ from django.urls import reverse_lazy
 from reviews.models import Review, Ticket, Tag
 from reviews.forms import TicketForm
 from users.models import CustomUser
+from app.utils import generate_random_numbers
 from django.contrib import messages
 from django.utils import timezone
+from django.http import JsonResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 
@@ -22,6 +24,22 @@ class TicketListView(LoginRequiredMixin, ListView):
             ticket.likes_count = ticket.get_likes_count()
             ticket.dislikes_count = ticket.get_dislikes_count()
         return tickets
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        colour_numbers = generate_random_numbers()
+        context['col1'] = colour_numbers[0]
+        context['col2'] = colour_numbers[1]
+        context['col3'] = colour_numbers[2]
+        context['col4'] = colour_numbers[3]
+        context['col5'] = colour_numbers[4]
+        context['col6'] = colour_numbers[5]
+        context['col7'] = colour_numbers[6]
+        context['col8'] = colour_numbers[7]
+        context['col9'] = colour_numbers[8]
+        context['col10'] = colour_numbers[9]
+        
+        return context
     
 class TicketCreateView(LoginRequiredMixin, CreateView):
     model = Ticket
@@ -71,11 +89,9 @@ class ArchiveTicketView(LoginRequiredMixin, UserPassesTestMixin, View):
     def post(self, request, *args, **kwargs):
         ticket = get_object_or_404(Ticket, pk=self.kwargs['pk'])
         
-        # Archive the ticket
         ticket.is_archived = True
         ticket.save()
 
-        # Archive related reviews
         reviews = Review.objects.filter(ticket=ticket)
         reviews.update(is_archived=True)
 

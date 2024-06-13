@@ -272,6 +272,46 @@ footer p {
     background-color: var(--success-colour);
 }
 
+.colour-1 {
+    color: rgb(231, 125, 111);
+}
+
+.colour-2 {
+    color: rgb(209, 143, 68);
+}
+
+.colour-3 {
+    color: rgb(218, 210, 98);
+}
+
+.colour-4 {
+    color: rgb(112, 197, 90);
+}
+
+.colour-5 {
+    color: rgb(125, 192, 184);
+}
+
+.colour-6 {
+    color: rgb(124, 182, 209);
+}
+
+.colour-7 {
+    color: rgb(139, 132, 209);
+}
+
+.colour-8 {
+    color: rgb(204, 130, 214);
+}
+
+.colour-9 {
+    color: rgb(209, 113, 158);
+}
+
+.colour-10 {
+    color: rgb(141, 141, 141);
+}
+
 .icon-hover-box:hover {
     cursor: pointer;
 }
