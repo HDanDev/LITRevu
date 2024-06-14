@@ -26,12 +26,13 @@
 
 <header>
     <!-- Navigation menu -->
+    <div id="navigationMenuBackground" class="navigation-menu-background"></div>
     <nav>
-        <ul class="naviagtion-menu">
+        <ul class="navigation-menu">
             {% if user.is_authenticated %}
-            <li class="navigation-menu-left-item"><a href="/"><i class="icon-books"></i>Home</a></li>
-            <li><a href="/profile/"><i class="icon-user"></i>Profile</a></li>
-            <li><a href="/logout/"><i class="icon-switch"></i>Logout</a></li>
+            <li class="navigation-menu-left-item nav-pink"><a href="/"><i class="icon-books nav-pink"></i>Home</a></li>
+            <li class="nav-blue"><a href="/profile/"><i class="icon-user nav-blue"></i>Profile</a></li>
+            <li class="nav-red"><a href="/logout/"><i class="icon-switch nav-red"></i>Logout</a></li>
             <li><a href="/users/"><i class="icon-users"></i>Users</a></li>
             {% else %}
             <li class="navigation-menu-right-item"><a href="/login/"><i class="icon-unlocked"></i>Login</a></li>

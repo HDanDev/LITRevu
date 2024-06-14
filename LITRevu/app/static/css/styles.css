@@ -66,13 +66,13 @@ form {
     margin-right: auto;
 }
 
-.naviagtion-menu {
+.navigation-menu {
     position: fixed;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    z-index: 1;
+    z-index: 999;
     top: 0;
     left: 0;
     width: calc(100vw - 48px);
@@ -81,12 +81,12 @@ form {
     gap: 40px;
 }
 
-.naviagtion-menu li {
+.navigation-menu li {
     color: var(--menu-text-colour);
     list-style: none;
 }
 
-.naviagtion-menu li a {
+.navigation-menu li a {
     color: inherit;
     text-decoration: none;
     font-size: 20px;
@@ -95,11 +95,26 @@ form {
     flex-direction: row;
     align-items: center;
     text-shadow: 1px 3px 5px #00000094;
-    transition: transform 0.3s ease-in;
+    transition-property: transform, text-shadow, color;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-in;
 }
 
-.naviagtion-menu li a:hover {
+.navigation-menu-background {
+    position: fixed;
+    z-index: 998;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 76px;
+    transition: opacity 0.3s ease-in;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0) 100%);
+    opacity: 0;
+}
+
+.navigation-menu li a:hover {
     transform: scale(1.3);
+    text-shadow: none;
 }
 
 .navigation-menu-left-item {
@@ -108,6 +123,22 @@ form {
 
 .navigation-menu-right-item {
     margin-left: auto;
+}
+
+.nav-pink:hover {
+    color: #d17cbc;
+}
+
+.nav-blue:hover {
+    color: #587ec5;
+}
+
+.nav-red:hover {
+    color: #dd6060;
+}
+
+.scrolled {
+    opacity: 1;
 }
 
 .modal {
@@ -312,6 +343,10 @@ footer p {
     color: rgb(141, 141, 141);
 }
 
+.validation-icon {
+    font-size: 36px;
+}
+
 .icon-hover-box:hover {
     cursor: pointer;
 }
@@ -360,12 +395,14 @@ footer p {
 }
 
 .icon-notification,
-.icon-pencil {
+.icon-pencil,
+.icon-blocked {
     color: rgb(199, 147, 80);
 }
 
 .icon-hover-box:hover .icon-notification,
-.icon-hover-box:hover .icon-pencil {
+.icon-hover-box:hover .icon-pencil,
+.icon-hover-box:hover .icon-blocked {
     color: rgb(233, 185, 123);
     transform: scale(1.2);
 }
@@ -402,7 +439,8 @@ footer p {
 .icon-plus,
 .icon-pen,
 .icon-arrow-left2,
-.icon-file-text {
+.icon-file-text,
+.icon-blocked {
     transition-property: color, transform;
     transition-duration: 0.3s;
     transition-timing-function: ease-in;

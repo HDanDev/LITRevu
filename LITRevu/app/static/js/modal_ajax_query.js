@@ -1,6 +1,18 @@
 let activeModal;
 let formToSubmit;
 
+document.addEventListener("DOMContentLoaded", function() {
+    const navigationMenuBackground = document.getElementById('navigationMenuBackground');
+    window.addEventListener('scroll', function () {
+        if (window.scrollY > 50) {
+            navigationMenuBackground.classList.add('scrolled');
+        } else {
+            navigationMenuBackground.classList.remove('scrolled');
+        }
+    });
+});
+
+
 window.deletionValidationInit = (deleteButtons, modal) => {
     for (let i = 0; i < deleteButtons.length; i++) {
         deleteButtons[i].addEventListener("click", (event) => {
