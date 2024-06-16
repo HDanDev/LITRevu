@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/icomoon.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-{% block optional_css %}{% endblock %}
+    {% block optional_css %}{% endblock %}
     <link rel="apple-touch-icon" href="{% static 'images/litrevulogotitleless.PNG' %}">
     <link rel="icon" href="{% static 'images/litrevulogotitleless.PNG' %}" type="image/x-icon">
     <meta name="robots" content="index, follow">
@@ -27,6 +27,8 @@
 <header>
     <!-- Navigation menu -->
     <div id="navigationMenuBackground" class="navigation-menu-background"></div>
+    <img id="topLogo" class="top-logo" src="{% static 'images/litrevulogotitlelessw.PNG' %}"/>
+    <div id="lineDesign" class="line-design"></div>
     <nav>
         <ul class="navigation-menu">
             {% if user.is_authenticated %}

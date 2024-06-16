@@ -30,13 +30,13 @@ Edit Profile
     <button type="button" class="icon-hover-box no-margin" id="openEditPasswordModalBtn">
         <div class="profile-info">
             <div id="userProfilePassword" class="button-exception">Change Password</div>
-            <i class="icon-pencil"></i>
+            <i class="icon-pencil margin-16"></i>
         </div>
         <div id="feedbackProfilePasswordDiv"></div>
     </button>
 </div>
 
-<form method="post" id="updateProfileForm" method="post" action="{% url 'update_profile' %}">
+<form method="post" class="profile-info" id="updateProfileForm" method="post" action="{% url 'update_profile' %}">
     {% csrf_token %}
     <div class="form-group">
         <label for="{{ form.profile_picture.id_for_label }}">Profile Picture:</label>

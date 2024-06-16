@@ -2,8 +2,10 @@ from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.views.generic.edit import CreateView
 from django.views.generic import ListView, CreateView, UpdateView, View
 from django.urls import reverse_lazy
-from reviews.models import Review, Ticket, Tag
-from reviews.forms import TicketForm
+from reviews.models import Review
+from tickets.models import Ticket, Tag
+from reviews.forms import ReviewForm
+from tickets.forms import TicketForm, TicketUpdateForm
 from users.models import CustomUser
 from app.utils import generate_random_numbers
 from django.contrib import messages
@@ -11,7 +13,8 @@ from django.utils import timezone
 from django.http import JsonResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
-
+from django.db import transaction, IntegrityError
+from django.core.exceptions import ValidationError
     
 class TicketListView(LoginRequiredMixin, ListView):
     model = Ticket
@@ -19,7 +22,7 @@ class TicketListView(LoginRequiredMixin, ListView):
     context_object_name = 'tickets'
     
     def get_queryset(self):
-        tickets = Ticket.objects.prefetch_related('reviews').filter(is_archived=False).distinct()
+        tickets = Ticket.objects.prefetch_related('tags', 'reviews').filter(is_archived=False).distinct()
         for ticket in tickets:
             ticket.likes_count = ticket.get_likes_count()
             ticket.dislikes_count = ticket.get_dislikes_count()
@@ -27,59 +30,110 @@ class TicketListView(LoginRequiredMixin, ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        colour_numbers = generate_random_numbers()
-        context['col1'] = colour_numbers[0]
-        context['col2'] = colour_numbers[1]
-        context['col3'] = colour_numbers[2]
-        context['col4'] = colour_numbers[3]
-        context['col5'] = colour_numbers[4]
-        context['col6'] = colour_numbers[5]
-        context['col7'] = colour_numbers[6]
-        context['col8'] = colour_numbers[7]
-        context['col9'] = colour_numbers[8]
-        context['col10'] = colour_numbers[9]
+        colour_numbers = generate_random_numbers()[:10]
+        ticket_form = TicketForm()
+        review_form = ReviewForm()
+        context.update({
+            'col{}'.format(i): colour_numbers[i] for i in range(min(len(colour_numbers), 10))
+            })
+        context['ticket_form'] = ticket_form
+        context['review_form'] = review_form
         
         return context
     
-class TicketCreateView(LoginRequiredMixin, CreateView):
+class TicketCreateView(CreateView):
     model = Ticket
     form_class = TicketForm
     template_name = 'ticket_form.html'
     success_url = reverse_lazy('ticket_list')
 
-    def form_valid(self, form):
-        form.instance.author = self.request.user
-        response = super().form_valid(form)
-
-        if form.cleaned_data['create_review']:
-            tags_str = form.cleaned_data['review_tags']
-            tag_names = [name.strip() for name in tags_str.split(',')]
-            tag_objs = [Tag.objects.get_or_create(name=name)[0] for name in tag_names]
-            review = Review(
-                title=form.cleaned_data['review_title'],
-                content=form.cleaned_data['review_content'],
-                cover_image=form.cleaned_data.get('review_cover_image', None),
-                author=self.request.user if self.request.user.is_authenticated else None,
-                ticket=self.object,
-                created_at=timezone.now()
-            )
-            review.save()
-            review.tags.set(tag_objs)
-            messages.success(self.request, 'Ticket and review created successfully.')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            context['review_form'] = ReviewForm(self.request.POST, self.request.FILES)
         else:
-            messages.warning(self.request, 'A problem occured while trying to create the ticket')
+            context['review_form'] = ReviewForm()
+        return context
 
-        return response
+    def form_valid(self, form):
+        response_data = {}
+        try:
+            with transaction.atomic():
+                form.instance.author = self.request.user
+                response = super().form_valid(form)
+
+                if form.cleaned_data.get('create_review'):
+                    review_form = ReviewForm(self.request.POST, self.request.FILES)
+                    if review_form.is_valid():
+                        tags_str = review_form.cleaned_data.get('review_tags', '')
+                        tag_names = [name.strip() for name in tags_str.split(',') if name.strip()]
+                        tag_objs = []
+
+                        for name in tag_names:
+                            tag, created = Tag.objects.get_or_create(name=name)
+                            tag_objs.append(tag)
+
+                        review = Review(
+                            title=review_form.cleaned_data['review_title'],
+                            content=review_form.cleaned_data['review_content'],
+                            cover_image=review_form.cleaned_data.get('review_cover_image'),
+                            author=self.request.user,
+                            ticket=self.object,
+                        )
+                        review.save()
+                        messages.success(self.request, 'Ticket and review created successfully.')
+                
+                response_data = {'success': True, 'message': 'Ticket created successfully.'}
+                if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    return JsonResponse(response_data)
+                return response
+
+        except Exception as e:
+            error_message = f"An error occurred: {str(e)}"
+            messages.error(self.request, error_message)
+            response_data = {'success': False, 'error': error_message}
+
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse(response_data)
+        return self.form_invalid(form)
+
+    def form_invalid(self, form):
+        response_data = {'success': False, 'errors': form.errors}
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse(response_data)
+        return super().form_invalid(form)
     
 class TicketUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Ticket
-    form_class = TicketForm
-    template_name = 'ticket_form.html'
-    success_url = reverse_lazy('ticket_list')
+    form_class = TicketUpdateForm
 
-    def test_func(self):
-        ticket = self.get_object()
-        return self.request.user == ticket.author or self.request.user.is_staff
+    def form_valid(self, form):
+            form.instance.author = self.request.user
+            response = super().form_valid(form) 
+            
+            if self.request.is_ajax():
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Ticket updated successfully.',
+                    'ticket': {
+                        'id': self.object.pk,
+                        'title': self.object.title,
+                        'description': self.object.description,
+                        'image_url': self.object.image.url if self.object.image else None
+                    }
+                })
+            else:
+                return response
+
+    def form_invalid(self, form):
+        if self.request.is_ajax():
+            return JsonResponse({
+                'success': False,
+                'message': 'Failed to update the ticket. Please correct the errors below.',
+                'errors': form.errors
+            })
+        else:
+            return super().form_invalid(form)
 
 class ArchiveTicketView(LoginRequiredMixin, UserPassesTestMixin, View):
     def test_func(self):

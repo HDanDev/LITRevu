@@ -12,7 +12,6 @@ class Review(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     cover_image = models.ImageField(upload_to='cover_images/', blank=True, null=True)
     miniature_image = models.ImageField(upload_to='miniature_images/', blank=True, null=True)
-    tags = models.ManyToManyField(Tag, related_name='reviews', blank=True)
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='reviews')
     is_archived = models.BooleanField(default=False)
     rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])

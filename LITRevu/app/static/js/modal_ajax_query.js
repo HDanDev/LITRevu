@@ -1,5 +1,6 @@
 let activeModal;
 let formToSubmit;
+let targetItemId;
 
 document.addEventListener("DOMContentLoaded", function() {
     const navigationMenuBackground = document.getElementById('navigationMenuBackground');
@@ -12,21 +13,48 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-
-window.deletionValidationInit = (deleteButtons, modal) => {
-    for (let i = 0; i < deleteButtons.length; i++) {
-        deleteButtons[i].addEventListener("click", (event) => {
+window.asyncDeletionModalFormHandlingInit = (btnsList, modal, targetElem) => {
+    for (let i = 0; i < btnsList.length; i++) {
+        btnsList[i].addEventListener("click", (event) => {
             event.preventDefault();
-            let button = event.target;
-            formToSubmit = button.closest('form');
+            let button = btnsList[i];
+            tempFormToSubmit = button.closest('form');
+            if (tempFormToSubmit != formToSubmit) formToSubmit = tempFormToSubmit;
             let itemName = button.getAttribute("data-item-name");
-            document.getElementById("itemName").textContent = itemName;
+            // console.log(button);
+            // console.log(itemName);
+            targetElem.innerHTML = itemName;
             openModal(modal);
         });
     }
 }
 
-window.deletionCancel = (cancelBtn) => {
+window.asyncMultipleBtnsModalFormInit = (btnsList, modal, targetElem) => {
+    let modalForm = modal.getElementsByTagName('form')[0];
+    for (let i = 0; i < btnsList.length; i++) {
+        btnsList[i].addEventListener("click", (event) => {
+            event.preventDefault();
+            let btn = btnsList[i];
+            let itemName = btn.getAttribute("data-item-name");
+            targetItemId = btn.getAttribute("data-item-id");
+            modalForm = btn.closest('form').action;
+            targetElem.innerHTML = itemName;
+            openModal(modal);
+            // uniqueBtnListener(validationBtn, modalForm.id, callbackCloseModal, modalForm)
+        });
+    }
+}
+
+window.asyncSingleBtnModalFormInit = (btn, modal, validationBtn) => {
+    let modalForm = modal.getElementsByTagName('form')[0];
+    btn.addEventListener("click", (event) => {
+        event.preventDefault();
+        openModal(modal);
+        uniqueBtnListener(validationBtn, modalForm, callbackCloseModal, btn.getAttribute("data-item-action"));
+    });
+}
+
+window.asyncModalFormCancel = (cancelBtn) => {
     cancelBtn.onclick = (event) => {
         event.preventDefault();
         activeModal.style.display = "none";
@@ -34,7 +62,7 @@ window.deletionCancel = (cancelBtn) => {
     } 
 }
 
-window.deletionConfirm = (confirmBtn) => {
+window.asyncModalFormConfirm = (confirmBtn) => {
     confirmBtn.onclick = () => {
         if (formToSubmit) {
             let tempFormToSubmit = formToSubmit;
@@ -61,14 +89,15 @@ window.onclick = (event) => {
     }
 }
 
-window.submitForm = async (event, formId, callback, url) => {
+window.submitForm = async (event, form, callback, url) => {
     event.preventDefault();
-    let form = document.getElementById(formId);
     if (!form) {
-        console.error('Form not found:', formId);
+        console.error('Form not found');
         return;
     }
+    console.log(form);
     let formData = new FormData(form);
+    console.log(formData);
 
     try {
         let response = await fetch(url, {
@@ -80,14 +109,16 @@ window.submitForm = async (event, formId, callback, url) => {
         });
 
         if (!response.ok) {
+            console.error('Network response was not ok', response.status, response.statusText);
             throw new Error('Network response was not ok');
         }
 
         let responseData = await response.json();
+        console.log('Response data:', responseData);
 
         if (responseData.success) {
             if (callback && typeof callback === 'function') {
-                callback(formId, responseData);
+                callback(form.id, responseData);
             }
             alert(responseData.message);
         } else {
@@ -174,9 +205,9 @@ window.clearProfileFeedbacks = () => {
 window.likeListener = (likeBtns) => {
     likeBtns.forEach((btn) => {
         btn.addEventListener("click", (event) => {
-            let formId = btn.closest('form').id;
+            let form = btn.closest('form');
             let url = btn.closest('form').action;
-            submitForm(event, formId, handleVoteCallback, url);
+            submitForm(event, form, handleVoteCallback, url);
         });
     });
 }
@@ -184,17 +215,15 @@ window.likeListener = (likeBtns) => {
 window.dislikeListener = (dislikeBtns) => {
     dislikeBtns.forEach((btn) => {
         btn.addEventListener("click", (event) => {
-            let formId = btn.closest('form').id;
+            let form = btn.closest('form');
             let url = btn.closest('form').action;
-            submitForm(event, formId, handleVoteCallback, url);
+            submitForm(event, form, handleVoteCallback, url);
         });
     });
 }
 
-window.uniqueBtnListener = (btn, callbackFunction) => {
+window.uniqueBtnListener = (btn, form, callbackFunction, url) => {
     btn.addEventListener("click", (event) => {
-        let formId = btn.closest('form').id;
-        let url = btn.closest('form').action;
-        submitForm(event, formId, callbackFunction, url);
+        submitForm(event, form, callbackFunction, url);
     });
 }
