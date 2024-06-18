@@ -126,7 +126,7 @@ window.submitForm = async (event, form, callback, url) => {
             for (let field in responseData.errors) {
                 errors += responseData.errors[field][0] + '\n';
             }
-            alert(errors);
+            alert(responseData.message, errors);
         }
     } catch (error) {
         alert('An error occurred while processing your request.');

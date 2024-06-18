@@ -47,61 +47,42 @@ class TicketCreateView(CreateView):
     template_name = 'ticket_form.html'
     success_url = reverse_lazy('ticket_list')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if self.request.POST:
-            context['review_form'] = ReviewForm(self.request.POST, self.request.FILES)
-        else:
-            context['review_form'] = ReviewForm()
-        return context
-
     def form_valid(self, form):
         response_data = {}
         try:
             with transaction.atomic():
                 form.instance.author = self.request.user
-                response = super().form_valid(form)
-
-                if form.cleaned_data.get('create_review'):
-                    review_form = ReviewForm(self.request.POST, self.request.FILES)
-                    if review_form.is_valid():
-                        tags_str = review_form.cleaned_data.get('review_tags', '')
-                        tag_names = [name.strip() for name in tags_str.split(',') if name.strip()]
-                        tag_objs = []
-
-                        for name in tag_names:
-                            tag, created = Tag.objects.get_or_create(name=name)
-                            tag_objs.append(tag)
-
+                
+                if form.is_valid():
+                        
+                    super().form_valid(form)
+                    response_data = {'success': True, 'message': 'Ticket created successfully.'}
+                            
+                    if form.cleaned_data.get('create_review') and form.cleaned_data.get('review_title'):
+                        
                         review = Review(
-                            title=review_form.cleaned_data['review_title'],
-                            content=review_form.cleaned_data['review_content'],
-                            cover_image=review_form.cleaned_data.get('review_cover_image'),
+                            title=form.cleaned_data['review_title'],
+                            content=form.cleaned_data['review_content'],
+                            cover_image=form.cleaned_data.get('review_cover_image'),
+                            rating=form.cleaned_data.get('review_rating') if form.cleaned_data.get('review_rating') else 0,
                             author=self.request.user,
                             ticket=self.object,
                         )
                         review.save()
-                        messages.success(self.request, 'Ticket and review created successfully.')
-                
-                response_data = {'success': True, 'message': 'Ticket created successfully.'}
-                if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                    return JsonResponse(response_data)
-                return response
+                        response_data = {'success': True, 'message': 'Ticket and review created successfully.'}
+                    else:
+                        response_data = {'success': False, 'message': 'To create a review you must at least give it a title.'}
+                    
+            return JsonResponse(response_data)
 
         except Exception as e:
             error_message = f"An error occurred: {str(e)}"
             messages.error(self.request, error_message)
             response_data = {'success': False, 'error': error_message}
 
-        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse(response_data)
-        return self.form_invalid(form)
-
     def form_invalid(self, form):
         response_data = {'success': False, 'errors': form.errors}
-        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse(response_data)
-        return super().form_invalid(form)
+        return JsonResponse(response_data)
     
 class TicketUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Ticket

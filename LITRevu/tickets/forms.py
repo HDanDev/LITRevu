@@ -3,7 +3,7 @@ from tickets.models import Ticket
 from tags.models import Tag
 
 class TicketForm(forms.ModelForm):
-    tags = forms.CharField(required=False, help_text='Enter tags separated by commas.')
+    tags = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder':'Enter tags separated by commas.'}))
     create_review = forms.BooleanField(required=False, label='Create an review')
     review_title = forms.CharField(max_length=200, required=False)
     review_content = forms.CharField(widget=forms.Textarea, required=False)
