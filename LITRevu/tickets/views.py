@@ -32,12 +32,10 @@ class TicketListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         colour_numbers = generate_random_numbers()[:10]
         ticket_form = TicketForm()
-        review_form = ReviewForm()
         context.update({
             'col{}'.format(i): colour_numbers[i] for i in range(min(len(colour_numbers), 10))
             })
         context['ticket_form'] = ticket_form
-        context['review_form'] = review_form
         
         return context
     
@@ -71,7 +69,7 @@ class TicketCreateView(CreateView):
                         review.save()
                         response_data = {'success': True, 'message': 'Ticket and review created successfully.'}
                     else:
-                        response_data = {'success': False, 'message': 'To create a review you must at least give it a title.'}
+                        response_data = {'success': False, 'error': 'To create a review you must at least give it a title.'}
                     
             return JsonResponse(response_data)
 

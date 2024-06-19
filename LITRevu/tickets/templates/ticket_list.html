@@ -44,33 +44,57 @@ Tickets
             <div class="tag">{{ tag.name }}</div>
             {% endfor %}
           </div>
-          <p class="item-infos">Created at: {{ ticket.created_at|date:"F j, Y" }} by {{ ticket.author }}</p>
-          <div class="like-container item-infos">
-            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-            <form id="like-form-{{ ticket.pk }}" method="post" action="{% url 'ticket_like' ticket.pk %}" class="like-block">
-              {% csrf_token %}
-              <button class="like-btn icon-hover-box"><i class="icon-heart"></i></button>
-              <span class="likes-count">{{ ticket.likes_count }}</span>
-            </form>
-            <form id="dislike-form-{{ ticket.pk }}" method="post" action="{% url 'ticket_dislike' ticket.pk %}" class="like-block">
-              {% csrf_token %}
-              <button class="dislike-btn icon-hover-box"><i class="icon-heart-broken"></i></button>
-              <span class="dislikes-count">{{ ticket.dislikes_count }}</span>
-            </form>
+          <div class="item-infos info-likes-block">
+            <span>Posted on {{ ticket.created_at|date:"F j, Y" }} by {{ ticket.author }}</span>
+            <div class="like-container">
+              <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+              <form id="like-form-{{ ticket.pk }}" method="post" action="{% url 'ticket_like' ticket.pk %}" class="like-block">
+                {% csrf_token %}
+                <button class="like-btn icon-hover-box"><i class="icon-heart"></i></button>
+                <span class="likes-count">{{ ticket.likes_count }}</span>
+              </form>
+              <form id="dislike-form-{{ ticket.pk }}" method="post" action="{% url 'ticket_dislike' ticket.pk %}" class="like-block">
+                {% csrf_token %}
+                <button class="dislike-btn icon-hover-box"><i class="icon-heart-broken"></i></button>
+                <span class="dislikes-count">{{ ticket.dislikes_count }}</span>
+              </form>
+            </div>
           </div>
-          <ul class="item-infos">
+          <ul class="item-infos reviews-list">
             {% for review in ticket.reviews.all %}
               {% if not review.is_archived %}
-                <li>
-                  <a href="{% url 'review_detail' review.pk %}" class="aligned icon-hover-box"><h4>{{ review.title }}</h4><i class="icon-eye-plus"></i></a>
-                  <p>{{ review.content }}</p>
+                <li id="review-{{ review.pk }}">
+                  <div class="item-container">
+                    {% if review.cover_image %}
+                    <div class="item-background" style="background-image:url({{ review.cover_image.url }})"></div>
+                    {% endif %}
+                    <h4 class="aligned item-infos">
+                      <a class="item-title icon-hover-box" href="{% url 'review_detail' review.pk %}" class="aligned icon-hover-box">
+                      <span class="font-style">{{ review.title }}</span>
+                      <i class="icon-eye-plus"></i>
+                      </a>
+                      {% if request.user == review.author or request.user.is_superuser %}
+                        <form id="editReviewForm" method="post" action="{% url 'review_update' review.pk %}">
+                          {% csrf_token %}
+                          <button type="button" id="edit-review-btn" name="edit-review" class="review-edit-btn icon-hover-box" data-item-name="{{ review.title }}"><i class="icon-pencil crud-btn"></i></button>
+                        </form>
+                        <form id="deleteReviewForm" method="post" action="{% url 'review_delete' review.pk %}">
+                          {% csrf_token %}
+                          <button type="button" id="delete-review-btn" name="delete-review" class="review-delete-btn icon-hover-box" data-item-name="{{ review.title }}"><i class="icon-bin crud-btn"></i></button>
+                        </form>
+                      {% endif %}
+                    </h4>
+                    <p><a class="item-infos" href="{% url 'review_detail' review.pk %}">{{ review.content }}</a></p>
+                    <p class="item-infos mini-font">Posted on {{ review.created_at|date:"F j, Y" }} by {{ review.author }}</p>
+                  <div>
                 </li>
               {% endif %}
             {% endfor %}
-            <form id="createReviewForm" method="post" action="{% url 'review_create' ticket.pk %}">
-              {% csrf_token %}
-              <button type="button" id="create-review-btn" name="create-review" class="review-create-btn icon-hover-box"><i class="icon-plus double-icon"></i><i class="icon-file-text double-icon"></i></button>
-            </form>
+            <button type="button" id="create-review-btn-{{ ticket.pk }}" name="create-review" class="review-create-btn icon-hover-box" data-item-action="{% url 'review_create' ticket.pk %}"><i class="icon-plus double-icon"></i><i class="icon-file-text double-icon"></i>
+            {% if ticket.reviews.all|length == 0 %}
+            <span class="blue">Be the first to review !</span>
+            {% endif %}
+          </button>
           </ul>
         </li>
         {% endif %}
@@ -86,9 +110,9 @@ Tickets
       <div class="page right">
           <div class="page-content">
               <h2 class="main-title">Are you sure you want to delete "<span id="deleteItemName"></span>"?</h2>
-              <div class="aligned-centered">
-                <button class="icon-hover-box" id="deleteTicketModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
-                <button class="icon-hover-box" id="deleteTicketModalConfirmBtn"><i class="icon-bin validation-icon"></i></button>
+              <div class="validation-btns">
+                <button class="icon-hover-box cancel-footer-btn" id="deleteTicketModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
+                <button class="icon-hover-box delete-footer-btn" id="deleteTicketModalConfirmBtn"><i class="icon-bin validation-icon"></i></button>
               </div>
           </div>
           <i class="icon-cross close icon-hover-box" id="deleteTicketModalCloseBtn"></i>
@@ -124,9 +148,9 @@ Tickets
                 <div class="error">{{ ticket_form.image.errors }}</div>
               {% endif %}
             </div>
-            <div class="aligned-centered item-infos">
-              <button class="icon-hover-box" id="editTicketModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
-              <button class="icon-hover-box" id="editTicketModalConfirmBtn"><i class="icon-checkmark validation-icon"></i></button>
+            <div class="item-infos validation-btns">
+              <button class="icon-hover-box cancel-footer-btn" id="editTicketModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
+              <button class="icon-hover-box confirm-footer-btn" id="editTicketModalConfirmBtn"><i class="icon-checkmark validation-icon"></i></button>
             </div>
           </div>
           <i class="icon-cross close icon-hover-box" id="editTicketModalCloseBtn"></i>
@@ -174,9 +198,9 @@ Tickets
             <label for="id_create_review">Create a review:</label>
             {{ ticket_form.create_review }}
           </div>
-          <div class="aligned-centered item-infos">
-            <button type="button" class="icon-hover-box" id="createTicketModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
-            <button type="submit" class="icon-hover-box" id="createTicketModalConfirmBtn"><i class="icon-checkmark validation-icon"></i></button>
+          <div class="item-infos validation-btns">
+            <button type="button" class="icon-hover-box cancel-footer-btn" id="createTicketModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
+            <button type="submit" class="icon-hover-box confirm-footer-btn" id="createTicketModalConfirmBtn"><i class="icon-checkmark validation-icon"></i></button>
           </div>
       </div>
   </div>      

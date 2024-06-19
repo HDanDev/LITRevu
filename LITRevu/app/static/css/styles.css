@@ -185,6 +185,7 @@ form {
     position: absolute;
     top: 8px;
     right: 4px;
+    z-index: 2;
 }
 
 .close-left {
@@ -305,6 +306,13 @@ footer p {
     right: 8px;
 }
 
+.info-likes-block {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .like-container {
     display: flex;
     flex-direction: row;
@@ -318,6 +326,13 @@ footer p {
 
 .single-page-spiral {
     left: 0;
+}
+
+.blue {
+    font-family: var(--main-font-style);
+    color: rgb(124, 182, 209);
+    font-style: italic;
+    font-size: 12px;
 }
 
 .rating {
@@ -374,8 +389,27 @@ footer p {
     border-bottom: 1px solid #ccc;
 }
 
+.reviews-list {
+    padding-left: 40px;
+    max-width: calc(100% - 40px);
+}
+
+.mini-font {
+    font-size: 12px;
+}
+
+.review-create-btn:not(:first-child) {
+    font-size: 24px;
+    margin-right: auto;
+    margin-top: 6px;
+}
+
 .item-title {
     margin-right: 8px;
+}
+
+.font-style {
+    font-family: var(--main-font-style);
 }
 
 .crud-btn {
@@ -423,12 +457,49 @@ footer p {
     background-color: var(--success-colour);
 }
 
-.validation-btn {
+.warning {
+    background-color: var(--warning-colour);
+}
+
+.error {
+    background-color: var(--error-colour);
+}
+
+.validation-btn,
+.cancel-footer-btn,
+.confirm-footer-btn,
+.delete-footer-btn {
+    background-color: #ffffff00;
     transition: background-color 0.3s ease-in;
 }
 
-.validation-btn:hover {
+.cancel-footer-btn,
+.confirm-footer-btn,
+.delete-footer-btn {
+    width: calc(100% / 2 - 8px);
+    padding: 8px 0;
+    border-radius: 8px;
+}
+
+.validation-btn:hover,
+.confirm-footer-btn:hover {
     background-color: var(--success-colour);
+}
+
+.cancel-footer-btn:hover {
+    background-color: var(--warning-colour);
+}
+
+.delete-footer-btn:hover {
+    background-color: var(--error-colour);
+}
+
+.validation-btns {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 8px;
 }
 
 .colour-1 {
@@ -529,10 +600,14 @@ footer p {
 }
 
 .icon-hover-box:hover .icon-notification,
-.icon-hover-box:hover .icon-pencil,
-.icon-hover-box:hover .icon-blocked {
+.icon-hover-box:hover .icon-pencil {
     color: rgb(233, 185, 123);
     transform: scale(1.2);
+}
+
+.icon-hover-box:hover .icon-blocked {
+    color: rgb(255, 233, 204);
+    transform: scale(1.5);
 }
 
 .icon-eye-plus,
