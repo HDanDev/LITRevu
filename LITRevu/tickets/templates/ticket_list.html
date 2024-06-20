@@ -28,14 +28,8 @@ Tickets
           <h3 class="aligned item-infos">
           <a class="item-title" href="{% url 'review_list' ticket.pk %}">{{ ticket.title }}</a>
             {% if request.user == ticket.author or request.user.is_superuser %}
-              <form id="editTicketForm" method="post" action="{% url 'ticket_update' ticket.pk %}">
-                {% csrf_token %}
-                <button type="button" id="edit-ticket-btn" name="edit-ticket" class="ticket-edit-btn icon-hover-box" data-item-name="{{ ticket.title }}"><i class="icon-pencil crud-btn"></i></button>
-              </form>
-              <form id="deleteTicketForm" method="post" action="{% url 'ticket_delete' ticket.pk %}">
-                {% csrf_token %}
-                <button type="button" id="delete-ticket-btn" name="delete-ticket" class="ticket-delete-btn icon-hover-box" data-item-name="{{ ticket.title }}"><i class="icon-bin crud-btn"></i></button>
-              </form>
+              <button type="button" id="edit-ticket-btn" name="edit-ticket" class="ticket-edit-btn icon-hover-box" data-item-name="{{ ticket.title }}" data-item-action="{% url 'ticket_update' ticket.pk %}"><i class="icon-pencil crud-btn"></i></button>
+              <button type="button" id="delete-ticket-btn" name="delete-ticket" class="ticket-delete-btn icon-hover-box" data-item-name="{{ ticket.title }}" data-item-action="{% url 'ticket_delete' ticket.pk %}"><i class="icon-bin crud-btn"></i></button>
             {% endif %}
           </h3>
           <a class="item-infos" href="{% url 'review_list' ticket.pk %}"><p>{{ ticket.description }}</p></a>
@@ -106,65 +100,67 @@ Tickets
 {% block modals %}
 
 <div id="deleteTicketModal" class="modal">
-  <div class="notepad margin-auto">
-      <div class="page right">
-          <div class="page-content">
-              <h2 class="main-title">Are you sure you want to delete "<span id="deleteItemName"></span>"?</h2>
-              <div class="validation-btns">
-                <button class="icon-hover-box cancel-footer-btn" id="deleteTicketModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
-                <button class="icon-hover-box delete-footer-btn" id="deleteTicketModalConfirmBtn"><i class="icon-bin validation-icon"></i></button>
-              </div>
-          </div>
-          <i class="icon-cross close icon-hover-box" id="deleteTicketModalCloseBtn"></i>
+  <form id="deleteTicketForm" class="notepad margin-auto" method="post">
+    <div class="page right">
+      <div class="page-content">
+        <h2 class="main-title">Are you sure you want to delete "<span id="deleteItemName"></span>"?</h2>
+        {% csrf_token %}
+        <div class="validation-btns">
+          <button class="icon-hover-box cancel-footer-btn" id="deleteTicketModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
+          <button class="icon-hover-box delete-footer-btn" id="deleteTicketModalConfirmBtn"><i class="icon-bin validation-icon"></i></button>
+        </div>
       </div>
-      <div class="spiral single-page-spiral"></div>
-  </div>
+      <i class="icon-cross close icon-hover-box" id="deleteTicketModalCloseBtn"></i>
+    </div>
+    <div class="spiral single-page-spiral"></div>
+  </form>
 </div>
 
 <div id="editTicketModal" class="modal">
-  <div class="notepad margin-auto">
-      <div class="page right">
-          <div class="page-content">
-            <h2 class="main-title item-infos">"<span id="editItemName"></span>" ticket edition</h2>
-            {{ ticket_form.non_field_errors }}
-            <div class="item-infos">
-              <label for="{{ ticket_form.title.id_for_label }}">Title:</label>
-              {{ ticket_form.title }}
-              {% if ticket_form.title.errors %}
-                <div class="error">{{ ticket_form.title.errors }}</div>
-              {% endif %}
-            </div>
-            <div class="item-infos">
-              <label for="{{ ticket_form.description.id_for_label }}">Description:</label>
-              {{ ticket_form.description }}
-              {% if ticket_form.description.errors %}
-                <div class="error">{{ ticket_form.description.errors }}</div>
-              {% endif %}
-            </div>
-            <div class="item-infos">
-              <label for="{{ ticket_form.image.id_for_label }}">Image:</label>
-              {{ ticket_form.image }}
-              {% if ticket_form.image.errors %}
-                <div class="error">{{ ticket_form.image.errors }}</div>
-              {% endif %}
-            </div>
-            <div class="item-infos validation-btns">
-              <button class="icon-hover-box cancel-footer-btn" id="editTicketModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
-              <button class="icon-hover-box confirm-footer-btn" id="editTicketModalConfirmBtn"><i class="icon-checkmark validation-icon"></i></button>
-            </div>
-          </div>
-          <i class="icon-cross close icon-hover-box" id="editTicketModalCloseBtn"></i>
+  <form id="editTicketForm" class="notepad margin-auto" method="post">
+    <div class="page right">
+      <div class="page-content">
+        <h2 class="main-title item-infos">"<span id="editItemName"></span>" ticket edition</h2>
+        {% csrf_token %}
+        {{ ticket_form.non_field_errors }}
+        <div class="item-infos">
+          <label for="{{ ticket_form.title.id_for_label }}">Title:</label>
+          {{ ticket_form.title }}
+          {% if ticket_form.title.errors %}
+            <div class="error">{{ ticket_form.title.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos">
+          <label for="{{ ticket_form.description.id_for_label }}">Description:</label>
+          {{ ticket_form.description }}
+          {% if ticket_form.description.errors %}
+            <div class="error">{{ ticket_form.description.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos">
+          <label for="{{ ticket_form.image.id_for_label }}">Image:</label>
+          {{ ticket_form.image }}
+          {% if ticket_form.image.errors %}
+            <div class="error">{{ ticket_form.image.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos validation-btns">
+          <button class="icon-hover-box cancel-footer-btn" id="editTicketModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
+          <button class="icon-hover-box confirm-footer-btn" id="editTicketModalConfirmBtn"><i class="icon-checkmark validation-icon"></i></button>
+        </div>
       </div>
-      <div class="spiral single-page-spiral"></div>
-  </div>
+      <i class="icon-cross close icon-hover-box" id="editTicketModalCloseBtn"></i>
+    </div>
+    <div class="spiral single-page-spiral"></div>
+  </form>
 </div>
 
 <div id="createTicketModal" class="modal">
-  <form id="createTicketForm" class="notepad margin-auto">
-    {% csrf_token %}
+  <form id="createTicketForm" class="notepad margin-auto" method="post">
     <div id="ticketFormPage" class="page left double-page-layout">
       <div class="page-content">
           <h2 class="main-title item-infos">Ticket creation</h2>
+          {% csrf_token %}
           {{ ticket_form.non_field_errors }}
           <div class="item-infos">
             <label for="{{ ticket_form.title.id_for_label }}">Title:</label>
@@ -206,7 +202,7 @@ Tickets
   </div>      
   <div id="reviewFormPage" class="page right double-page-layout d-none">
     <div class="page-content">
-        <h2 class="main-title item-infos"></h2>
+        <h2 class="main-title item-infos">Review creation</h2>
         <div class="main-content">
           <div id="reviewForm">
             <div class="item-infos">
@@ -249,6 +245,56 @@ Tickets
     <i class="icon-cross close close-left icon-hover-box" id="createTicketModalCloseBtn"></i>
     <div id="spiralDoublePage" class="spiral double-page-spiral-modal"></div>
   </form>
+</div>
+
+<div id="createReviewModal" class="modal">
+  <form id="createReviewForm" class="notepad margin-auto" method="post">
+      <div class="page right">
+          <div class="page-content">
+            <h2 class="main-title item-infos">Review creation</h2>
+            {% csrf_token %}
+            <div class="item-infos">
+              <label for="{{ review_form.title.id_for_label }}">Title:</label>
+              {{ review_form.title }}
+              {% if review_form.title.errors %}
+                <div class="error">{{ review_form.title.errors }}</div>
+              {% endif %}
+            </div>
+            <div class="item-infos">
+              <label for="{{ review_form.content.id_for_label }}">Content:</label>
+              {{ review_form.content }}
+              {% if review_form.content.errors %}
+                <div class="error">{{ review_form.content.errors }}</div>
+              {% endif %}
+            </div>
+            <div class="item-infos">
+              <label for="{{ review_form.cover_image.id_for_label }}">Image:</label>
+              {{ review_form.cover_image }}
+              {% if review_form.cover_image.errors %}
+                <div class="error">{{ review_form.cover_image.errors }}</div>
+              {% endif %}
+            </div>
+            <div class="item-infos">
+              <label for="{{ review_form.rating.id_for_label }}">Rating:</label>
+              <div class="rating">
+                {% for i in "543210" %}
+                <input type="radio" name="{{ review_form.rating.name }}" id="star{{ i }}" value="{{ i }}">
+                <label for="star{{ i }}" title="{{ i }} stars">☆</label>
+                {% endfor %}
+              </div>
+              {% if review_form.rating.errors %}
+                <div class="error">{{ review_form.rating.error }}</div>
+              {% endif %}
+            </div>
+            <div class="item-infos validation-btns">
+              <button class="icon-hover-box cancel-footer-btn" id="createReviewModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
+              <button class="icon-hover-box confirm-footer-btn" id="createReviewModalConfirmBtn"><i class="icon-checkmark validation-icon"></i></button>
+            </div>
+          </div>
+          <i class="icon-cross close icon-hover-box" id="createReviewModalCloseBtn"></i>
+      </div>
+      <div class="spiral single-page-spiral"></div>
+    </form>
 </div>
 
 {% endblock %}

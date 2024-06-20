@@ -31,11 +31,11 @@ class TicketListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         colour_numbers = generate_random_numbers()[:10]
-        ticket_form = TicketForm()
         context.update({
             'col{}'.format(i): colour_numbers[i] for i in range(min(len(colour_numbers), 10))
             })
-        context['ticket_form'] = ticket_form
+        context['ticket_form'] =  TicketForm()
+        context['review_form'] =  ReviewForm()
         
         return context
     
@@ -57,19 +57,19 @@ class TicketCreateView(CreateView):
                     response_data = {'success': True, 'message': 'Ticket created successfully.'}
                             
                     if form.cleaned_data.get('create_review') and form.cleaned_data.get('review_title'):
-                        
-                        review = Review(
-                            title=form.cleaned_data['review_title'],
-                            content=form.cleaned_data['review_content'],
-                            cover_image=form.cleaned_data.get('review_cover_image'),
-                            rating=form.cleaned_data.get('review_rating') if form.cleaned_data.get('review_rating') else 0,
-                            author=self.request.user,
-                            ticket=self.object,
-                        )
-                        review.save()
-                        response_data = {'success': True, 'message': 'Ticket and review created successfully.'}
-                    else:
-                        response_data = {'success': False, 'error': 'To create a review you must at least give it a title.'}
+                        try:
+                            review = Review(
+                                title=form.cleaned_data['review_title'],
+                                content=form.cleaned_data['review_content'],
+                                cover_image=form.cleaned_data.get('review_cover_image'),
+                                rating=form.cleaned_data.get('review_rating') if form.cleaned_data.get('review_rating') else 0,
+                                author=self.request.user,
+                                ticket=self.object,
+                            )
+                            review.save()
+                            response_data = {'success': True, 'message': 'Ticket and review created successfully.'}
+                        except Exception as e:
+                            response_data = {'success': False, 'error': e}
                     
             return JsonResponse(response_data)
 
@@ -120,12 +120,17 @@ class ArchiveTicketView(LoginRequiredMixin, UserPassesTestMixin, View):
         return self.request.user == ticket.author or self.request.user.is_staff
 
     def post(self, request, *args, **kwargs):
-        ticket = get_object_or_404(Ticket, pk=self.kwargs['pk'])
+        try:
+            ticket = get_object_or_404(Ticket, pk=self.kwargs['pk'])
+            
+            ticket.is_archived = True
+            ticket.save()
+
+            reviews = Review.objects.filter(ticket=ticket)
+            reviews.update(is_archived=True)
+
+            return JsonResponse({'success': True, 'message': 'Ticket successfully deleted'})
         
-        ticket.is_archived = True
-        ticket.save()
-
-        reviews = Review.objects.filter(ticket=ticket)
-        reviews.update(is_archived=True)
-
-        return redirect('ticket_list')
+        except Exception as e:
+            error_message = f"An error occurred: {str(e)}"
+            return JsonResponse({'success': False, 'error': error_message})

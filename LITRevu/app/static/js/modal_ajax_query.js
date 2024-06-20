@@ -30,29 +30,35 @@ window.asyncDeletionModalFormHandlingInit = (btnsList, modal, targetElem) => {
     }
 }
 
-window.asyncMultipleBtnsModalFormInit = (btnsList, modal, targetElem) => {
+window.asyncMultipleBtnsModalFormInit = (btnsList, modal, validationBtn, targetElem=null) => {
     let modalForm = modal.getElementsByTagName('form')[0];
     for (let i = 0; i < btnsList.length; i++) {
-        btnsList[i].addEventListener("click", (event) => {
-            event.preventDefault();
+        btnsList[i].addEventListener("click", () => {
             let btn = btnsList[i];
-            let itemName = btn.getAttribute("data-item-name");
-            targetItemId = btn.getAttribute("data-item-id");
-            modalForm = btn.closest('form').action;
-            targetElem.innerHTML = itemName;
-            openModal(modal);
-            // uniqueBtnListener(validationBtn, modalForm.id, callbackCloseModal, modalForm)
+            action = autoFormFill(modal, btn, targetElem);
+            uniqueBtnListener(validationBtn, modalForm, callbackCloseModal, action);
         });
     }
 }
 
-window.asyncSingleBtnModalFormInit = (btn, modal, validationBtn) => {
+window.asyncSingleBtnModalFormInit = (btn, modal, validationBtn, targetElem=null) => {
     let modalForm = modal.getElementsByTagName('form')[0];
-    btn.addEventListener("click", (event) => {
-        event.preventDefault();
-        openModal(modal);
-        uniqueBtnListener(validationBtn, modalForm, callbackCloseModal, btn.getAttribute("data-item-action"));
+    btn.addEventListener("click", () => {
+        action = autoFormFill(modal, btn, targetElem);
+        uniqueBtnListener(validationBtn, modalForm, callbackCloseModal, action);
     });
+}
+
+window.autoFormFill = (targetModal, btn, targetElem=null) => {
+    action = btn.getAttribute("data-item-action")
+    targetModal.action = action;
+    if (targetElem != null) {
+        document.getElementById(targetElem);
+        let itemName = btn.getAttribute("data-item-name");
+        targetElem.innerHTML = itemName;
+    }
+    openModal(targetModal);
+    return action;
 }
 
 window.asyncModalFormCancel = (cancelBtn) => {

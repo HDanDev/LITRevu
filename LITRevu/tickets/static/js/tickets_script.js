@@ -22,11 +22,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const editItemName = document.getElementById("editItemName");
     const editTicketButtons = document.getElementsByClassName("ticket-edit-btn");
 
+    const createReviewModal = document.getElementById("createReviewModal");
+    const createReviewConfirmButton = document.getElementById("createReviewModalConfirmBtn");
+    const createReviewCancelButton = document.getElementById("createReviewModalCancelBtn");
+    const createReviewCloseModalBtn = document.getElementById("createReviewModalCloseBtn");
+    const createReviewTicketButtons = document.getElementsByClassName("review-create-btn");
+
     //////////// List const list ////////////
 
     const ticketsLikeBtns = document.querySelectorAll(".like-btn");
     const ticketsDislikeBtns = document.querySelectorAll(".dislike-btn");
-    const reviewsCreateBtns = document.querySelectorAll(".review-create-btn");
     const stars = document.querySelectorAll('.rating input[type="radio"]');
     const starsLabels = document.querySelectorAll('.rating label');
     
@@ -35,18 +40,25 @@ document.addEventListener("DOMContentLoaded", () => {
     deletionCloseModalBtn.addEventListener("click", () => {closeModal(deletionModal);});
     createCloseModalBtn.addEventListener("click", () => {closeModal(createModal);});
     editCloseModalBtn.addEventListener("click", () => {closeModal(editModal);});
+    createReviewCloseModalBtn.addEventListener("click", () => {closeModal(createReviewModal);});
 
     //////////// Functions init ////////////
 
-    asyncDeletionModalFormHandlingInit(deletionTicketButtons, deletionModal, deleteItemName);
+    // asyncDeletionModalFormHandlingInit(deletionTicketButtons, deletionModal, deleteItemName);
+    // asyncModalFormCancel(deletionCancelButton);
+    // asyncModalFormConfirm(deletionConfirmButton);
+
+    asyncMultipleBtnsModalFormInit(deletionTicketButtons, deletionModal, deletionConfirmButton, deleteItemName);
     asyncModalFormCancel(deletionCancelButton);
-    asyncModalFormConfirm(deletionConfirmButton);
 
     asyncSingleBtnModalFormInit(createTicketButton, createModal, createConfirmButton);
     asyncModalFormCancel(createCancelButton);
 
-    asyncMultipleBtnsModalFormInit(editTicketButtons, editModal, editItemName);
+    asyncMultipleBtnsModalFormInit(editTicketButtons, editModal, editConfirmButton, editItemName);
     asyncModalFormCancel(editCancelButton);
+
+    asyncMultipleBtnsModalFormInit(createReviewTicketButtons, createReviewModal, createReviewConfirmButton);
+    asyncModalFormCancel(createReviewCancelButton);
 
     likeListener(ticketsLikeBtns);
     dislikeListener(ticketsDislikeBtns);
