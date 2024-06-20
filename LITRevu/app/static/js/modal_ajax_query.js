@@ -1,6 +1,7 @@
 let activeModal;
 let formToSubmit;
 let targetItemId;
+let previousStar;
 
 document.addEventListener("DOMContentLoaded", function() {
     const navigationMenuBackground = document.getElementById('navigationMenuBackground');
@@ -226,4 +227,55 @@ window.uniqueBtnListener = (btn, form, callbackFunction, url) => {
     btn.addEventListener("click", (event) => {
         submitForm(event, form, callbackFunction, url);
     });
+}
+
+window.manageRating = (stars, labels) => {
+    stars.forEach((star) => {
+        star.addEventListener("click", (event) => {
+            const selectedStars = event.target.value;
+
+            if (selectedStars == previousStar) {
+                const lastRadioButton = stars[stars.length - 1];
+                lastRadioButton.checked = true;
+                labels.forEach((label) => {
+                    label.classList.add('selected');
+                });
+            }
+            else {
+                labels.forEach((label, index) => {
+                    if (index < selectedStars) {
+                        label.classList.add('selected');
+                    } else {
+                        label.classList.remove('selected');
+                    }
+                });
+            }
+            previousStar = selectedStars;
+        });
+    });
+}
+
+window.singleToDoublePageSwitcher = () => {
+
+    var createReviewCheckbox = document.getElementById("id_create_review");
+    var reviewForm = document.getElementById('reviewFormPage');
+    var ticketForm = document.getElementById('ticketFormPage');
+    var spiral = document.getElementById('spiralDoublePage');
+    var closeBtn = document.getElementById('createTicketModalCloseBtn');
+
+    createReviewCheckbox.addEventListener('change', (event) => {
+        if (event.target.checked) {
+            reviewForm.classList.remove('d-none');
+            ticketForm.classList.add('double-page-layout');
+            spiral.classList.remove('double-page-spiral-modal');
+            closeBtn.classList.add('double-page-close');
+        } else {
+            reviewForm.classList.add('d-none');
+            ticketForm.classList.remove('double-page-layout');
+            spiral.classList.add('double-page-spiral-modal');
+            closeBtn.classList.remove('double-page-close');
+        }
+    });
+
+    createReviewCheckbox.dispatchEvent(new Event('change'));
 }

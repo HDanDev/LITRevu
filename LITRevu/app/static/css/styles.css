@@ -345,6 +345,10 @@ footer p {
     display: none;
 }
 
+.rating label:last-of-type {
+    display: none;
+}
+
 .rating label {
     font-size: 2rem;
     color: #ddd;

@@ -233,7 +233,7 @@ Tickets
             <div class="item-infos">
               <label for="{{ ticket_form.review_rating.id_for_label }}">Rating:</label>
               <div class="rating">
-                {% for i in "12345" %}
+                {% for i in "543210" %}
                 <input type="radio" name="{{ ticket_form.review_rating.name }}" id="star{{ i }}" value="{{ i }}">
                 <label for="star{{ i }}" title="{{ i }} stars">☆</label>
                 {% endfor %}
