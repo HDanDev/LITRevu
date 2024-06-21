@@ -89,6 +89,13 @@ document.addEventListener("DOMContentLoaded", () => {
     manageRating(starCreateTicketReviewRating, labelCreateTicketReviewRating);
     manageRating(starCreateSingleRating, labelCreateSingleRating);
     manageRating(starEditSingleRating, labelEditSingleRating);
+
+    imagePreviewManager("editTicketFormImageInput", "editTicketFormImagePreview");
+    imagePreviewManager("editReviewFormImageInput", "editReviewFormImagePreview");
+    imagePreviewManager("createTicketFormImageInput", "createTicketFormImagePreview");
+    imagePreviewManager("reviewFormImageInput", "reviewFormImagePreview");
+    imagePreviewManager("createReviewFormImageInput", "createReviewFormImagePreview");
     
     singleToDoublePageSwitcher();
+    followUserManager(".follow-btn");
 });

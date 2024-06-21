@@ -237,6 +237,14 @@ window.callbackUpdatedPassword = (formId, responseData) => {
     ProfileUpdateFeedback(formId, responseData, "feedbackProfilePasswordDiv", "Password", "userProfilePassword");
 }
 
+window.callbackFollow = (responseData, source) => {
+    if (responseData.status) {
+        source.innerHTML = '<i class="icon-user-minus"></i>';
+    } else {
+        source.innerHTML = '<i class="icon-user-plus"></i>';
+    }
+}
+
 window.ProfileUpdateFeedback = (formId, responseData, divId, innerHtmlText, targetInfo) => {
     clearProfileFeedbacks();
     const targetElem = document.getElementById(targetInfo);
@@ -346,4 +354,28 @@ window.singleToDoublePageSwitcher = () => {
     });
 
     createReviewCheckbox.dispatchEvent(new Event('change'));
+}
+
+window.imagePreviewManager = (imageInputId, previewPlaceholder) => {
+    document.getElementById(imageInputId).addEventListener("change", function(event) {
+        var reader = new FileReader();
+        reader.onload = function() {
+            var output = document.getElementById(previewPlaceholder);
+            output.src = reader.result;
+        }
+        reader.readAsDataURL(event.target.files[0]);
+    });
+}
+
+window.followUserManager = (btnClassName) => {
+    document.querySelectorAll(btnClassName).forEach((button) => {
+        button.addEventListener('click', (event) => {
+            const btn = event.target.closest('button');
+            const userId = btn.getAttribute('data-user-id');
+            const url = btn.getAttribute('data-url');
+            const csrfToken = btn.getAttribute('data-token');
+            const jsonBody = JSON.stringify({ user_id: userId });
+            ajaxCall(url, csrfToken, jsonBody, callbackFollow, btn);
+        });
+    });
 }

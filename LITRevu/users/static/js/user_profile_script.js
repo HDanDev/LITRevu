@@ -32,4 +32,6 @@ document.addEventListener("DOMContentLoaded", function() {
     uniqueBtnListener(updateUsernameFormValidationBtn, updateUsernameForm, callbackUpdatedUsername, updateUsernameForm.action);
     uniqueBtnListener(updatePasswordFormValidationBtn, updatePasswordForm, callbackUpdatedPassword, updatePasswordForm.action);
 
+    imagePreviewManager("id_profile_picture", "profile-picture-preview");
+    followUserManager(".follow-btn");
 });

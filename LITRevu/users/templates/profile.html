@@ -42,9 +42,9 @@ Edit Profile
         <label for="{{ form.profile_picture.id_for_label }}">Profile Picture:</label>
         <div>
         {% if user.profile.profile_picture %}
-            <img id="profile-picture-preview" src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" style="max-width: 200px;">
+            <img id="profile-picture-preview" src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="image-preview">
         {% else %}
-            <img id="profile-picture-preview" src="{% static 'images/PPPlaceholder.PNG' %}" alt="Profile Picture" style="max-width: 200px;">
+            <img id="profile-picture-preview" src="{% static 'images/PPPlaceholder.PNG' %}" alt="Profile Picture" class="image-preview">
         {% endif %}        
         </div>
         {{ form.profile_picture }}
@@ -72,8 +72,7 @@ People you follow
 {% for user in followed_users %}
 <li>
     <a href="{% url 'user_detail' user.pk %}">{{ user.username }}</a>
-    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-    <button class="follow-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}">
+    <button class="follow-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}" data-token="{{ csrf_token }}">
         {% if user.followers_status %}
             <i class="icon-user-minus"></i>
         {% else %}
@@ -145,7 +144,6 @@ People you follow
 {% endblock %}
 
 {% block js %}
-<script src="{% static 'js/profile_picture_script.js' %}"></script>
 <Script src="{% static 'js/modal_ajax_query.js' %}"></Script>
 <script src="{% static 'js/users.js' %}"></script>
 <script src="{% static 'js/user_profile_script.js' %}"></script>

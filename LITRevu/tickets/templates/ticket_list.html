@@ -39,7 +39,21 @@ Tickets
             {% endfor %}
           </div>
           <div class="item-infos info-likes-block">
-            <span>Posted on {{ ticket.created_at|date:"F j, Y" }} by {{ ticket.author }}</span>
+            <p>
+              <span>Posted on {{ ticket.created_at|date:"F j, Y" }} by </span>
+              {% if request.user != ticket.author %}
+              <span>{{ ticket.author }}</span>    
+              <button class="follow-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}" data-token="{{ csrf_token }}">
+                {% if user.followers_status %}
+                  <i class="icon-user-minus"></i>
+                {% else %}
+                  <i class="icon-user-plus"></i>
+                {% endif %}
+              </button>
+              {% else %}
+              you
+              {% endif %}
+            </p>
             <div class="like-container">
               <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
               <form id="like-form-{{ ticket.pk }}" method="post" action="{% url 'ticket_like' ticket.pk %}" class="like-block">
@@ -73,7 +87,20 @@ Tickets
                       {% endif %}
                     </h4>
                     <p><a class="item-infos" href="{% url 'review_detail' review.pk %}">{{ review.content }}</a></p>
-                    <p class="item-infos mini-font">Posted on {{ review.created_at|date:"F j, Y" }} by {{ review.author }}</p>
+                    <p class="item-infos mini-font"><span>Posted on {{ review.created_at|date:"F j, Y" }} by </span>
+                      {% if request.user != review.author %}
+                      <span>{{ review.author }}</span>
+                      <button class="follow-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}" data-token="{{ csrf_token }}">
+                        {% if user.followers_status %}
+                            <i class="icon-user-minus"></i>
+                        {% else %}
+                            <i class="icon-user-plus"></i>
+                        {% endif %}
+                      </button>
+                      {% else %}
+                      you
+                      {% endif %}
+                    </p>
                   <div>
                 </li>
               {% endif %}
@@ -149,8 +176,12 @@ Tickets
           {% endif %}
         </div>
         <div class="item-infos">
-          <label for="{{ ticket_form.image.id_for_label }}">Image:</label>
-          {{ ticket_form.image }}
+          <label for="{{ ticket_form.image.id_for_label }}">Image:</label>        
+          <div>
+            <img id="editTicketFormImagePreview" src="{% static 'images/PPPlaceholder.PNG' %}" alt="Profile Picture" class="image-preview">
+          </div>
+          {{ ticket_form.image.label_tag }} 
+          <input type="file" name="{{ ticket_form.image.name }}" id="editTicketFormImageInput" class="{{ ticket_form.image.css_classes }}" {{ ticket_form.image.attrs|safe }} />
           {% if ticket_form.image.errors %}
             <div class="error">{{ ticket_form.image.errors }}</div>
           {% endif %}
@@ -187,8 +218,12 @@ Tickets
           {% endif %}
         </div>
         <div class="item-infos">
-          <label for="{{ review_form.cover_image.id_for_label }}">Image:</label>
-          {{ review_form.cover_image }}
+          <label for="{{ review_form.cover_image.id_for_label }}">Image:</label>        
+          <div>
+            <img id="editReviewFormImagePreview" src="{% static 'images/PPPlaceholder.PNG' %}" alt="Profile Picture" class="image-preview">  
+          </div>
+          {{ review_form.cover_image.label_tag }} 
+          <input type="file" name="{{ review_form.cover_image.name }}" id="editReviewFormImageInput" class="{{ review_form.cover_image.css_classes }}" {{ review_form.cover_image.attrs|safe }} />
           {% if review_form.cover_image.errors %}
             <div class="error">{{ review_form.cover_image.errors }}</div>
           {% endif %}
@@ -245,8 +280,12 @@ Tickets
             {% endif %}
           </div>
           <div class="item-infos">
-            <label for="{{ ticket_form.image.id_for_label }}">Image:</label>
-            {{ ticket_form.image }}
+            <label for="{{ ticket_form.image.id_for_label }}">Image:</label>        
+            <div>
+              <img id="createTicketFormImagePreview" src="{% static 'images/PPPlaceholder.PNG' %}" alt="Profile Picture" class="image-preview">      
+            </div>
+            {{ ticket_form.image.label_tag }} 
+            <input type="file" name="{{ ticket_form.image.name }}" id="createTicketFormImageInput" class="{{ ticket_form.image.css_classes }}" {{ ticket_form.image.attrs|safe }} />
             {% if ticket_form.image.errors %}
               <div class="error">{{ ticket_form.image.errors }}</div>
             {% endif %}
@@ -281,8 +320,12 @@ Tickets
               {% endif %}
             </div>
             <div class="item-infos">
-              <label for="{{ ticket_form.review_cover_image.id_for_label }}">Image:</label>
-              {{ ticket_form.review_cover_image }}
+              <label for="{{ ticket_form.review_cover_image.id_for_label }}">Image:</label>        
+              <div>
+                <img id="reviewFormImagePreview" src="{% static 'images/PPPlaceholder.PNG' %}" alt="Profile Picture" class="image-preview">      
+              </div>
+              {{ ticket_form.review_cover_image.label_tag }} 
+              <input type="file" name="{{ ticket_form.review_cover_image.name }}" id="reviewFormImageInput" class="{{ ticket_form.review_cover_image.css_classes }}" {{ ticket_form.review_cover_image.attrs|safe }} />
               {% if ticket_form.review_cover_image.errors %}
                 <div class="error">{{ ticket_form.review_cover_image.errors }}</div>
               {% endif %}
@@ -329,8 +372,12 @@ Tickets
           {% endif %}
         </div>
         <div class="item-infos">
-          <label for="{{ review_form.cover_image.id_for_label }}">Image:</label>
-          {{ review_form.cover_image }}
+          <label for="{{ review_form.cover_image.id_for_label }}">Image:</label>          
+          <div>
+            <img id="createReviewFormImagePreview" src="{% static 'images/PPPlaceholder.PNG' %}" alt="Profile Picture" class="image-preview">    
+          </div>
+          {{ review_form.cover_image.label_tag }} 
+          <input type="file" name="{{ review_form.cover_image.name }}" id="createReviewFormImageInput" class="{{ review_form.cover_image.css_classes }}" {{ review_form.cover_image.attrs|safe }} />
           {% if review_form.cover_image.errors %}
             <div class="error">{{ review_form.cover_image.errors }}</div>
           {% endif %}
