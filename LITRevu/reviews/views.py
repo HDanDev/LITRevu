@@ -9,6 +9,7 @@ from tickets.models import Ticket
 from reviews.forms import ReviewForm
 from users.models import CustomUser
 from django.contrib import messages
+from django.http import JsonResponse
 from django.utils import timezone
 from django.http import HttpResponseRedirect
 
@@ -37,32 +38,35 @@ class ReviewDetailView(LoginRequiredMixin, DetailView):
 class ReviewCreateView(LoginRequiredMixin, CreateView):
     model = Review
     form_class = ReviewForm
-    template_name = 'review_form.html'
-    success_url = reverse_lazy('review_list')  
+    success_url = reverse_lazy('ticket_list')
     guest_user = None
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        ticket_pk = self.kwargs.get('pk')
-        context['ticket'] = Ticket.objects.get(pk=ticket_pk)
-        return context
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.method == 'POST' and not request.user.is_authenticated:
-            self.guest_user = CustomUser.objects.get_or_create(username='guest')[0]
-            login(request, self.guest_user)
-        return super().dispatch(request, *args, **kwargs)
+    # def dispatch(self, request, *args, **kwargs):
+    #     if request.method == 'POST' and not request.user.is_authenticated:
+    #         self.guest_user = CustomUser.objects.get_or_create(username='guest')[0]
+    #         login(request, self.guest_user)
+    #     return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        form.instance.author = self.request.user if self.request.user.is_authenticated else self.guest_user
-        form.instance.ticket = get_object_or_404(Ticket, pk=self.kwargs['pk'])
-        return super().form_valid(form)
+        try:
+            form.instance.author = self.request.user if self.request.user.is_authenticated else self.guest_user
+            form.instance.ticket = get_object_or_404(Ticket, pk=self.kwargs['pk'])
+            if form.is_valid():           
+                super().form_valid(form)
+            
+                return JsonResponse({'success': True, 'message': 'review created successfully!'})
 
-    def get_success_url(self):
-        ticket_pk = self.kwargs['pk']
-        if self.guest_user:
-            logout(self.request)
-        return reverse_lazy('review_list', kwargs={'pk': ticket_pk})
+        except Exception as e:
+            error_message = f"An error occurred: {str(e)}"
+            messages.error(self.request, error_message)
+
+        return JsonResponse({'success': False, 'error': error_message})
+
+    # def get_success_url(self):
+    #     ticket_pk = self.kwargs['pk']
+    #     if self.guest_user:
+    #         logout(self.request)
+    #     return reverse_lazy('review_list', kwargs={'pk': ticket_pk})
     
 class ReviewUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Review

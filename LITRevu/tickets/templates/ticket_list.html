@@ -278,8 +278,8 @@ Tickets
               <label for="{{ review_form.rating.id_for_label }}">Rating:</label>
               <div id="createSingleRating" class="rating">
                 {% for i in "543210" %}
-                <input type="radio" name="rating2" id="star2-{{ i }}" value="{{ i }}" class="rating-create-single-input">
-                <label for="star2-{{ i }}" title="{{ i }} stars" class="rating-create-single-label">☆</label>
+                <input type="radio" name="rating" id="star-{{ i }}" value="{{ i }}" class="rating-create-single-input">
+                <label for="star-{{ i }}" title="{{ i }} stars" class="rating-create-single-label">☆</label>
                 {% endfor %}
             </div>
               {% if review_form.rating.errors %}
