@@ -265,11 +265,13 @@ footer p {
 .page.left {
     border-right: 1px solid #ccc;
     padding-right: 32px;
+    padding-left: 3.5%;
 }
 
 .page.right {
     border-left: 1px solid #ccc;
     padding-left: 32px;
+    padding-right: 3.5%;
 }
 
 /* .page-content p,
