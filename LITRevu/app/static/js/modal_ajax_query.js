@@ -1,7 +1,4 @@
 let activeModal;
-let formToSubmit;
-let targetItemId;
-let previousStar;
 
 document.addEventListener("DOMContentLoaded", function() {
     const navigationMenuBackground = document.getElementById('navigationMenuBackground');
@@ -13,22 +10,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
-
-window.asyncDeletionModalFormHandlingInit = (btnsList, modal, targetElem) => {
-    for (let i = 0; i < btnsList.length; i++) {
-        btnsList[i].addEventListener("click", (event) => {
-            event.preventDefault();
-            let button = btnsList[i];
-            tempFormToSubmit = button.closest('form');
-            if (tempFormToSubmit != formToSubmit) formToSubmit = tempFormToSubmit;
-            let itemName = button.getAttribute("data-item-name");
-            // console.log(button);
-            // console.log(itemName);
-            targetElem.innerHTML = itemName;
-            openModal(modal);
-        });
-    }
-}
 
 window.asyncMultipleBtnsModalFormInit = (btnsList, modal, validationBtn, targetElem=null) => {
     let modalForm = modal.getElementsByTagName('form')[0];
@@ -69,16 +50,6 @@ window.asyncModalFormCancel = (cancelBtn) => {
     } 
 }
 
-window.asyncModalFormConfirm = (confirmBtn) => {
-    confirmBtn.onclick = () => {
-        if (formToSubmit) {
-            let tempFormToSubmit = formToSubmit;
-            formToSubmit = null;
-            tempFormToSubmit.submit();
-        }
-    }
-}
-
 window.openModal = (modal) => {
     modal.style.display = 'flex';
     activeModal = modal;
@@ -107,39 +78,64 @@ window.submitForm = async (event, form, callback, url) => {
     console.log(formData);
 
     try {
-        let response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-            body: formData
-        });
-
-        if (!response.ok) {
-            console.error('Network response was not ok', response.status, response.statusText);
-            throw new Error('Network response was not ok');
-        }
-
-        let responseData = await response.json();
-        console.log('Response data:', responseData);
-
-        if (responseData.success) {
-            if (callback && typeof callback === 'function') {
-                callback(form.id, responseData);
-            }
-            alert(responseData.message);
-        } else {
-            let errors = '';
-            for (let field in responseData.errors) {
-                errors += responseData.errors[field][0] + '\n';
-            }
-            alert(responseData.message, errors);
-        }
+        ajaxCallFromForm(url, callback, formData, form);        
     } catch (error) {
         alert('An error occurred while processing your request.');
         console.error('Fetch error:', error);
     }
 };
+
+window.ajaxCallFromForm = async (url, callback, formData, form) => {
+    let response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: formData
+    });
+    handleResponse(response, callback, form);
+}
+
+window.ajaxCall = async (url, token, jsonBody, callback, source=null) => {
+    let response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': token,
+        },
+        body: jsonBody
+    });
+    handleResponse(response, callback, null, source);
+}
+
+window.handleResponse = async (response, callback, form=null, source=null) => {
+    if (!response.ok) {
+        console.error('Network response was not ok', response.status, response.statusText);
+        throw new Error('Network response was not ok');
+    }
+
+    let responseData = await response.json();
+    console.log('Response data:', responseData);
+
+    if (responseData.success) {
+        console.log('is success');
+        if (callback && typeof callback === 'function') {
+            if (form != null){
+                callback(form.id, responseData);
+            } 
+            else {
+                callback(responseData, source);
+            } 
+        }
+        alert(responseData.message);
+    } else {
+        let errors = '';
+        for (let field in responseData.errors) {
+            errors += responseData.errors[field][0] + '\n';
+        }
+        alert(responseData.message, errors);
+    }
+}
 
 window.handleVoteCallback = (formId, responseData) => {
     let likeFormId = formId;
@@ -236,27 +232,30 @@ window.uniqueBtnListener = (btn, form, callbackFunction, url) => {
 }
 
 window.manageRating = (stars, labels) => {
-    stars.forEach((star) => {
-        star.addEventListener("click", (event) => {
-            const selectedStars = event.target.value;
+    let previousStar = null;
 
+    Array.prototype.forEach.call(stars, (star, s) => {
+        star.addEventListener("click", (event) => {
+            let selectedStars = event.target;
+            // console.log(event.target.closest('form').id);
+            
             if (selectedStars == previousStar) {
-                const lastRadioButton = stars[stars.length - 1];
+                let lastRadioButton = stars[stars.length - 1];
                 lastRadioButton.checked = true;
-                labels.forEach((label) => {
+                Array.prototype.forEach.call(labels, (label) => {
                     label.classList.add('selected');
                 });
-            }
-            else {
-                labels.forEach((label, index) => {
-                    if (index < selectedStars) {
+                previousStar = null;
+            } else {
+                Array.prototype.forEach.call(labels, (label, l) => {
+                    if (l < selectedStars) {
                         label.classList.add('selected');
                     } else {
                         label.classList.remove('selected');
                     }
                 });
+                previousStar = selectedStars;
             }
-            previousStar = selectedStars;
         });
     });
 }

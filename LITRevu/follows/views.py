@@ -6,18 +6,26 @@ from follows.models import UserFollow
 
 @login_required
 def toggle_follow(request, pk):
-    followed_user = get_object_or_404(CustomUser, pk=pk)
-    user_follow, created = UserFollow.objects.get_or_create(
-        follower=request.user,
-        followed=followed_user,
-        defaults={'status': True}
-    )
-    
-    if not created:
-        user_follow.status = not user_follow.status
-        user_follow.save()
+    try: 
+        followed_user = get_object_or_404(CustomUser, pk=pk)
+        user_follow, created = UserFollow.objects.get_or_create(
+            follower=request.user,
+            followed=followed_user,
+            defaults={'status': True}
+        )
+        
+        if not created:
+            user_follow.status = not user_follow.status
+            user_follow.save()
+            isSuccess = True
+            error = ''
+    except Exception as e:
+        isSuccess = False
+        error = e
 
     return JsonResponse({
+        'success': isSuccess,
+        'error': error,
         'status': user_follow.status,
         'updated_at': user_follow.updated_at
     })

@@ -26,14 +26,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const createReviewConfirmButton = document.getElementById("createReviewModalConfirmBtn");
     const createReviewCancelButton = document.getElementById("createReviewModalCancelBtn");
     const createReviewCloseModalBtn = document.getElementById("createReviewModalCloseBtn");
-    const createReviewTicketButtons = document.getElementsByClassName("review-create-btn");
+    const createReviewButtons = document.getElementsByClassName("review-create-btn");
 
     //////////// List const list ////////////
 
     const ticketsLikeBtns = document.querySelectorAll(".like-btn");
     const ticketsDislikeBtns = document.querySelectorAll(".dislike-btn");
-    const stars = document.querySelectorAll('.rating input[type="radio"]');
-    const starsLabels = document.querySelectorAll('.rating label');
+
+    const starCreateTicketReviewRating = document.getElementsByClassName("rating-create-ticket-review-input");
+    const labelCreateTicketReviewRating = document.getElementsByClassName("rating-create-ticket-review-label");
+    const starCreateSingleRating = document.getElementsByClassName("rating-create-single-input");
+    const labelCreateSingleRating = document.getElementsByClassName("rating-create-single-label");
     
     //////////// Listeners init ////////////
 
@@ -44,24 +47,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //////////// Functions init ////////////
 
-    // asyncDeletionModalFormHandlingInit(deletionTicketButtons, deletionModal, deleteItemName);
-    // asyncModalFormCancel(deletionCancelButton);
-    // asyncModalFormConfirm(deletionConfirmButton);
+    asyncSingleBtnModalFormInit(createTicketButton, createModal, createConfirmButton);
+    asyncModalFormCancel(createCancelButton);
 
     asyncMultipleBtnsModalFormInit(deletionTicketButtons, deletionModal, deletionConfirmButton, deleteItemName);
     asyncModalFormCancel(deletionCancelButton);
 
-    asyncSingleBtnModalFormInit(createTicketButton, createModal, createConfirmButton);
-    asyncModalFormCancel(createCancelButton);
-
     asyncMultipleBtnsModalFormInit(editTicketButtons, editModal, editConfirmButton, editItemName);
     asyncModalFormCancel(editCancelButton);
 
-    asyncMultipleBtnsModalFormInit(createReviewTicketButtons, createReviewModal, createReviewConfirmButton);
+    asyncMultipleBtnsModalFormInit(createReviewButtons, createReviewModal, createReviewConfirmButton);
     asyncModalFormCancel(createReviewCancelButton);
 
     likeListener(ticketsLikeBtns);
     dislikeListener(ticketsDislikeBtns);
-    manageRating(stars, starsLabels);
+
+    manageRating(starCreateTicketReviewRating, labelCreateTicketReviewRating);
+    manageRating(starCreateSingleRating, labelCreateSingleRating);
+    
     singleToDoublePageSwitcher();
 });
