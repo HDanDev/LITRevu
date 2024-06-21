@@ -2,9 +2,10 @@ from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.contrib.auth import login, logout
 from django.shortcuts import get_object_or_404
 from django.views.generic.edit import CreateView
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, View
 from django.urls import reverse_lazy
 from reviews.models import Review
+from comments.models import Comment
 from tickets.models import Ticket
 from reviews.forms import ReviewForm
 from users.models import CustomUser
@@ -78,17 +79,23 @@ class ReviewUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         review = self.get_object()
         return self.request.user.is_superuser or self.request.user == review.author
     
-class ReviewDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    model = Review
-    template_name = 'review_confirm_delete.html'
-    success_url = reverse_lazy('review_list')
-
+class ArchiveReviewView(LoginRequiredMixin, UserPassesTestMixin, View):
     def test_func(self):
-        review = self.get_object()
-        return self.request.user.is_superuser or self.request.user == review.author
+        ticket = get_object_or_404(Review, pk=self.kwargs['pk'])
+        return self.request.user == ticket.author or self.request.user.is_staff
     
-    def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.object.is_archived = True
-        self.object.save()
-        return HttpResponseRedirect(self.get_success_url())
+    def post(self, request, *args, **kwargs):
+        try:
+            review = get_object_or_404(Review, pk=self.kwargs['pk'])
+            
+            review.is_archived = True
+            review.save()
+
+            comments = Comment.objects.filter(review=review)
+            comments.update(is_archived=True)
+
+            return JsonResponse({'success': True, 'message': 'Review successfully deleted'})
+        
+        except Exception as e:
+            error_message = f"An error occurred: {str(e)}"
+            return JsonResponse({'success': False, 'error': error_message})

@@ -1,3 +1,24 @@
+class FormTypeEnum {
+    
+    static EDIT_TICKET =  'edit_ticket';
+    static DELETE_TICKET =  'delete_ticket';
+    static EDIT_REVIEW =  'edit_review';
+    static DELETE_REVIEW =  'delete_review';
+    static EDIT_COMMENT =  'edit_comment';
+    static DELETE_COMMENT =  'delete_comment';
+
+    static values() {
+        return [
+            FormTypeEnum.EDIT_TICKET,
+            FormTypeEnum.DELETE_TICKET,
+            FormTypeEnum.EDIT_REVIEW,
+            FormTypeEnum.DELETE_REVIEW,
+            FormTypeEnum.EDIT_COMMENT,
+            FormTypeEnum.DELETE_COMMENT
+        ];
+    }
+}
+
 let activeModal;
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -11,35 +32,77 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-window.asyncMultipleBtnsModalFormInit = (btnsList, modal, validationBtn, targetElem=null) => {
+window.asyncMultipleBtnsModalFormInit = (btnsList, modal, validationBtn, targetId=null, formType=null) => {
     let modalForm = modal.getElementsByTagName('form')[0];
     for (let i = 0; i < btnsList.length; i++) {
         btnsList[i].addEventListener("click", () => {
             let btn = btnsList[i];
-            action = autoFormFill(modal, btn, targetElem);
+            action = autoFormFill(modal, btn, targetId, formType);
             uniqueBtnListener(validationBtn, modalForm, callbackCloseModal, action);
         });
     }
 }
 
-window.asyncSingleBtnModalFormInit = (btn, modal, validationBtn, targetElem=null) => {
+window.asyncSingleBtnModalFormInit = (btn, modal, validationBtn, targetId=null, formType=null) => {
     let modalForm = modal.getElementsByTagName('form')[0];
     btn.addEventListener("click", () => {
-        action = autoFormFill(modal, btn, targetElem);
+        action = autoFormFill(modal, btn, targetId, formType);
         uniqueBtnListener(validationBtn, modalForm, callbackCloseModal, action);
     });
 }
 
-window.autoFormFill = (targetModal, btn, targetElem=null) => {
-    action = btn.getAttribute("data-item-action")
+window.autoFormFill = (targetModal, btn, targetId=null, formType=null) => {
+    action = btn.getAttribute("data-item-action");
     targetModal.action = action;
-    if (targetElem != null) {
-        document.getElementById(targetElem);
-        let itemName = btn.getAttribute("data-item-name");
-        targetElem.innerHTML = itemName;
+    if (formType != null && targetId != null) {
+        const objectId = btn.getAttribute("data-item-id");
+                // editTicketPopulateModal(targetId, objectId);
+
+        switch (formType) {
+            case FormTypeEnum.EDIT_TICKET:
+                editTicketPopulateModal(targetId, objectId);
+                break;
+            case FormTypeEnum.DELETE_TICKET:
+                deleteTicketPopulateModal(targetId, objectId);
+                break;
+            case FormTypeEnum.EDIT_REVIEW:
+                editReviewPopulateModal(targetId, objectId);
+                break;
+            case FormTypeEnum.DELETE_REVIEW:
+                deleteReviewPopulateModal(targetId, objectId);
+                break;
+            case FormTypeEnum.EDIT_COMMENT:
+                // populateModal(targetId, objectId);
+                break;
+            case FormTypeEnum.DELETE_COMMENT:
+                // populateModal(targetId, objectId);
+                break;
+            default:
+            break;
+        }
     }
     openModal(targetModal);
     return action;
+}
+
+window.editTicketPopulateModal = (targetId, objectId) => {   
+    const ticket = ticketsData.find(t => t.id === objectId);
+    targetId.innerHTML = ticket.title;
+}
+
+window.editReviewPopulateModal = (targetId, objectId) => {    
+    const review = reviewsData.find(r => r.id === objectId);
+    targetId.innerHTML = review.title;
+}
+
+window.deleteTicketPopulateModal = (targetId, objectId) => {    
+    const ticket = ticketsData.find(t => t.id === objectId);
+    targetId.innerHTML = ticket.title;
+}
+
+window.deleteReviewPopulateModal = (targetId, objectId) => {    
+    const review = reviewsData.find(r => r.id === objectId);
+    targetId.innerHTML = review.title;
 }
 
 window.asyncModalFormCancel = (cancelBtn) => {

@@ -28,8 +28,8 @@ Tickets
           <h3 class="aligned item-infos">
           <a class="item-title" href="{% url 'review_list' ticket.pk %}">{{ ticket.title }}</a>
             {% if request.user == ticket.author or request.user.is_superuser %}
-              <button type="button" id="edit-ticket-btn" name="edit-ticket" class="ticket-edit-btn icon-hover-box" data-item-name="{{ ticket.title }}" data-item-action="{% url 'ticket_update' ticket.pk %}"><i class="icon-pencil crud-btn"></i></button>
-              <button type="button" id="delete-ticket-btn" name="delete-ticket" class="ticket-delete-btn icon-hover-box" data-item-name="{{ ticket.title }}" data-item-action="{% url 'ticket_delete' ticket.pk %}"><i class="icon-bin crud-btn"></i></button>
+              <button type="button" id="edit-ticket-btn" name="edit-ticket" class="ticket-edit-btn icon-hover-box" data-item-id="{{ ticket.pk }}" data-item-name="{{ ticket.title }}" data-item-action="{% url 'ticket_update' ticket.pk %}"><i class="icon-pencil crud-btn"></i></button>
+              <button type="button" id="delete-ticket-btn" name="delete-ticket" class="ticket-delete-btn icon-hover-box" data-item-id="{{ ticket.pk }}" data-item-name="{{ ticket.title }}" data-item-action="{% url 'ticket_delete' ticket.pk %}"><i class="icon-bin crud-btn"></i></button>
             {% endif %}
           </h3>
           <a class="item-infos" href="{% url 'review_list' ticket.pk %}"><p>{{ ticket.description }}</p></a>
@@ -68,14 +68,8 @@ Tickets
                       <i class="icon-eye-plus"></i>
                       </a>
                       {% if request.user == review.author or request.user.is_superuser %}
-                        <form id="editReviewForm" method="post" action="{% url 'review_update' review.pk %}">
-                          {% csrf_token %}
-                          <button type="button" id="edit-review-btn" name="edit-review" class="review-edit-btn icon-hover-box" data-item-name="{{ review.title }}"><i class="icon-pencil crud-btn"></i></button>
-                        </form>
-                        <form id="deleteReviewForm" method="post" action="{% url 'review_delete' review.pk %}">
-                          {% csrf_token %}
-                          <button type="button" id="delete-review-btn" name="delete-review" class="review-delete-btn icon-hover-box" data-item-name="{{ review.title }}"><i class="icon-bin crud-btn"></i></button>
-                        </form>
+                        <button type="button" id="edit-review-btn" name="edit-review" class="review-edit-btn icon-hover-box" data-item-id="{{ review.pk }}" data-item-name="{{ review.title }}" data-item-action="{% url 'review_update' review.pk %}"><i class="icon-pencil crud-btn"></i></button>
+                        <button type="button" id="delete-review-btn" name="delete-review" class="review-delete-btn icon-hover-box" data-item-id="{{ review.pk }}" data-item-name="{{ review.title }}" data-item-action="{% url 'review_delete' review.pk %}"><i class="icon-bin crud-btn"></i></button>
                       {% endif %}
                     </h4>
                     <p><a class="item-infos" href="{% url 'review_detail' review.pk %}">{{ review.content }}</a></p>
@@ -103,7 +97,7 @@ Tickets
   <form id="deleteTicketForm" class="notepad margin-auto" method="post">
     <div class="page right">
       <div class="page-content">
-        <h2 class="main-title">Are you sure you want to delete "<span id="deleteItemName"></span>"?</h2>
+        <h2 class="main-title">Are you sure you want to delete "<span id="deleteTicketName"></span>"?</h2>
         {% csrf_token %}
         <div class="validation-btns">
           <button class="icon-hover-box cancel-footer-btn" id="deleteTicketModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
@@ -116,11 +110,28 @@ Tickets
   </form>
 </div>
 
+<div id="deleteReviewModal" class="modal">
+  <form id="deleteReviewForm" class="notepad margin-auto" method="post">
+    <div class="page right">
+      <div class="page-content">
+        <h2 class="main-title">Are you sure you want to delete "<span id="deleteReviewName"></span>"?</h2>
+        {% csrf_token %}
+        <div class="validation-btns">
+          <button class="icon-hover-box cancel-footer-btn" id="deleteReviewModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
+          <button class="icon-hover-box delete-footer-btn" id="deleteReviewModalConfirmBtn"><i class="icon-bin validation-icon"></i></button>
+        </div>
+      </div>
+      <i class="icon-cross close icon-hover-box" id="deleteReviewModalCloseBtn"></i>
+    </div>
+    <div class="spiral single-page-spiral"></div>
+  </form>
+</div>
+
 <div id="editTicketModal" class="modal">
   <form id="editTicketForm" class="notepad margin-auto" method="post">
     <div class="page right">
       <div class="page-content">
-        <h2 class="main-title item-infos">"<span id="editItemName"></span>" ticket edition</h2>
+        <h2 class="main-title item-infos">"<span id="editTicketName"></span>" ticket edition</h2>
         {% csrf_token %}
         {{ ticket_form.non_field_errors }}
         <div class="item-infos">
@@ -150,6 +161,56 @@ Tickets
         </div>
       </div>
       <i class="icon-cross close icon-hover-box" id="editTicketModalCloseBtn"></i>
+    </div>
+    <div class="spiral single-page-spiral"></div>
+  </form>
+</div>
+
+<div id="editReviewModal" class="modal">
+  <form id="editReviewForm" class="notepad margin-auto" method="post">
+    <div class="page right">
+      <div class="page-content">
+        <h2 class="main-title item-infos">"<span id="editReviewName"></span>" review edition</h2>
+        {% csrf_token %}
+        <div class="item-infos">
+          <label for="{{ review_form.title.id_for_label }}">Title:</label>
+          {{ review_form.title }}
+          {% if review_form.title.errors %}
+            <div class="error">{{ review_form.title.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos">
+          <label for="{{ review_form.content.id_for_label }}">Content:</label>
+          {{ review_form.content }}
+          {% if review_form.content.errors %}
+            <div class="error">{{ review_form.content.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos">
+          <label for="{{ review_form.cover_image.id_for_label }}">Image:</label>
+          {{ review_form.cover_image }}
+          {% if review_form.cover_image.errors %}
+            <div class="error">{{ review_form.cover_image.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos">
+          <label for="{{ review_form.rating.id_for_label }}">Rating:</label>
+          <div id="editSingleRating" class="rating">
+            {% for i in "543210" %}
+            <input type="radio" name="rating" id="star-{{ i }}" value="{{ i }}" class="rating-edit-review-input">
+            <label for="star-{{ i }}" title="{{ i }} stars" class="rating-edit-review-label">☆</label>
+            {% endfor %}
+        </div>
+          {% if review_form.rating.errors %}
+            <div class="error">{{ review_form.rating.error }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos validation-btns">
+          <button class="icon-hover-box cancel-footer-btn" id="editReviewModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
+          <button class="icon-hover-box confirm-footer-btn" id="editReviewModalConfirmBtn"><i class="icon-checkmark validation-icon"></i></button>
+        </div>
+      </div>
+      <i class="icon-cross close icon-hover-box" id="editReviewModalCloseBtn"></i>
     </div>
     <div class="spiral single-page-spiral"></div>
   </form>
@@ -249,57 +310,85 @@ Tickets
 
 <div id="createReviewModal" class="modal">
   <form id="createReviewForm" class="notepad margin-auto" method="post">
-      <div class="page right">
-          <div class="page-content">
-            <h2 class="main-title item-infos">Review creation</h2>
-            {% csrf_token %}
-            <div class="item-infos">
-              <label for="{{ review_form.title.id_for_label }}">Title:</label>
-              {{ review_form.title }}
-              {% if review_form.title.errors %}
-                <div class="error">{{ review_form.title.errors }}</div>
-              {% endif %}
-            </div>
-            <div class="item-infos">
-              <label for="{{ review_form.content.id_for_label }}">Content:</label>
-              {{ review_form.content }}
-              {% if review_form.content.errors %}
-                <div class="error">{{ review_form.content.errors }}</div>
-              {% endif %}
-            </div>
-            <div class="item-infos">
-              <label for="{{ review_form.cover_image.id_for_label }}">Image:</label>
-              {{ review_form.cover_image }}
-              {% if review_form.cover_image.errors %}
-                <div class="error">{{ review_form.cover_image.errors }}</div>
-              {% endif %}
-            </div>
-            <div class="item-infos">
-              <label for="{{ review_form.rating.id_for_label }}">Rating:</label>
-              <div id="createSingleRating" class="rating">
-                {% for i in "543210" %}
-                <input type="radio" name="rating" id="star-{{ i }}" value="{{ i }}" class="rating-create-single-input">
-                <label for="star-{{ i }}" title="{{ i }} stars" class="rating-create-single-label">☆</label>
-                {% endfor %}
-            </div>
-              {% if review_form.rating.errors %}
-                <div class="error">{{ review_form.rating.error }}</div>
-              {% endif %}
-            </div>
-            <div class="item-infos validation-btns">
-              <button class="icon-hover-box cancel-footer-btn" id="createReviewModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
-              <button class="icon-hover-box confirm-footer-btn" id="createReviewModalConfirmBtn"><i class="icon-checkmark validation-icon"></i></button>
-            </div>
-          </div>
-          <i class="icon-cross close icon-hover-box" id="createReviewModalCloseBtn"></i>
+    <div class="page right">
+      <div class="page-content">
+        <h2 class="main-title item-infos">Review creation</h2>
+        {% csrf_token %}
+        <div class="item-infos">
+          <label for="{{ review_form.title.id_for_label }}">Title:</label>
+          {{ review_form.title }}
+          {% if review_form.title.errors %}
+            <div class="error">{{ review_form.title.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos">
+          <label for="{{ review_form.content.id_for_label }}">Content:</label>
+          {{ review_form.content }}
+          {% if review_form.content.errors %}
+            <div class="error">{{ review_form.content.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos">
+          <label for="{{ review_form.cover_image.id_for_label }}">Image:</label>
+          {{ review_form.cover_image }}
+          {% if review_form.cover_image.errors %}
+            <div class="error">{{ review_form.cover_image.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos">
+          <label for="{{ review_form.rating.id_for_label }}">Rating:</label>
+          <div id="createSingleRating" class="rating">
+            {% for i in "543210" %}
+            <input type="radio" name="rating" id="star-{{ i }}" value="{{ i }}" class="rating-create-single-input">
+            <label for="star-{{ i }}" title="{{ i }} stars" class="rating-create-single-label">☆</label>
+            {% endfor %}
+        </div>
+          {% if review_form.rating.errors %}
+            <div class="error">{{ review_form.rating.error }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos validation-btns">
+          <button class="icon-hover-box cancel-footer-btn" id="createReviewModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
+          <button class="icon-hover-box confirm-footer-btn" id="createReviewModalConfirmBtn"><i class="icon-checkmark validation-icon"></i></button>
+        </div>
       </div>
-      <div class="spiral single-page-spiral"></div>
-    </form>
+      <i class="icon-cross close icon-hover-box" id="createReviewModalCloseBtn"></i>
+    </div>
+    <div class="spiral single-page-spiral"></div>
+  </form>
 </div>
 
 {% endblock %}
 
 {% block js %}
+<script>
+  const ticketsData = [
+  {% for ticket in tickets %}
+  {
+      id: "{{ ticket.pk }}",
+      title: "{{ ticket.title|escapejs }}",
+      description: "{{ ticket.description|escapejs }}",
+      image: "{% if ticket.image %}{{ ticket.image.url }}{% else %}/static/images/litrevulogotitleless.PNG{% endif %}"
+  },
+  {% endfor %}
+];
+console.log(ticketsData);
+{% comment %} tags: "{{ item.tags }}" {% endcomment %}
+const reviewsData = [
+{% for ticket in tickets %}
+{% for review in ticket.reviews.all %}
+{
+    id: "{{ review.pk }}",
+    title: "{{ review.title|escapejs }}",
+    content: "{{ review.content|escapejs }}",
+    cover_image_url: "{% if review.cover_image %}{{ review.cover_image.url }}{% else %}/static/images/litrevulogotitleless.PNG{% endif %}",
+    rating: "{{ review.rating }}"
+},
+{% endfor %}
+{% endfor %}
+];
+console.log(reviewsData);
+</script>
 <script src="{% static 'js/modal_ajax_query.js' %}"></script>
 <script src="{% static 'js/tickets_script.js' %}"></script>
 {% endblock%}

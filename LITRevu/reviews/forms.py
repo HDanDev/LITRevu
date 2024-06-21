@@ -6,7 +6,7 @@ class ReviewForm(forms.ModelForm):
     
     class Meta:
         model = Review
-        fields = ['title', 'content', 'rating', 'cover_image']
+        fields = ['title', 'content', 'cover_image', 'rating']
         
     def clean_rating(self):
         rating = self.cleaned_data['rating'] if self.cleaned_data['rating'] else 0
