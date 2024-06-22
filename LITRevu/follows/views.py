@@ -27,5 +27,6 @@ def toggle_follow(request, pk):
         'success': isSuccess,
         'error': error,
         'status': user_follow.status,
+        'followed_user': followed_user.id,
         'updated_at': user_follow.updated_at
     })

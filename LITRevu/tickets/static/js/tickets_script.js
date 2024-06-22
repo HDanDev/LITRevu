@@ -42,6 +42,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const createReviewCloseModalBtn = document.getElementById("createReviewModalCloseBtn");
     const createReviewButtons = document.getElementsByClassName("review-create-btn");
 
+    const viewTicketButtons = document.getElementsByClassName("view-ticket-btn");
+    const viewTicketCancelButton = document.getElementById("viewTicketModalCloseBtn");
+
     //////////// List const list ////////////
 
     const ticketsLikeBtns = document.querySelectorAll(".like-btn");
@@ -82,6 +85,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     asyncMultipleBtnsModalFormInit(deleteReviewButtons, deleteReviewModal, deleteReviewConfirmButton, deleteReviewName, FormTypeEnum.DELETE_REVIEW);
     asyncModalFormCancel(deleteReviewCancelButton);
+    
+    openViewModal(viewTicketButtons);
+    asyncModalFormCancel(viewTicketCancelButton);
 
     likeListener(ticketsLikeBtns);
     dislikeListener(ticketsDislikeBtns);
@@ -97,5 +103,5 @@ document.addEventListener("DOMContentLoaded", () => {
     imagePreviewManager("createReviewFormImageInput", "createReviewFormImagePreview");
     
     singleToDoublePageSwitcher();
-    followUserManager(".follow-btn");
+    followUserManager(".follow-btn", callbackMassFollow);
 });

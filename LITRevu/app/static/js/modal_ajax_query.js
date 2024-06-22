@@ -102,9 +102,9 @@ window.editReviewPopulateModal = (targetId, objectId) => {
     targetId.innerHTML = review.title;
     form.querySelector("#id_title").value = review.title;
     form.querySelector("#id_content").value = review.content;
-    if (review.cover_image_url){
-        document.getElementById("editReviewFormImagePreview").src = review.cover_image_url;
-        document.getElementById("editReviewFormImageInput").src = review.cover_image_url;
+    if (review.coverImage){
+        document.getElementById("editReviewFormImagePreview").src = review.coverImage;
+        document.getElementById("editReviewFormImageInput").src = review.coverImage;
     }
     setRadioValue(document.getElementById("editSingleRating"), review.rating);
 }
@@ -142,6 +142,15 @@ window.onclick = (event) => {
         activeModal.style.display = "none";
         activeModal = null;
     }
+}
+
+window.openViewModal = (openModalViewButtons) => {
+    Array.prototype.forEach.call(openModalViewButtons, (btn) => {
+        btn.onclick = (event) => {
+            event.preventDefault();
+            generateViewTicketModal(btn.getAttribute("data-item-id"));
+        }
+    });
 }
 
 window.submitForm = async (event, form, callback, url) => {
@@ -252,11 +261,16 @@ window.callbackUpdatedPassword = (formId, responseData) => {
 }
 
 window.callbackFollow = (responseData, source) => {
-    if (responseData.status) {
-        source.innerHTML = '<i class="icon-user-minus"></i>';
-    } else {
-        source.innerHTML = '<i class="icon-user-plus"></i>';
-    }
+    source.innerHTML = responseData.status ? '<i class="icon-user-minus"></i>' : '<i class="icon-user-plus"></i>';
+}
+
+window.callbackMassFollow = (responseData, source) => {
+    let listOfLikes = document.querySelectorAll(".follow-btn");
+    let concernedListOfLikes = Array.from(listOfLikes).filter(like => like.getAttribute("data-user-id") == responseData.followed_user);
+    let innerHTMLIcon = responseData.status ? '<i class="icon-user-minus"></i>' : '<i class="icon-user-plus"></i>';
+    concernedListOfLikes.forEach((like) => {
+        like.innerHTML = innerHTMLIcon;
+    });
 }
 
 window.ProfileUpdateFeedback = (formId, responseData, divId, innerHtmlText, targetInfo) => {
@@ -392,7 +406,7 @@ window.imagePreviewManager = (imageInputId, previewPlaceholder) => {
     });
 }
 
-window.followUserManager = (btnClassName) => {
+window.followUserManager = (btnClassName, callback) => {
     document.querySelectorAll(btnClassName).forEach((button) => {
         button.addEventListener('click', (event) => {
             const btn = event.target.closest('button');
@@ -400,7 +414,167 @@ window.followUserManager = (btnClassName) => {
             const url = btn.getAttribute('data-url');
             const csrfToken = btn.getAttribute('data-token');
             const jsonBody = JSON.stringify({ user_id: userId });
-            ajaxCall(url, csrfToken, jsonBody, callbackFollow, btn);
+            ajaxCall(url, csrfToken, jsonBody, callback, btn);
         });
     });
 }
+
+window.generateViewTicketModal = (ticketId) => {
+    const ticket = ticketsData.find(t => t.id === ticketId);
+    const title = document.createElement('h2');
+    title.className = 'main-title item-infos';
+    title.innerHTML = `"<span id="viewTicketName">${ticket.title}</span>" ticket details`;
+  
+    const itemContainer = document.createElement('div');
+    itemContainer.className = 'item-container';
+  
+    if (ticket.image) {
+      const itemBackground = document.createElement('div');
+      itemBackground.className = 'item-background';
+      itemBackground.style.backgroundImage = `url(${ticket.image})`;
+      itemContainer.appendChild(itemBackground);
+    }
+  
+    const ticketInfo = document.createElement('h3');
+    ticketInfo.className = 'aligned item-infos';
+  
+    const ticketLink = document.createElement('a');
+    ticketLink.className = 'item-title';
+    ticketLink.href = `/reviews/${ticket.id}`;
+    ticketLink.innerText = ticket.title;
+    ticketInfo.appendChild(ticketLink);
+  
+    itemContainer.appendChild(ticketInfo);
+  
+    const description = document.createElement('p');
+    description.innerText = ticket.description;
+    itemContainer.appendChild(description);
+    
+    if (ticket.tags.length > 0){
+        const tagsContainer = document.createElement('div');
+        tagsContainer.className = 'tag-container item-infos';
+        const tags = ticket.tags.split(',');
+        tags.forEach(tag => {
+          const tagDiv = document.createElement('div');
+          tagDiv.className = 'tag';
+          tagDiv.innerText = tag;
+          tagsContainer.appendChild(tagDiv);
+        });
+        itemContainer.appendChild(tagsContainer);
+    }
+    itemContainer.appendChild(generateReviewsList(reviewsData.filter(r => r.ticket === ticket.id && r.isArchived.toLowerCase() === "false"), ticket.id));
+  
+    const viewTicketContainer = document.getElementById('viewTicketContainer');
+    viewTicketContainer.innerHTML = "";
+    viewTicketContainer.appendChild(title);
+    viewTicketContainer.appendChild(itemContainer);
+
+    openModal(document.getElementById("viewTicketModal"));
+  }
+
+  window.generateReviewsList = (ticketList, ticketId) => {
+    const reviewsList = document.createElement('ul');
+    reviewsList.className = 'item-infos reviews-list';
+
+    ticketList.forEach(review => {
+        const listItem = document.createElement('li');
+        listItem.id = `review-${review.id}`;
+
+        const itemContainer = document.createElement('div');
+        itemContainer.className = 'item-container';
+
+        if (review.coverImage) {
+            const backgroundDiv = document.createElement('div');
+            backgroundDiv.className = 'item-background';
+            backgroundDiv.style.backgroundImage = `url(${review.coverImage})`;
+            itemContainer.appendChild(backgroundDiv);
+        }
+
+        const h4 = document.createElement('h4');
+        h4.className = 'aligned item-infos';
+
+        const reviewLink = document.createElement('a');
+        reviewLink.className = 'item-title icon-hover-box';
+        reviewLink.href = `/review/${review.id}/detail`;
+        reviewLink.innerHTML = `<span class="font-style">${review.title}</span> <i class="icon-eye-plus"></i>`;
+        h4.appendChild(reviewLink);
+
+        if (review.author === jsUser) {
+            const editButton = createButton('edit-review-btn', 'edit-review', review.id, review.title, `/review/${review.id}/update`, 'icon-pencil', 'crud-btn');
+            h4.appendChild(editButton);
+
+            const deleteButton = createButton('delete-review-btn', 'delete-review', review.id, review.title, `/review/${review.id}/delete`, 'icon-bin', 'crud-btn');
+            h4.appendChild(deleteButton);
+        }
+
+        itemContainer.appendChild(h4);
+
+        const reviewContent = document.createElement('p');
+        reviewContent.className = 'item-infos';
+        reviewContent.innerHTML = `<a href="/review/${review.id}/detail">${review.content}</a>`;
+        itemContainer.appendChild(reviewContent);
+
+        const reviewInfo = document.createElement('p');
+        reviewInfo.className = 'item-infos mini-font';
+        reviewInfo.innerHTML = `<span>Posted on ${review.createdAt} by </span>`;
+
+        if (review.author === jsUser) {
+            reviewInfo.innerHTML += 'you';
+        } else {
+            const authorSpan = document.createElement('span');
+            authorSpan.textContent = review.author;
+            reviewInfo.appendChild(authorSpan);
+
+            const followButton = createFollowButton(review.author, `/toggle_follow/${review.author}`, jsCsrfToken, review.isFollowing);
+            reviewInfo.appendChild(followButton);
+        }
+
+        itemContainer.appendChild(reviewInfo);
+
+        listItem.appendChild(itemContainer);
+        reviewsList.appendChild(listItem);
+    });
+
+    const createReviewButton = document.createElement('button');
+    createReviewButton.type = 'button';
+    createReviewButton.id = `create-review-btn-${ticketId}`;
+    createReviewButton.name = 'create-review';
+    createReviewButton.className = 'review-create-btn icon-hover-box';
+    createReviewButton.dataset.itemAction = `/review/create/${ticketId}`;
+    createReviewButton.innerHTML = `<i class="icon-plus double-icon"></i><i class="icon-file-text double-icon"></i>`;
+    if (ticketList.length === 0) {
+        const span = document.createElement('span');
+        span.className = 'blue';
+        span.textContent = 'Be the first to review !';
+        createReviewButton.appendChild(span);
+    }
+    reviewsList.appendChild(createReviewButton);
+
+    return reviewsList;
+}
+
+window.createButton = (buttonId, buttonName, itemId, itemName, actionUrl, iconClass, crudClass) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.id = `${buttonId}-${itemId}`;
+    button.name = buttonName;
+    button.className = `${buttonId} icon-hover-box`;
+    button.dataset.itemId = itemId;
+    button.dataset.itemName = itemName;
+    button.dataset.itemAction = actionUrl;
+    button.innerHTML = `<i class="${iconClass} ${crudClass}"></i>`;
+    return button;
+}
+
+window.createFollowButton = (userId, url, csrfToken, isFollowing) => {
+    const followButton = document.createElement('button');
+    followButton.className = 'follow-btn icon-hover-box';
+    followButton.dataset.userId = userId;
+    followButton.dataset.url = url;
+    followButton.dataset.token = csrfToken;
+
+    followButton.innerHTML = `<i class="${isFollowing ? 'icon-user-minus' : 'icon-user-plus'}"></i>`;
+
+    return followButton;
+}
+  
