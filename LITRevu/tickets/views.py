@@ -36,6 +36,7 @@ class TicketListView(LoginRequiredMixin, ListView):
             })
         context['ticket_form'] =  TicketForm()
         context['review_form'] =  ReviewForm()
+        context['ticket_update_form'] =  TicketUpdateForm()
         
         return context
     
@@ -69,7 +70,7 @@ class TicketCreateView(CreateView):
                             review.save()
                             response_data = {'success': True, 'message': 'Ticket and review created successfully.'}
                         except Exception as e:
-                            response_data = {'success': False, 'error': e}
+                            response_data = {'success': False, 'error': str(e)}
                     
             return JsonResponse(response_data)
 
@@ -85,12 +86,16 @@ class TicketCreateView(CreateView):
 class TicketUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Ticket
     form_class = TicketUpdateForm
+    success_url = reverse_lazy('ticket_list')
+    
+    def test_func(self):
+        ticket = self.get_object()
+        return self.request.user.is_superuser or self.request.user == ticket.author
 
     def form_valid(self, form):
-            form.instance.author = self.request.user
-            response = super().form_valid(form) 
-            
-            if self.request.is_ajax():
+            try:
+                form.instance.author = self.request.user
+                response = super().form_valid(form) 
                 return JsonResponse({
                     'success': True,
                     'message': 'Ticket updated successfully.',
@@ -101,18 +106,19 @@ class TicketUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
                         'image_url': self.object.image.url if self.object.image else None
                     }
                 })
-            else:
-                return response
+            except Exception as e:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'A problem occured while updating the ticket.',
+                    'errors': str(e)
+                })
 
     def form_invalid(self, form):
-        if self.request.is_ajax():
-            return JsonResponse({
-                'success': False,
-                'message': 'Failed to update the ticket. Please correct the errors below.',
-                'errors': form.errors
-            })
-        else:
-            return super().form_invalid(form)
+        return JsonResponse({
+            'success': False,
+            'message': 'Failed to update the ticket. Please correct the errors below.',
+            'errors': form.errors
+        })
 
 class ArchiveTicketView(LoginRequiredMixin, UserPassesTestMixin, View):
     def test_func(self):

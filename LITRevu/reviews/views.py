@@ -72,12 +72,40 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
 class ReviewUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Review
     form_class = ReviewForm
-    template_name = 'review_form.html'
-    success_url = reverse_lazy('review_list')
+    success_url = reverse_lazy('ticket_list')
     
     def test_func(self):
         review = self.get_object()
         return self.request.user.is_superuser or self.request.user == review.author
+
+    def form_valid(self, form):
+            try:
+                form.instance.author = self.request.user
+                response = super().form_valid(form) 
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Review updated successfully.',
+                    'review': {
+                        'id': self.object.pk,
+                        'title': self.object.title,
+                        'content': self.object.content,
+                        'rating': self.object.rating,
+                        'cover_image_url': self.object.cover_image.url if self.object.cover_image else None
+                    }
+                })
+            except Exception as e:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'A problem occured while updating the review.',
+                    'errors': str(e)
+                })
+
+    def form_invalid(self, form):
+        return JsonResponse({
+            'success': False,
+            'message': 'Failed to update the review. Please correct the errors below.',
+            'errors': form.errors
+        })
     
 class ArchiveReviewView(LoginRequiredMixin, UserPassesTestMixin, View):
     def test_func(self):

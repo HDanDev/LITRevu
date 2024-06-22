@@ -163,30 +163,37 @@ Tickets
       <div class="page-content">
         <h2 class="main-title item-infos">"<span id="editTicketName"></span>" ticket edition</h2>
         {% csrf_token %}
-        {{ ticket_form.non_field_errors }}
+        {{ ticket_update_form.non_field_errors }}
         <div class="item-infos">
-          <label for="{{ ticket_form.title.id_for_label }}">Title:</label>
-          {{ ticket_form.title }}
-          {% if ticket_form.title.errors %}
-            <div class="error">{{ ticket_form.title.errors }}</div>
+          <label for="{{ ticket_update_form.title.id_for_label }}">Title:</label>
+          {{ ticket_update_form.title }}
+          {% if ticket_update_form.title.errors %}
+            <div class="error">{{ ticket_update_form.title.errors }}</div>
           {% endif %}
         </div>
         <div class="item-infos">
-          <label for="{{ ticket_form.description.id_for_label }}">Description:</label>
-          {{ ticket_form.description }}
-          {% if ticket_form.description.errors %}
-            <div class="error">{{ ticket_form.description.errors }}</div>
+          <label for="{{ ticket_update_form.description.id_for_label }}">Description:</label>
+          {{ ticket_update_form.description }}
+          {% if ticket_update_form.description.errors %}
+            <div class="error">{{ ticket_update_form.description.errors }}</div>
           {% endif %}
         </div>
         <div class="item-infos">
-          <label for="{{ ticket_form.image.id_for_label }}">Image:</label>        
+          <label for="{{ ticket_update_form.tags.id_for_label }}">Tags:</label>
+          {{ ticket_update_form.tags }}
+          {% if ticket_update_form.tags.errors %}
+            <div class="error">{{ ticket_update_form.tags.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos">
+          <label for="{{ ticket_update_form.image.id_for_label }}">Image:</label>        
           <div>
             <img id="editTicketFormImagePreview" src="{% static 'images/PPPlaceholder.PNG' %}" alt="Profile Picture" class="image-preview">
           </div>
-          {{ ticket_form.image.label_tag }} 
-          <input type="file" name="{{ ticket_form.image.name }}" id="editTicketFormImageInput" class="{{ ticket_form.image.css_classes }}" {{ ticket_form.image.attrs|safe }} />
-          {% if ticket_form.image.errors %}
-            <div class="error">{{ ticket_form.image.errors }}</div>
+          {{ ticket_update_form.image.label_tag }} 
+          <input type="file" name="{{ ticket_update_form.image.name }}" id="editTicketFormImageInput" class="{{ ticket_update_form.image.css_classes }}" {{ ticket_update_form.image.attrs|safe }} />
+          {% if ticket_update_form.image.errors %}
+            <div class="error">{{ ticket_update_form.image.errors }}</div>
           {% endif %}
         </div>
         <div class="item-infos validation-btns">
@@ -418,11 +425,12 @@ Tickets
       id: "{{ ticket.pk }}",
       title: "{{ ticket.title|escapejs }}",
       description: "{{ ticket.description|escapejs }}",
-      image: "{% if ticket.image %}{{ ticket.image.url }}{% else %}/static/images/litrevulogotitleless.PNG{% endif %}"
+      image: "{% if ticket.image %}{{ ticket.image.url }}{% else %}/static/images/litrevulogotitleless.PNG{% endif %}",
+      tags: "{{ ticket.tags.all|join:',' }}"
   },
   {% endfor %}
 ];
-{% comment %} tags: "{{ item.tags }}" {% endcomment %}
+{% comment %} tags: {% endcomment %}
 const reviewsData = [
 {% for ticket in tickets %}
 {% for review in ticket.reviews.all %}

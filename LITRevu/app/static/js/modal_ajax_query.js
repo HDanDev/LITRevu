@@ -89,6 +89,7 @@ window.editTicketPopulateModal = (targetId, objectId) => {
     targetId.innerHTML = ticket.title;
     form.querySelector("#id_title").value = ticket.title;
     form.querySelector("#id_description").value = ticket.description;
+    form.querySelector("#id_tags").value = ticket.tags;
     if (ticket.image){
         document.getElementById("editTicketFormImagePreview").src = ticket.image;
         document.getElementById("editTicketFormImageInput").src = ticket.image;

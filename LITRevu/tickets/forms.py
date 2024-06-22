@@ -27,6 +27,20 @@ class TicketForm(forms.ModelForm):
         return instance
     
 class TicketUpdateForm(forms.ModelForm):
+    tags = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder':'Enter tags separated by commas.'}))
+    
     class Meta:
         model = Ticket
-        fields = ['title', 'description', 'image'] 
+        fields = ['title', 'description', 'tags', 'image'] 
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.save()
+
+        tags_str = self.cleaned_data['tags']
+        tag_names = [name.strip() for name in tags_str.split(',') if name.strip()]
+        tag_names.append(instance.title)
+        tag_objs = [Tag.objects.get_or_create(name=name)[0] for name in tag_names]
+        instance.tags.set(tag_objs)
+
+        return instance
