@@ -422,7 +422,6 @@ Tickets
   },
   {% endfor %}
 ];
-console.log(ticketsData);
 {% comment %} tags: "{{ item.tags }}" {% endcomment %}
 const reviewsData = [
 {% for ticket in tickets %}
@@ -437,7 +436,6 @@ const reviewsData = [
 {% endfor %}
 {% endfor %}
 ];
-console.log(reviewsData);
 </script>
 <script src="{% static 'js/modal_ajax_query.js' %}"></script>
 <script src="{% static 'js/tickets_script.js' %}"></script>

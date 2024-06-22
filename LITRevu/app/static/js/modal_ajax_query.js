@@ -56,8 +56,6 @@ window.autoFormFill = (targetModal, btn, targetId=null, formType=null) => {
     targetModal.action = action;
     if (formType != null && targetId != null) {
         const objectId = btn.getAttribute("data-item-id");
-                // editTicketPopulateModal(targetId, objectId);
-
         switch (formType) {
             case FormTypeEnum.EDIT_TICKET:
                 editTicketPopulateModal(targetId, objectId);
@@ -87,12 +85,27 @@ window.autoFormFill = (targetModal, btn, targetId=null, formType=null) => {
 
 window.editTicketPopulateModal = (targetId, objectId) => {   
     const ticket = ticketsData.find(t => t.id === objectId);
+    const form = targetId.closest('form');
     targetId.innerHTML = ticket.title;
+    form.querySelector("#id_title").value = ticket.title;
+    form.querySelector("#id_description").value = ticket.description;
+    if (ticket.image){
+        document.getElementById("editTicketFormImagePreview").src = ticket.image;
+        document.getElementById("editTicketFormImageInput").src = ticket.image;
+    }
 }
 
 window.editReviewPopulateModal = (targetId, objectId) => {    
     const review = reviewsData.find(r => r.id === objectId);
+    const form = targetId.closest('form');
     targetId.innerHTML = review.title;
+    form.querySelector("#id_title").value = review.title;
+    form.querySelector("#id_content").value = review.content;
+    if (review.cover_image_url){
+        document.getElementById("editReviewFormImagePreview").src = review.cover_image_url;
+        document.getElementById("editReviewFormImageInput").src = review.cover_image_url;
+    }
+    setRadioValue(document.getElementById("editSingleRating"), review.rating);
 }
 
 window.deleteTicketPopulateModal = (targetId, objectId) => {    
@@ -329,6 +342,17 @@ window.manageRating = (stars, labels) => {
             }
         });
     });
+}
+
+window.setRadioValue = (input, value) => {
+    const inputs = input.querySelectorAll("input");
+    for (let i = 0; i < inputs.length; i++) {
+        if (inputs[i].value == value) {
+            inputs[i].checked = true;
+            inputs[i].click();
+            break;
+        }
+    }
 }
 
 window.singleToDoublePageSwitcher = () => {
