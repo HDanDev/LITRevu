@@ -1,5 +1,6 @@
 {% extends 'double_page_template.html' %}
 {% load static %}
+{% load custom_tags %}
 
 {% block title %}Ticket List{% endblock %}
 {% block optional_css %}
@@ -44,7 +45,7 @@ Tickets
               {% if request.user != ticket.author %}
               <span>{{ ticket.author }}</span>    
               <button class="follow-btn icon-hover-box" data-user-id="{{ ticket.author.pk }}" data-url="{% url 'toggle_follow' ticket.author.pk %}" data-token="{{ csrf_token }}">
-                {% if ticket.author.followers_status %}
+                {% if request.user|is_following:ticket.author %}
                   <i class="icon-user-minus"></i>
                 {% else %}
                   <i class="icon-user-plus"></i>
@@ -94,7 +95,7 @@ Tickets
                       {% if request.user != review.author %}
                       <span>{{ review.author }}</span>
                       <button class="follow-btn icon-hover-box" data-user-id="{{ review.author.pk }}" data-url="{% url 'toggle_follow' review.author.pk %}" data-token="{{ csrf_token }}">
-                        {% if review.author.followers_status %}
+                        {% if request.user|is_following:review.author %}
                             <i class="icon-user-minus"></i>
                         {% else %}
                             <i class="icon-user-plus"></i>
