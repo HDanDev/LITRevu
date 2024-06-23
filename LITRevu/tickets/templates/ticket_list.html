@@ -10,6 +10,7 @@
 Tickets
 {% endblock %}
 {% block content %}
+<input type="text" id="filterInput" placeholder="Search...">
 {% endblock %}
 
 {% block second_page_title %}
@@ -21,19 +22,19 @@ Tickets
     <ul id="tickets-list">
       {% for ticket in tickets %}
         {% if not ticket.is_archived %}
-        <li id="ticket-{{ ticket.pk }}">
+        <li id="ticket-{{ ticket.pk }}" class="ticket-li">
           <div class="item-container">
             {% if ticket.image %}
             <div class="item-background" style="background-image:url({{ ticket.image.url }})"></div>
             {% endif %}
           <h3 class="aligned item-infos">
-          <a class="item-title view-ticket-btn" data-item-id="{{ ticket.pk }}" href="">{{ ticket.title }}</a>
+          <a class="ticket-title item-title view-ticket-btn" data-item-id="{{ ticket.pk }}" href="">{{ ticket.title }}</a>
             {% if request.user == ticket.author or request.user.is_superuser %}
               <button type="button" id="edit-ticket-btn" name="edit-ticket" class="ticket-edit-btn icon-hover-box" data-item-id="{{ ticket.pk }}" data-item-name="{{ ticket.title }}" data-item-action="{% url 'ticket_update' ticket.pk %}"><i class="icon-pencil crud-btn"></i></button>
               <button type="button" id="delete-ticket-btn" name="delete-ticket" class="ticket-delete-btn icon-hover-box" data-item-id="{{ ticket.pk }}" data-item-name="{{ ticket.title }}" data-item-action="{% url 'ticket_delete' ticket.pk %}"><i class="icon-bin crud-btn"></i></button>
             {% endif %}
           </h3>
-          <a class="item-infos view-ticket-btn" data-item-id="{{ ticket.pk }}" href=""><p>{{ ticket.description }}</p></a>
+          <a class="item-infos view-ticket-btn" data-item-id="{{ ticket.pk }}" href=""><p class="ticket-description">{{ ticket.description }}</p></a>
           <div class="tag-container item-infos">
             {% for tag in ticket.tags.all %}
             <div class="tag">{{ tag.name }}</div>

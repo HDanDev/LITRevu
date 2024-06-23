@@ -115,8 +115,20 @@ def profile_view(request):
     followed_users = CustomUser.objects.filter(
         followers__follower=request.user,
         followers__status=True
-    ).annotate(
+    ).exclude(pk=request.user.pk).annotate(
         followers_status=followers_status
+    )
+
+    following_users = CustomUser.objects.filter(
+        following__followed=request.user,
+        following__status=True
+    ).exclude(pk=request.user.pk)
+
+    followed_user_ids = followed_users.values_list('id', flat=True)
+    users_list = CustomUser.objects.exclude(
+        pk=request.user.pk
+    ).exclude(
+        pk__in=followed_user_ids
     )
 
     return render(request, 'profile.html', {
@@ -124,7 +136,9 @@ def profile_view(request):
         'email_form': email_form, 
         'username_form': username_form, 
         'password_form': password_form, 
-        'followed_users': followed_users
+        'followed_users': followed_users,
+        'following_users': following_users,
+        'users_list': users_list,
     })
     
 @login_required

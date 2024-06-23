@@ -112,4 +112,5 @@ document.addEventListener("DOMContentLoaded", () => {
     
     singleToDoublePageSwitcher();
     followUserManager(".follow-btn", callbackMassFollow);
+    searchThroughList('filterInput', '.ticket-li', ['.ticket-title', '.ticket-description', '.tag'], true)
 });

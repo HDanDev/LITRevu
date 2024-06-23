@@ -34,4 +34,5 @@ document.addEventListener("DOMContentLoaded", function() {
 
     imagePreviewManager("id_profile_picture", "profile-picture-preview");
     followUserManager(".follow-btn", callbackFollow);
+    searchThroughList('filterInput', '.user-li', ['a'])
 });

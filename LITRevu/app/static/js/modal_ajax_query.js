@@ -589,5 +589,34 @@ window.createFollowButton = (userId, url, csrfToken, isFollowing) => {
     return followButton;
 }
 
+window.isNullOrWhitespace = (string) => {
+    return !string || string.trim().length === 0;
+}
+
+window.searchThroughList = (inputId, querySelectorValue, subQuerySelectorValue, isIgnoringNullInput=false) => {
+    document.getElementById(inputId).addEventListener('keyup', (event) => {
+        const filterValue = event.target.value.toLowerCase().trim();
+        const items = document.querySelectorAll(querySelectorValue);
+
+        items.forEach(item => {
+            let isToBeHidden = true;
+            subQuerySelectorValue.forEach(subItemSelector => {
+                const subItem = item.querySelector(subItemSelector);
+                if (subItem) {
+                    const subItemText = subItem.innerHTML.toLowerCase();
+                    if (subItemText.includes(filterValue) && (!isNullOrWhitespace(filterValue) || isIgnoringNullInput)) {
+                        isToBeHidden = false;
+                    }
+                }
+            });
+            if(isToBeHidden) {
+                item.classList.add('d-none');
+            } else {
+                item.classList.remove('d-none');
+            }
+        });
+    });
+}
+
 window.switchModal = (sourceModal, targetModal) => {}
   
