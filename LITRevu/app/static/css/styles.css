@@ -447,6 +447,20 @@ footer p {
     color: white;
 }
 
+.search-block {
+    position: relative;
+}
+
+#filterInput {
+    border-radius: 8px;
+    border: 0 solid transparent;
+    padding: 8px 8px 8px 32px;
+}
+
+#filterInput:focus {
+    outline: none;
+}
+
 .feedback {
     display: flex;
     flex-direction: row;
@@ -638,6 +652,17 @@ footer p {
     transform: scale(1.2);
 }
 
+.icon-search {
+    color: rgb(92, 92, 92);
+    position: absolute;
+    top: calc(100% / 2 - 7px);
+}
+
+.icon-hover-box:hover .icon-search {
+    color: rgb(153, 153, 153);
+    transform: scale(1.2);
+}
+
 .icon-user-minus,
 .icon-heart,
 .icon-user-plus,
@@ -654,7 +679,8 @@ footer p {
 .icon-pen,
 .icon-arrow-left2,
 .icon-file-text,
-.icon-blocked {
+.icon-blocked,
+.icon-search {
     transition-property: color, transform;
     transition-duration: 0.3s;
     transition-timing-function: ease-in;

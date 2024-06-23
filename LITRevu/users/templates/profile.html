@@ -69,10 +69,10 @@ Relations
 
 {% block second_page_content %}
 <div>
-    <h3>People you follow</h3>
+    <h3 class="profile-info">People you follow</h3>
     <ul>
     {% for user in followed_users %}
-    <li>
+    <li class="profile-info">
         <a href="{% url 'user_detail' user.pk %}">{{ user.username }}</a>
         <button class="follow-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}" data-token="{{ csrf_token }}">
             {% if user.followers_status %}
@@ -86,10 +86,10 @@ Relations
     </ul>
 </div>
 <div>
-    <h3>People following you</h3>
+    <h3 class="profile-info">People following you</h3>
     <ul>
     {% for user in following_users %}
-    <li>
+    <li class="profile-info">
         <a href="{% url 'user_detail' user.pk %}">{{ user.username }}</a>
         <button class="follow-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}" data-token="{{ csrf_token }}">
             {% if user.followers_status %}
@@ -103,11 +103,11 @@ Relations
     </ul>
 </div>
 <div>
-    <h3>Find new people</h3>
-    <input type="text" id="filterInput" placeholder="Search...">
+    <h3 class="profile-info">Find new people</h3>
+    <div class="icon-hover-box search-block"><i class="icon-search"></i><input type="text" id="filterInput" placeholder="Search..."></div>
     <ul>
     {% for user in users_list %}
-    <li class="user-li d-none">
+    <li class="user-li profile-info profile-info-less-padding d-none">
         <a href="{% url 'user_detail' user.pk %}">{{ user.username }}</a>
         <button class="follow-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}" data-token="{{ csrf_token }}">
             {% if user.followers_status %}

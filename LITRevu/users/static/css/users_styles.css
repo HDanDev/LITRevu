@@ -2,6 +2,10 @@
     background-color: #a3d6f3;
 }
 
+ul {
+    margin: 0;
+}
+
 .profile-section {
     display: flex;
     flex-direction: column;
@@ -21,6 +25,10 @@
     border-bottom: 1px solid #ccc;
 }
 
+.profile-info-less-padding {
+    padding: 8px 0;
+}
+
 .button-exception {
     font-family: var(--main-font-style);
     font-size: var(--main-font-size);
@@ -38,4 +46,16 @@
 
 .margin-16 {
     margin-left: 16px;
+}
+
+#filterInput {
+    margin-top: 12px;
+}
+
+.icon-search {
+    top: calc(100% / 2 - 1px);
+}
+
+.d-none {
+    display: none !important;
 }
