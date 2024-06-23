@@ -436,16 +436,7 @@ window.generateViewTicketModal = (ticketId) => {
       itemContainer.appendChild(itemBackground);
     }
   
-    const ticketInfo = document.createElement('h3');
-    ticketInfo.className = 'aligned item-infos';
-  
-    const ticketLink = document.createElement('a');
-    ticketLink.className = 'item-title';
-    ticketLink.href = `/reviews/${ticket.id}`;
-    ticketLink.innerText = ticket.title;
-    ticketInfo.appendChild(ticketLink);
-  
-    itemContainer.appendChild(ticketInfo);
+    itemContainer.appendChild(generateTitle(ticket, true));
   
     const description = document.createElement('p');
     description.innerText = ticket.description;
@@ -463,15 +454,17 @@ window.generateViewTicketModal = (ticketId) => {
         });
         itemContainer.appendChild(tagsContainer);
     }
-    const ticketReviewsFilteredList = generateReviewsList(reviewsData.filter(r => r.ticket === ticket.id && r.isArchived.toLowerCase() === "false"), ticket.id);
+
+    itemContainer.appendChild(generateInfos(ticket));
+
+    const ticketReviewsFilteredList = reviewsData.filter(r => r.ticket === ticket.id && r.isArchived.toLowerCase() === "false");
     const reviewsList = document.createElement('ul');
     reviewsList.className = 'item-infos reviews-list';
     if (ticketReviewsFilteredList.length > 0) {
-
         ticketReviewsFilteredList.forEach(review => {
             const listItem = document.createElement('li');
             listItem.id = `review-${review.id}`;
-            listItem.appendChild(generateReviewsList(review));
+            listItem.appendChild(generateReviewsList(review, true));
             reviewsList.appendChild(listItem);
         });
     }
@@ -490,6 +483,7 @@ window.generateViewTicketModal = (ticketId) => {
         createReviewButton.appendChild(span);
     }
     reviewsList.appendChild(createReviewButton);
+    itemContainer.appendChild(reviewsList);
 
     const viewTicketContainer = document.getElementById('viewTicketContainer');
     viewTicketContainer.innerHTML = "";
@@ -509,7 +503,7 @@ window.generateViewTicketModal = (ticketId) => {
     viewReviewContainer.appendChild(generateReviewsList(review));
   }
 
-  window.generateReviewsList = (review) => {
+  window.generateReviewsList = (review, isInList=false) => {
     const itemContainer = document.createElement('div');
     itemContainer.className = 'item-container';
 
@@ -520,37 +514,41 @@ window.generateViewTicketModal = (ticketId) => {
         itemContainer.appendChild(backgroundDiv);
     }
 
-    const h4 = document.createElement('h4');
-    h4.className = 'aligned item-infos';
-
-    const reviewLink = document.createElement('a');
-    reviewLink.className = 'item-title icon-hover-box';
-    reviewLink.href = `/review/${review.id}/detail`;
-    reviewLink.innerHTML = `<span class="font-style">${review.title}</span>`;
-    h4.appendChild(reviewLink);
-
-    if (review.author === jsUser) {
-        const editButton = createButton('edit-review-btn', 'edit-review', review.id, review.title, `/review/${review.id}/update`, 'icon-pencil', 'crud-btn');
-        h4.appendChild(editButton);
-
-        const deleteButton = createButton('delete-review-btn', 'delete-review', review.id, review.title, `/review/${review.id}/delete`, 'icon-bin', 'crud-btn');
-        h4.appendChild(deleteButton);
-    }
-
-    itemContainer.appendChild(h4);
+    itemContainer.appendChild(generateTitle(review, !isInList));
 
     const reviewContent = document.createElement('p');
     reviewContent.className = 'item-infos';
-    reviewContent.innerHTML = `<a href="/review/${review.id}/detail">${review.content}</a>`;
+    reviewContent.innerHTML = isInList 
+    ? `<a href="/review/${review.id}/detail">${review.content}</a>`
+    : `<p>${review.content}</p>`;
     itemContainer.appendChild(reviewContent);
-    itemContainer.appendChild(generateInfos(review));
+    itemContainer.appendChild(generateInfos(review, isInList ? 'mini-font' : ''));
 
     return itemContainer;
 }
 
-window.generateInfos = (object) => {
+window.generateTitle = (object, isTicket) => {  
+    const header = document.createElement(isTicket ? 'h3' : 'h4');
+    header.className = 'aligned item-infos';
+
+    const titleA = document.createElement(isTicket ? 'span' : 'a');
+    titleA.className = `item-title ${isTicket ? '' : 'icon-hover-box'}`;
+    titleA.innerHTML = `<span class="font-style">${object.title}</span>${isTicket ? '' : '<i class="icon-eye-plus"></i>'}`;
+    header.appendChild(titleA);
+
+    if (object.author === jsUser) {
+        const editButton = createButton('edit-review-btn', 'edit-review', object.id, object.title, `/review/${object.id}/update`, 'icon-pencil', 'crud-btn');
+        header.appendChild(editButton);
+
+        const deleteButton = createButton('delete-review-btn', 'delete-review', object.id, object.title, `/review/${object.id}/delete`, 'icon-bin', 'crud-btn');
+        header.appendChild(deleteButton);
+    }
+    return header;
+}
+
+window.generateInfos = (object, optionalClass="") => {
     const infoBlock = document.createElement('p');
-    infoBlock.className = 'item-infos mini-font';
+    infoBlock.className = 'item-infos ' + optionalClass;
     infoBlock.innerHTML = `<span>Posted on ${object.createdAt} by </span>`;
 
     if (object.author === jsUser) {
@@ -590,4 +588,6 @@ window.createFollowButton = (userId, url, csrfToken, isFollowing) => {
 
     return followButton;
 }
+
+window.switchModal = (sourceModal, targetModal) => {}
   

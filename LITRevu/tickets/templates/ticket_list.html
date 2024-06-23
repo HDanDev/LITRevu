@@ -453,7 +453,7 @@ Tickets
       image: "{% if ticket.image %}{{ ticket.image.url }}{% else %}/static/images/litrevulogotitleless.PNG{% endif %}",
       tags: "{{ ticket.tags.all|join:',' }}",
       author: "{{ ticket.author.pk }}",
-      authorName: "{{ review.author }}",
+      authorName: "{{ ticket.author }}",
       isFollowing: "{{ request.user|is_following:ticket.author }}",
       createdAt: "{{ ticket.created_at }}"
   },
