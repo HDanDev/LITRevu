@@ -42,8 +42,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const createReviewCloseModalBtn = document.getElementById("createReviewModalCloseBtn");
     const createReviewButtons = document.getElementsByClassName("review-create-btn");
 
+    const viewTicketModal = document.getElementById("viewTicketModal");
     const viewTicketButtons = document.getElementsByClassName("view-ticket-btn");
     const viewTicketCancelButton = document.getElementById("viewTicketModalCloseBtn");
+
+    const viewReviewModal = document.getElementById("viewReviewModal");
+    const viewReviewButtons = document.getElementsByClassName("view-review-btn");
+    const viewReviewCancelButton = document.getElementById("viewReviewModalCloseBtn");
 
     //////////// List const list ////////////
 
@@ -86,8 +91,11 @@ document.addEventListener("DOMContentLoaded", () => {
     asyncMultipleBtnsModalFormInit(deleteReviewButtons, deleteReviewModal, deleteReviewConfirmButton, deleteReviewName, FormTypeEnum.DELETE_REVIEW);
     asyncModalFormCancel(deleteReviewCancelButton);
     
-    openViewModal(viewTicketButtons);
+    openViewModal(viewTicketButtons, generateViewTicketModal, viewTicketModal);
     asyncModalFormCancel(viewTicketCancelButton);
+    
+    openViewModal(viewReviewButtons, generateViewReviewModal, viewReviewModal);
+    asyncModalFormCancel(viewReviewCancelButton);
 
     likeListener(ticketsLikeBtns);
     dislikeListener(ticketsDislikeBtns);

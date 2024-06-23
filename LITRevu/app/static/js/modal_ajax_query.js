@@ -144,11 +144,12 @@ window.onclick = (event) => {
     }
 }
 
-window.openViewModal = (openModalViewButtons) => {
+window.openViewModal = (openModalViewButtons, generatingFunction, targetModal) => {
     Array.prototype.forEach.call(openModalViewButtons, (btn) => {
         btn.onclick = (event) => {
             event.preventDefault();
-            generateViewTicketModal(btn.getAttribute("data-item-id"));
+            generatingFunction(btn.getAttribute("data-item-id"));
+            openModal(targetModal);
         }
     });
 }
@@ -462,87 +463,27 @@ window.generateViewTicketModal = (ticketId) => {
         });
         itemContainer.appendChild(tagsContainer);
     }
-    itemContainer.appendChild(generateReviewsList(reviewsData.filter(r => r.ticket === ticket.id && r.isArchived.toLowerCase() === "false"), ticket.id));
-  
-    const viewTicketContainer = document.getElementById('viewTicketContainer');
-    viewTicketContainer.innerHTML = "";
-    viewTicketContainer.appendChild(title);
-    viewTicketContainer.appendChild(itemContainer);
-
-    openModal(document.getElementById("viewTicketModal"));
-  }
-
-  window.generateReviewsList = (ticketList, ticketId) => {
+    const ticketReviewsFilteredList = generateReviewsList(reviewsData.filter(r => r.ticket === ticket.id && r.isArchived.toLowerCase() === "false"), ticket.id);
     const reviewsList = document.createElement('ul');
     reviewsList.className = 'item-infos reviews-list';
+    if (ticketReviewsFilteredList.length > 0) {
 
-    ticketList.forEach(review => {
-        const listItem = document.createElement('li');
-        listItem.id = `review-${review.id}`;
-
-        const itemContainer = document.createElement('div');
-        itemContainer.className = 'item-container';
-
-        if (review.coverImage) {
-            const backgroundDiv = document.createElement('div');
-            backgroundDiv.className = 'item-background';
-            backgroundDiv.style.backgroundImage = `url(${review.coverImage})`;
-            itemContainer.appendChild(backgroundDiv);
-        }
-
-        const h4 = document.createElement('h4');
-        h4.className = 'aligned item-infos';
-
-        const reviewLink = document.createElement('a');
-        reviewLink.className = 'item-title icon-hover-box';
-        reviewLink.href = `/review/${review.id}/detail`;
-        reviewLink.innerHTML = `<span class="font-style">${review.title}</span> <i class="icon-eye-plus"></i>`;
-        h4.appendChild(reviewLink);
-
-        if (review.author === jsUser) {
-            const editButton = createButton('edit-review-btn', 'edit-review', review.id, review.title, `/review/${review.id}/update`, 'icon-pencil', 'crud-btn');
-            h4.appendChild(editButton);
-
-            const deleteButton = createButton('delete-review-btn', 'delete-review', review.id, review.title, `/review/${review.id}/delete`, 'icon-bin', 'crud-btn');
-            h4.appendChild(deleteButton);
-        }
-
-        itemContainer.appendChild(h4);
-
-        const reviewContent = document.createElement('p');
-        reviewContent.className = 'item-infos';
-        reviewContent.innerHTML = `<a href="/review/${review.id}/detail">${review.content}</a>`;
-        itemContainer.appendChild(reviewContent);
-
-        const reviewInfo = document.createElement('p');
-        reviewInfo.className = 'item-infos mini-font';
-        reviewInfo.innerHTML = `<span>Posted on ${review.createdAt} by </span>`;
-
-        if (review.author === jsUser) {
-            reviewInfo.innerHTML += 'you';
-        } else {
-            const authorSpan = document.createElement('span');
-            authorSpan.textContent = review.author;
-            reviewInfo.appendChild(authorSpan);
-
-            const followButton = createFollowButton(review.author, `/toggle_follow/${review.author}`, jsCsrfToken, review.isFollowing);
-            reviewInfo.appendChild(followButton);
-        }
-
-        itemContainer.appendChild(reviewInfo);
-
-        listItem.appendChild(itemContainer);
-        reviewsList.appendChild(listItem);
-    });
-
+        ticketReviewsFilteredList.forEach(review => {
+            const listItem = document.createElement('li');
+            listItem.id = `review-${review.id}`;
+            listItem.appendChild(generateReviewsList(review));
+            reviewsList.appendChild(listItem);
+        });
+    }
     const createReviewButton = document.createElement('button');
     createReviewButton.type = 'button';
-    createReviewButton.id = `create-review-btn-${ticketId}`;
+    createReviewButton.id = `create-review-btn-${ticket.id}`;
     createReviewButton.name = 'create-review';
     createReviewButton.className = 'review-create-btn icon-hover-box';
-    createReviewButton.dataset.itemAction = `/review/create/${ticketId}`;
+    createReviewButton.dataset.itemAction = `/review/create/${ticket.id}`;
     createReviewButton.innerHTML = `<i class="icon-plus double-icon"></i><i class="icon-file-text double-icon"></i>`;
-    if (ticketList.length === 0) {
+
+    if (ticketReviewsFilteredList.length === 0) {
         const span = document.createElement('span');
         span.className = 'blue';
         span.textContent = 'Be the first to review !';
@@ -550,7 +491,79 @@ window.generateViewTicketModal = (ticketId) => {
     }
     reviewsList.appendChild(createReviewButton);
 
-    return reviewsList;
+    const viewTicketContainer = document.getElementById('viewTicketContainer');
+    viewTicketContainer.innerHTML = "";
+    viewTicketContainer.appendChild(title);
+    viewTicketContainer.appendChild(itemContainer);
+  }
+
+  window.generateViewReviewModal = (reviewId) => {
+    const review = reviewsData.find(r => r.id === reviewId);
+    const title = document.createElement('h2');
+    title.className = 'main-title item-infos';
+    title.innerHTML = `"<span id="viewReviewName">${review.title}</span>" review details`;
+
+    const viewReviewContainer = document.getElementById('viewReviewContainer');
+    viewReviewContainer.innerHTML = "";
+    viewReviewContainer.appendChild(title);
+    viewReviewContainer.appendChild(generateReviewsList(review));
+  }
+
+  window.generateReviewsList = (review) => {
+    const itemContainer = document.createElement('div');
+    itemContainer.className = 'item-container';
+
+    if (review.coverImage) {
+        const backgroundDiv = document.createElement('div');
+        backgroundDiv.className = 'item-background';
+        backgroundDiv.style.backgroundImage = `url(${review.coverImage})`;
+        itemContainer.appendChild(backgroundDiv);
+    }
+
+    const h4 = document.createElement('h4');
+    h4.className = 'aligned item-infos';
+
+    const reviewLink = document.createElement('a');
+    reviewLink.className = 'item-title icon-hover-box';
+    reviewLink.href = `/review/${review.id}/detail`;
+    reviewLink.innerHTML = `<span class="font-style">${review.title}</span>`;
+    h4.appendChild(reviewLink);
+
+    if (review.author === jsUser) {
+        const editButton = createButton('edit-review-btn', 'edit-review', review.id, review.title, `/review/${review.id}/update`, 'icon-pencil', 'crud-btn');
+        h4.appendChild(editButton);
+
+        const deleteButton = createButton('delete-review-btn', 'delete-review', review.id, review.title, `/review/${review.id}/delete`, 'icon-bin', 'crud-btn');
+        h4.appendChild(deleteButton);
+    }
+
+    itemContainer.appendChild(h4);
+
+    const reviewContent = document.createElement('p');
+    reviewContent.className = 'item-infos';
+    reviewContent.innerHTML = `<a href="/review/${review.id}/detail">${review.content}</a>`;
+    itemContainer.appendChild(reviewContent);
+    itemContainer.appendChild(generateInfos(review));
+
+    return itemContainer;
+}
+
+window.generateInfos = (object) => {
+    const infoBlock = document.createElement('p');
+    infoBlock.className = 'item-infos mini-font';
+    infoBlock.innerHTML = `<span>Posted on ${object.createdAt} by </span>`;
+
+    if (object.author === jsUser) {
+        infoBlock.innerHTML += 'you';
+    } else {
+        const authorSpan = document.createElement('span');
+        authorSpan.textContent = object.authorName;
+        infoBlock.appendChild(authorSpan);
+
+        const followButton = createFollowButton(object.author, `/toggle_follow/${object.author}`, jsCsrfToken, object.isFollowing);
+        infoBlock.appendChild(followButton);
+    }
+    return infoBlock;
 }
 
 window.createButton = (buttonId, buttonName, itemId, itemName, actionUrl, iconClass, crudClass) => {
