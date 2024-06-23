@@ -122,7 +122,11 @@ def profile_view(request):
     following_users = CustomUser.objects.filter(
         following__followed=request.user,
         following__status=True
-    ).exclude(pk=request.user.pk)
+    ).exclude(
+        pk=request.user.pk
+    ).annotate(
+        followers_status=followers_status
+    )
 
     followed_user_ids = followed_users.values_list('id', flat=True)
     users_list = CustomUser.objects.exclude(
