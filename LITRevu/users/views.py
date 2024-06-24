@@ -9,7 +9,7 @@ from django.contrib.auth.tokens import default_token_generator
 from users.form import CustomUserCreationForm, CustomAuthenticationForm, CustomUserEditForm, UpdateEmailForm, UpdateUsernameForm, UpdatePasswordForm
 from users.email_utils import EmailUtils
 from users.models import UserActivation, CustomUser
-from follows.models import UserFollow
+from follows.models import UserFollow, UserBlock
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView
 from django.db.models import Exists, OuterRef
@@ -105,6 +105,8 @@ def profile_view(request):
     email_form = UpdateEmailForm(instance=request.user)
     username_form = UpdateUsernameForm(instance=request.user)
     password_form = UpdatePasswordForm(request.user)
+    blocked_users_ids = UserBlock.objects.filter(blocker=request.user).values_list('blocked', flat=True)
+    blocked_users = CustomUser.objects.filter(id__in=blocked_users_ids)
 
     followers_status = Case(
         When(followers__follower=request.user, followers__status=True, then=True),
@@ -143,6 +145,7 @@ def profile_view(request):
         'followed_users': followed_users,
         'following_users': following_users,
         'users_list': users_list,
+        'blocked_users' : blocked_users,
     })
     
 @login_required

@@ -10,3 +10,18 @@ class UserFollow(models.Model):
 
     class Meta:
         unique_together = ('follower', 'followed')
+        
+        
+class UserBlock(models.Model):
+    blocker = models.ForeignKey(CustomUser, related_name='blocker', on_delete=models.CASCADE)
+    blocked = models.ForeignKey(CustomUser, related_name='blocked', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('blocker', 'blocked')
+        indexes = [
+            models.Index(fields=['blocker', 'blocked']),
+        ]
+
+    def __str__(self):
+        return f"{self.blocker} blocks {self.blocked}"

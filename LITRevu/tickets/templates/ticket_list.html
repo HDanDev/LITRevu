@@ -52,6 +52,13 @@ Tickets
                   <i class="icon-user-plus"></i>
                 {% endif %}
               </button>
+              <button class="block-btn icon-hover-box" data-user-id="{{ ticket.author.pk }}" data-url="{% url 'toggle_block' ticket.author.pk %}" data-token="{{ csrf_token }}">
+                  {% if ticket.author in blocked_users %}
+                      <i class="icon-checkmark not-validation"></i>
+                  {% else %}
+                      <i class="icon-blocked not-validation"></i>
+                  {% endif %}
+              </button>
               {% else %}
               you
               {% endif %}
@@ -101,6 +108,13 @@ Tickets
                         {% else %}
                             <i class="icon-user-plus"></i>
                         {% endif %}
+                      </button>
+                      <button class="block-btn icon-hover-box" data-user-id="{{ review.author.pk }}" data-url="{% url 'toggle_block' review.author.pk %}" data-token="{{ csrf_token }}">
+                          {% if review.author in blocked_users %}
+                              <i class="icon-checkmark not-validation"></i>
+                          {% else %}
+                              <i class="icon-blocked not-validation"></i>
+                          {% endif %}
                       </button>
                       {% else %}
                       you

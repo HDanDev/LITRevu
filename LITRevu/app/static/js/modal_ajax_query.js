@@ -261,16 +261,32 @@ window.callbackUpdatedPassword = (formId, responseData) => {
     ProfileUpdateFeedback(formId, responseData, "feedbackProfilePasswordDiv", "Password", "userProfilePassword");
 }
 
+window.callbackBlock = (responseData, source) => {
+    iconSwitcher(responseData.is_blocked, source, "checkmark not-validation", "blocked not-validation");
+}
+
+window.callbackMassBlock = (responseData, source) => {
+    massIconSwitcher(".block-btn", responseData.blocked_user, responseData.is_blocked, "checkmark not-validation", "blocked not-validation");
+}
+
 window.callbackFollow = (responseData, source) => {
-    source.innerHTML = responseData.status ? '<i class="icon-user-minus"></i>' : '<i class="icon-user-plus"></i>';
+    iconSwitcher(responseData.status, source, "user-minus", "user-plus");
 }
 
 window.callbackMassFollow = (responseData, source) => {
-    let listOfLikes = document.querySelectorAll(".follow-btn");
-    let concernedListOfLikes = Array.from(listOfLikes).filter(like => like.getAttribute("data-user-id") == responseData.followed_user);
-    let innerHTMLIcon = responseData.status ? '<i class="icon-user-minus"></i>' : '<i class="icon-user-plus"></i>';
-    concernedListOfLikes.forEach((like) => {
-        like.innerHTML = innerHTMLIcon;
+    massIconSwitcher(".follow-btn", responseData.followed_user, responseData.status, "user-minus", "user-plus");
+}
+
+window.iconSwitcher = (condition, source, trueIcon, falseIcon) => {
+    source.innerHTML = condition ? `<i class="icon-${trueIcon}"></i>` : `<i class="icon-${falseIcon}"></i>`;
+}
+
+window.massIconSwitcher = (targetClass, followedUserId, condition, trueIcon, falseIcon) => {
+    let targetList = document.querySelectorAll(targetClass);
+    let concernedTargetList = Array.from(targetList).filter(i => i.getAttribute("data-user-id") == followedUserId);
+    let innerHTMLIcon = condition ? `<i class="icon-${trueIcon}"></i>` : `<i class="icon-${falseIcon}"></i>`;
+    concernedTargetList.forEach((l) => {
+        l.innerHTML = innerHTMLIcon;
     });
 }
 

@@ -6,6 +6,7 @@ from reviews.models import Review
 from tickets.models import Ticket, Tag
 from reviews.forms import ReviewForm
 from tickets.forms import TicketForm, TicketUpdateForm
+from follows.models import UserBlock
 from users.models import CustomUser
 from app.utils import generate_random_numbers
 from django.contrib import messages
@@ -22,14 +23,24 @@ class TicketListView(LoginRequiredMixin, ListView):
     context_object_name = 'tickets'
     
     def get_queryset(self):
-        tickets = Ticket.objects.prefetch_related('tags', 'reviews').filter(is_archived=False).distinct()
+        blocked_users = UserBlock.objects.filter(blocker=self.request.user).values_list('blocked', flat=True)
+
+        tickets = Ticket.objects.prefetch_related('tags', 'reviews').filter(
+            is_archived=False
+        ).exclude(
+            author__in=blocked_users
+        ).distinct()
+
         for ticket in tickets:
             ticket.likes_count = ticket.get_likes_count()
             ticket.dislikes_count = ticket.get_dislikes_count()
+        
         return tickets
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        blocked_users_ids = UserBlock.objects.filter(blocker=self.request.user).values_list('blocked', flat=True)
+        blocked_users = CustomUser.objects.filter(id__in=blocked_users_ids)
         colour_numbers = generate_random_numbers()[:10]
         context.update({
             'col{}'.format(i): colour_numbers[i] for i in range(min(len(colour_numbers), 10))
@@ -37,6 +48,7 @@ class TicketListView(LoginRequiredMixin, ListView):
         context['ticket_form'] =  TicketForm()
         context['review_form'] =  ReviewForm()
         context['ticket_update_form'] =  TicketUpdateForm()
+        context['blocked_users'] = blocked_users
         
         return context
     

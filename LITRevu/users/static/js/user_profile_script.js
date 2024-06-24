@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", function() {
     uniqueBtnListener(updatePasswordFormValidationBtn, updatePasswordForm, callbackUpdatedPassword, updatePasswordForm.action);
 
     imagePreviewManager("id_profile_picture", "profile-picture-preview");
-    followUserManager(".follow-btn", callbackFollow);
-    searchThroughList('filterInput', '.user-li', ['a'])
+    followUserManager(".follow-btn", callbackMassFollow);
+    followUserManager(".block-btn", callbackMassBlock);
+    searchThroughList('filterInput', '.user-li', ['a']);
 });

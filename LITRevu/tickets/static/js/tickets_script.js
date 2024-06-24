@@ -111,6 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
     imagePreviewManager("createReviewFormImageInput", "createReviewFormImagePreview");
     
     singleToDoublePageSwitcher();
+    followUserManager(".block-btn", callbackMassBlock);
     followUserManager(".follow-btn", callbackMassFollow);
     searchThroughList('filterInput', '.ticket-li', ['.ticket-title', '.ticket-description', '.tag'], true)
 });

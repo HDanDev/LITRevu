@@ -81,6 +81,13 @@ Relations
                 <i class="icon-user-plus"></i>
             {% endif %}
         </button>
+        <button class="block-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_block' user.pk %}" data-token="{{ csrf_token }}">
+            {% if user in blocked_users %}
+                <i class="icon-checkmark not-validation"></i>
+            {% else %}
+                <i class="icon-blocked not-validation"></i>
+            {% endif %}
+        </button>
     </li>
     {% endfor %}
     </ul>
@@ -98,6 +105,26 @@ Relations
                 <i class="icon-user-plus"></i>
             {% endif %}
         </button>
+        <button class="block-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_block' user.pk %}" data-token="{{ csrf_token }}">
+            {% if user in blocked_users %}
+                <i class="icon-checkmark not-validation"></i>
+            {% else %}
+                <i class="icon-blocked not-validation"></i>
+            {% endif %}
+        </button>
+    </li>
+    {% endfor %}
+    </ul>
+</div>
+<div>
+    <h3 class="profile-info">Blocked</h3>
+    <ul>
+    {% for user in blocked_users %}
+    <li class="profile-info">
+        <a href="{% url 'user_detail' user.pk %}">{{ user.username }}</a>
+        <button class="block-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_block' user.pk %}" data-token="{{ csrf_token }}">
+            <i class="icon-checkmark not-validation"></i>
+        </button>
     </li>
     {% endfor %}
     </ul>
@@ -114,6 +141,13 @@ Relations
                 <i class="icon-user-minus"></i>
             {% else %}
                 <i class="icon-user-plus"></i>
+            {% endif %}
+        </button>
+        <button class="block-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_block' user.pk %}" data-token="{{ csrf_token }}">
+            {% if user.pk in blocked_user_ids %}
+                <i class="icon-checkmark not-validation"></i>
+            {% else %}
+                <i class="icon-blocked not-validation"></i>
             {% endif %}
         </button>
     </li>
