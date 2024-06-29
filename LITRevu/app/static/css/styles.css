@@ -31,6 +31,20 @@ h1 {
     color: var(--main-text-colour);
 }
 
+h4.stylish-header {
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+    border-radius: 4px;
+    padding-left: 12px;
+}
+
+h3.stylish-header {
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.9) 0%, rgba(0, 0, 0, 0) 100%);
+    border-radius: 4px;
+    padding-left: 12px;
+    margin-top: 8px;
+}
+
+
 .title {
     font-weight: bold;
 }
@@ -392,6 +406,12 @@ footer p {
 .rating label:hover,
 .rating label:hover ~ label {
     color: #f5b301;
+}
+
+.rating-preview {
+    margin-left: auto;
+    color: #f5b301;
+    padding-right: 12px;
 }
 
 .item-container {

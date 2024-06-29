@@ -29,7 +29,7 @@ Tickets
             {% if ticket.image %}
             <div class="item-background" style="background-image:url({{ ticket.image.url }})"></div>
             {% endif %}
-          <h3 class="aligned item-infos">
+          <h3 class="aligned item-infos stylish-header">
           <a class="ticket-title item-title view-ticket-btn title custom-colour-target" data-item-id="{{ ticket.pk }}" href="">{{ ticket.title }}</a>
             {% if request.user == ticket.author or request.user.is_superuser %}
               <button type="button" id="edit-ticket-btn" name="edit-ticket" class="ticket-edit-btn icon-hover-box" data-item-id="{{ ticket.pk }}" data-item-name="{{ ticket.title }}" data-item-action="{% url 'ticket_update' ticket.pk %}"><i class="icon-pencil crud-btn"></i></button>
@@ -89,7 +89,7 @@ Tickets
                     <div class="review-img" style="background-image:url({{ review.cover_image.url }})"></div>
                     {% endif %}
                     <div class="review-infos">
-                      <h4 class="aligned item-infos">
+                      <h4 class="aligned item-infos stylish-header">
                         <a class="item-title icon-hover-box view-review-btn" data-item-id="{{ review.pk }}" href="" class="aligned icon-hover-box">
                         <span class="font-style title custom-colour-target">{{ review.title }}</span>
                         </a>
@@ -97,6 +97,11 @@ Tickets
                           <button type="button" id="edit-review-btn" name="edit-review" class="review-edit-btn icon-hover-box" data-item-id="{{ review.pk }}" data-item-name="{{ review.title }}" data-item-action="{% url 'review_update' review.pk %}"><i class="icon-pencil crud-btn"></i></button>
                           <button type="button" id="delete-review-btn" name="delete-review" class="review-delete-btn icon-hover-box" data-item-id="{{ review.pk }}" data-item-name="{{ review.title }}" data-item-action="{% url 'review_delete' review.pk %}"><i class="icon-bin crud-btn"></i></button>
                         {% endif %}
+                        <div class="rating-preview">
+                        {% for _ in "x"|rjust:review.rating %}
+                        ☆
+                        {% endfor %}
+                        </div>
                       </h4>
                       <p><a class="item-infos view-review-btn font-style" data-item-id="{{ review.pk }}" href="">{{ review.content }}</a></p>
                     </div>
