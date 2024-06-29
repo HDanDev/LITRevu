@@ -74,3 +74,44 @@ ul {
 .d-none {
     display: none !important;
 }
+
+input[type="date"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+    font-size: 16px;
+    transition: border-color 0.3s ease-in;
+}
+
+input[type="date"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+input[type="date"]::placeholder {
+    font-family: var(--main-font-style);
+    color: #aaa;
+}
+
+input[type="date"] {
+    font-family: var(--main-font-style);
+    color: #333;
+}
+
+input[type="date"] {
+    max-width: calc(100% - 18px);
+}
+
+input[type="date"]:hover {
+    border-color: #888;
+    cursor: pointer;
+}
+
+input[type="date"]:focus {
+    border-color: #555;
+    cursor: unset;
+    outline: none;
+}

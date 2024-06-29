@@ -113,5 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
     singleToDoublePageSwitcher();
     followUserManager(".block-btn", callbackMassBlock);
     followUserManager(".follow-btn", callbackMassFollow);
-    searchThroughList('filterInput', '.ticket-li', ['.ticket-title', '.ticket-description', '.tag'], true)
+    searchThroughList('filterInput', '.ticket-li', ['.ticket-title', '.ticket-description', '.tag'], true);
+    setRandomColour(document.getElementById("rightPage"));
 });

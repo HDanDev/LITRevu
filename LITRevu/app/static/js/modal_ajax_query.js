@@ -429,9 +429,8 @@ window.followUserManager = (btnClassName, callback) => {
             const btn = event.target.closest('button');
             const userId = btn.getAttribute('data-user-id');
             const url = btn.getAttribute('data-url');
-            const csrfToken = btn.getAttribute('data-token');
             const jsonBody = JSON.stringify({ user_id: userId });
-            ajaxCall(url, csrfToken, jsonBody, callback, btn);
+            ajaxCall(url, jsCsrfToken, jsonBody, callback, btn);
         });
     });
 }
@@ -632,6 +631,12 @@ window.searchThroughList = (inputId, querySelectorValue, subQuerySelectorValue, 
             }
         });
     });
+}
+
+window.setRandomColour = (target) => {
+    target.querySelectorAll(".custom-colour-target").forEach(i => {
+        i.classList.add(`colour-${Math.floor(Math.random() * 10)}`);
+    })
 }
 
 window.switchModal = (sourceModal, targetModal) => {}

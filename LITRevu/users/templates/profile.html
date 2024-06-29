@@ -74,14 +74,14 @@
     {% for user in followed_users %}
     <li class="profile-info">
         <a href="{% url 'user_detail' user.pk %}">{{ user.username }}</a>
-        <button class="follow-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}" data-token="{{ csrf_token }}">
+        <button class="follow-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}">
             {% if user.followers_status %}
                 <i class="icon-user-minus"></i>
             {% else %}
                 <i class="icon-user-plus"></i>
             {% endif %}
         </button>
-        <button class="block-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_block' user.pk %}" data-token="{{ csrf_token }}">
+        <button class="block-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_block' user.pk %}">
             {% if user in blocked_users %}
                 <i class="icon-checkmark not-validation"></i>
             {% else %}
@@ -98,14 +98,14 @@
     {% for user in following_users %}
     <li class="profile-info">
         <a href="{% url 'user_detail' user.pk %}">{{ user.username }}</a>
-        <button class="follow-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}" data-token="{{ csrf_token }}">
+        <button class="follow-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}">
             {% if user.followers_status %}
                 <i class="icon-user-minus"></i>
             {% else %}
                 <i class="icon-user-plus"></i>
             {% endif %}
         </button>
-        <button class="block-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_block' user.pk %}" data-token="{{ csrf_token }}">
+        <button class="block-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_block' user.pk %}">
             {% if user in blocked_users %}
                 <i class="icon-checkmark not-validation"></i>
             {% else %}
@@ -122,7 +122,7 @@
     {% for user in blocked_users %}
     <li class="profile-info">
         <a href="{% url 'user_detail' user.pk %}">{{ user.username }}</a>
-        <button class="block-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_block' user.pk %}" data-token="{{ csrf_token }}">
+        <button class="block-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_block' user.pk %}">
             <i class="icon-checkmark not-validation"></i>
         </button>
     </li>
@@ -136,14 +136,14 @@
     {% for user in users_list %}
     <li class="user-li profile-info profile-info-less-padding d-none">
         <a href="{% url 'user_detail' user.pk %}">{{ user.username }}</a>
-        <button class="follow-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}" data-token="{{ csrf_token }}">
+        <button class="follow-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}">
             {% if user.followers_status %}
                 <i class="icon-user-minus"></i>
             {% else %}
                 <i class="icon-user-plus"></i>
             {% endif %}
         </button>
-        <button class="block-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_block' user.pk %}" data-token="{{ csrf_token }}">
+        <button class="block-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_block' user.pk %}">
             {% if user.pk in blocked_user_ids %}
                 <i class="icon-checkmark not-validation"></i>
             {% else %}
@@ -216,6 +216,9 @@
 {% endblock %}
 
 {% block js %}
+<script>
+    const jsCsrfToken = "{{ csrf_token }}";
+</script>
 <Script src="{% static 'js/modal_ajax_query.js' %}"></Script>
 <script src="{% static 'js/users.js' %}"></script>
 <script src="{% static 'js/user_profile_script.js' %}"></script>

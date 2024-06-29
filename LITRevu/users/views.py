@@ -194,29 +194,36 @@ def update_profile(request):
 
                     user.profile_picture = optimized_image
                     user.save()
+                    request.user = user
 
                     if old_profile_picture_path and os.path.isfile(old_profile_picture_path):
                         try:
                             os.remove(old_profile_picture_path)
                             messages.success(request, "Your profile has been successfully updated")
-                            return JsonResponse({'success': True, 'message': 'Your profile was successfully updated!'})
+                            # return JsonResponse({'success': True, 'message': 'Your profile was successfully updated!'})
+                            return profile_view(request)
+                            
                         except Exception as e:
                             print(f"Error deleting old profile picture: {e}")
-                            return JsonResponse({'success': False, 'errors': 'An error occurred while deleting your previous profile picture'})
-                        
+                            # return JsonResponse({'success': False, 'errors': 'An error occurred while deleting your previous profile picture'})
+                            return profile_view(request)
                 except Exception as e:
                     messages.error(request, 'An error occurred while updating your profile')
-                    return JsonResponse({'success': False, 'errors': form.errors})
-                
+                    # return JsonResponse({'success': False, 'errors': form.errors})
+                    return profile_view(request)
             else: 
+                user.date_of_birth = form.cleaned_data['date_of_birth']
                 user.save()
                 messages.success(request, "Your date of birth has been successfully updated")
-                return JsonResponse({'success': True, 'message': 'Your date of birth has been successfully updated!'})
+                # return JsonResponse({'success': True, 'message': 'Your date of birth has been successfully updated!'})
+                return profile_view(request)
         else:
             messages.error(request, 'An error occurred while updating your profile')
-            return JsonResponse({'success': False, 'errors': form.errors})
+            # return JsonResponse({'success': False, 'errors': form.errors})
+            return profile_view(request)
     else:
-        return JsonResponse({'success': False, 'message': 'Invalid request method.'})
+        # return JsonResponse({'success': False, 'message': 'Invalid request method.'})
+        return profile_view(request)
 
 @login_required
 def update_email(request):

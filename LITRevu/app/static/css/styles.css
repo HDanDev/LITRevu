@@ -35,6 +35,19 @@ h1 {
     font-weight: bold;
 }
 
+.messages {
+    padding: 12px;
+    color: white;
+    background-color: var(--success-colour);
+    border-radius: 8px;
+    margin-bottom: 4px;
+}
+
+.messages li {
+    background-color: unset;
+    list-style: none;
+}
+
 i {
     margin-right: 8px;
     margin-left: 8px;
@@ -66,7 +79,8 @@ form {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
+    min-height: calc(100vh - 120px);
+    padding-top: 120px;
 }
 
 .main-title {
@@ -231,6 +245,14 @@ footer p {
     justify-content: center;
 }
 
+.top-actions-block {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+}
+
 .notepad {
     display: flex;
     flex-direction: row;
@@ -242,9 +264,10 @@ footer p {
     box-sizing: border-box;
     overflow: hidden;
     max-width: 80vw;
+    min-width: 34vw;
     margin: auto;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin-top: 100px;
+    margin-top: 0;
 }
 
 .margin-auto {
@@ -438,6 +461,24 @@ footer p {
 
 .mini-font {
     font-size: 12px;
+    margin: 0;
+}
+
+.mini-likes {
+    font-size: 12px;
+}
+
+.mini-likes .like-btn,
+.mini-likes .dislike-btn {
+    padding: 0;
+}
+
+.mini-likes .icon-heart,
+.mini-likes .icon-heart-broken,
+.mini-likes .icon-blocked,
+.mini-likes .icon-user-minus,
+.mini-likes .icon-user-plus {
+    font-size: 12px;
 }
 
 .review-create-btn:not(:first-child) {
@@ -491,6 +532,10 @@ footer p {
     border-radius: 8px;
     border: 0 solid transparent;
     padding: 8px 8px 8px 32px;
+}
+
+#filterInput::placeholder {
+    font-family: var(--main-font-style);
 }
 
 #filterInput:focus {
@@ -572,6 +617,10 @@ footer p {
     gap: 8px;
 }
 
+.colour-0 {
+    color: rgb(141, 141, 141);
+}
+
 .colour-1 {
     color: rgb(231, 125, 111);
 }
@@ -606,10 +655,6 @@ footer p {
 
 .colour-9 {
     color: rgb(209, 113, 158);
-}
-
-.colour-10 {
-    color: rgb(141, 141, 141);
 }
 
 .validation-icon {
