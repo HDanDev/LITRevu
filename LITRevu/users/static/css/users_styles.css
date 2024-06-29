@@ -4,6 +4,7 @@
 
 ul {
     margin: 0;
+    padding: 0;
 }
 
 .profile-section {
@@ -16,7 +17,7 @@ ul {
     display: flex;
     flex-direction: row;
     align-items: center;    
-    min-width: max-content;
+    /* min-width: max-content; */
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -27,6 +28,20 @@ ul {
 
 .profile-info-less-padding {
     padding: 8px 0;
+}
+
+.profile-form {
+    flex-direction: column;
+}
+
+.profile-form div,
+.profile-form input,
+.profile-form button {
+    width: 100%;
+}
+
+.profile-form button i {
+    margin-right: 0;
 }
 
 .button-exception {

@@ -31,6 +31,10 @@ h1 {
     color: var(--main-text-colour);
 }
 
+.title {
+    font-weight: bold;
+}
+
 i {
     margin-right: 8px;
     margin-left: 8px;
@@ -385,6 +389,38 @@ footer p {
     /* background-blend-mode: luminosity; */
     opacity: 0.1;
     border-radius: 36px;
+}
+
+.review-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.review-container:hover {
+    cursor: pointer;
+}
+
+.review-container:hover .review-img {
+    filter: unset;
+}
+
+.review-img {
+    margin-right: 16px;
+    width: 148px;
+    height: auto;
+    max-width: 148px;
+    max-height: 100%;
+    background-size: cover;
+    background-clip: content-box;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 4px;
+    transition: filter 0.3s ease-in;
+    filter: grayscale(0.5);
+}
+
+.review-infos {
+    flex: 1;
 }
 
 .item-infos {

@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_str, force_bytes
 from django.contrib.sites.shortcuts import get_current_site
+from app.utils import generate_random_numbers
 from django.contrib.auth.tokens import default_token_generator
 from users.form import CustomUserCreationForm, CustomAuthenticationForm, CustomUserEditForm, UpdateEmailForm, UpdateUsernameForm, UpdatePasswordForm
 from users.email_utils import EmailUtils
@@ -16,6 +17,13 @@ from django.db.models import Exists, OuterRef
 from django.db.models import Case, When, BooleanField
 from django.http import JsonResponse
 from django.db.models import Q
+import os
+import uuid
+from PIL import Image
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
+import logging
+logger = logging.getLogger(__name__)
 
 def login_view(request):
     if request.method == 'POST':
@@ -136,8 +144,8 @@ def profile_view(request):
     ).exclude(
         pk__in=followed_user_ids
     )
-
-    return render(request, 'profile.html', {
+    colour_numbers = generate_random_numbers()[:10]
+    context = {
         'form': form, 
         'email_form': email_form, 
         'username_form': username_form, 
@@ -146,19 +154,69 @@ def profile_view(request):
         'following_users': following_users,
         'users_list': users_list,
         'blocked_users' : blocked_users,
-    })
-    
+    }
+    context.update({
+        'col{}'.format(i): colour_numbers[i] for i in range(min(len(colour_numbers), 10))
+        })
+
+    return render(request, 'profile.html', context)
+
 @login_required
 def update_profile(request):
     if request.method == 'POST':
         form = CustomUserEditForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Your profile has been successfully updated")
-            return JsonResponse({'success': True, 'message': 'Your profile was successfully updated!'})
+            user = CustomUser.objects.get(pk=request.user.pk)
+            old_profile_picture_path = user.profile_picture.path if user.profile_picture else None
+            new_profile_picture = form.cleaned_data['profile_picture']
+            if new_profile_picture and new_profile_picture != user.profile_picture:
+                try:
+                    img = Image.open(new_profile_picture)
+                    img_format = img.format
+
+                    output = BytesIO()
+
+                    if img_format == 'JPEG':
+                        img.save(output, format='JPEG', quality=85)
+                        content_type = 'image/jpeg'
+                    elif img_format == 'PNG':
+                        img.save(output, format='PNG', optimize=True)
+                        content_type = 'image/png'
+
+                    output_size = output.tell()
+                    output.seek(0)
+
+                    new_filename = "{}.{}".format(uuid.uuid4(), img_format.lower())
+
+                    optimized_image = InMemoryUploadedFile(
+                        output, 'ImageField', new_filename, content_type, output_size, None
+                    )
+
+                    user.profile_picture = optimized_image
+                    user.save()
+
+                    if old_profile_picture_path and os.path.isfile(old_profile_picture_path):
+                        try:
+                            os.remove(old_profile_picture_path)
+                            messages.success(request, "Your profile has been successfully updated")
+                            return JsonResponse({'success': True, 'message': 'Your profile was successfully updated!'})
+                        except Exception as e:
+                            print(f"Error deleting old profile picture: {e}")
+                            return JsonResponse({'success': False, 'errors': 'An error occurred while deleting your previous profile picture'})
+                        
+                except Exception as e:
+                    messages.error(request, 'An error occurred while updating your profile')
+                    return JsonResponse({'success': False, 'errors': form.errors})
+                
+            else: 
+                user.save()
+                messages.success(request, "Your date of birth has been successfully updated")
+                return JsonResponse({'success': True, 'message': 'Your date of birth has been successfully updated!'})
         else:
             messages.error(request, 'An error occurred while updating your profile')
             return JsonResponse({'success': False, 'errors': form.errors})
+    else:
+        return JsonResponse({'success': False, 'message': 'Invalid request method.'})
 
 @login_required
 def update_email(request):

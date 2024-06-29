@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content_title %}
-Edit Profile
+<span class="colour-{{ col1 }}">Edit Profile</span>
 {% endblock %}
 
 {% block content %}
@@ -36,35 +36,35 @@ Edit Profile
     </button>
 </div>
 
-<form method="post" class="profile-info" id="updateProfileForm" method="post" action="{% url 'update_profile' %}">
+<form method="post" enctype="multipart/form-data" class="profile-info profile-form" id="updateProfileForm" action="{% url 'update_profile' %}">
     {% csrf_token %}
     <div class="form-group">
         <label for="{{ form.profile_picture.id_for_label }}">Profile Picture:</label>
         <div>
-        {% if user.profile.profile_picture %}
-            <img id="profile-picture-preview" src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="image-preview">
+        {% if user.profile_picture %}
+            <img id="profile-picture-preview" src="{{ user.profile_picture.url }}" alt="Profile Picture" class="image-preview">
         {% else %}
             <img id="profile-picture-preview" src="{% static 'images/PPPlaceholder.PNG' %}" alt="Profile Picture" class="image-preview">
-        {% endif %}        
+        {% endif %}
         </div>
         {{ form.profile_picture }}
         {% if form.profile_picture.errors %}
             <div class="error">{{ form.profile_picture.errors }}</div>
         {% endif %}
     </div>
-    {% comment %} <div class="form-group">
+    <div class="form-group">
         <label for="{{ form.date_of_birth.id_for_label }}">Date of Birth:</label>
         {{ form.date_of_birth }}
         {% if form.date_of_birth.errors %}
             <div class="error">{{ form.date_of_birth.errors }}</div>
         {% endif %}
-    </div> {% endcomment %}
+    </div>
     <button type="submit" class="icon-hover-box feedback validation-btn"><i class="icon-checkmark"></i></button>
 </form>
 {% endblock %}
 
 {% block second_page_title %}
-Relations
+<span class="colour-{{ col2 }}">Relations</span>
 {% endblock %}
 
 {% block second_page_content %}

@@ -5,10 +5,17 @@ from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.auth import authenticate
 from django.utils import timezone
 from users.models import CustomUser
+from django.forms.widgets import ClearableFileInput
+
+
+class CustomClearableFileInput(ClearableFileInput):
+    template_name = 'custom_widgets/custom_clearable_file_input.html'
+
+    def __init__(self, attrs=None):
+        super().__init__(attrs)
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True, help_text='Enter a valid email address.')
-    # date_of_birth = forms.DateField(required=True, widget=forms.DateInput(attrs={'type': 'date', 'min': '1910-01-01', 'max': timezone.now().strftime('%Y-%m-%d')}))
     
     class Meta:
         model = CustomUser
@@ -43,21 +50,6 @@ class CustomUserCreationForm(UserCreationForm):
         if CustomUser.objects.filter(email=email).exists():
             raise ValidationError("This email address is already in use.")
         return email
-
-    # def clean_date_of_birth(self):
-    #     birth_date = self.cleaned_data.get('date_of_birth')
-    #     today = timezone.now().date()
-    #     min_birth_date = today - timezone.timedelta(days=12*365)  # 12 years ago
-    #     max_birth_date = today - timezone.timedelta(days=200*365)  # 200 years ago
-
-    #     if birth_date:
-    #         if birth_date > today:
-    #             raise ValidationError('Birth date cannot be in the future.')
-    #         if birth_date < min_birth_date:
-    #             raise ValidationError('You must be at least 12 years old to register.')
-    #         if birth_date > max_birth_date:
-    #             raise ValidationError('You must be younger than 200 years old to register.')
-    #     return birth_date
     
     def save(self, commit=True):
         user = super(CustomUserCreationForm, self).save(commit=False)
@@ -67,7 +59,7 @@ class CustomUserCreationForm(UserCreationForm):
             user.save()
         return user
     
-class CustomUserEditForm(UserCreationForm):
+class CustomUserEditForm(forms.ModelForm):
     date_of_birth = forms.DateField(
         required=False,
         widget=forms.DateInput(
@@ -78,25 +70,47 @@ class CustomUserEditForm(UserCreationForm):
                 'id': 'edit-date-field',
                 'class': 'form-control',
                 'label': 'Date of birth'
-            }))
-    
+            })
+    )
+
     class Meta:
         model = CustomUser
-        fields = ("date_of_birth", "profile_picture")
+        fields = ['profile_picture', 'date_of_birth']
+        widgets = {
+            'profile_picture': CustomClearableFileInput,
+        }
+
+    def clean_profile_picture(self):
+        image = self.cleaned_data.get('profile_picture')
+
+        if image is self.instance.profile_picture:
+            return image
+
+        if not (image.name.endswith('.jpg') or image.name.endswith('.png')):
+            raise forms.ValidationError("Only .jpg and .png files are allowed.")
+
+        if image.size > 2 * 1024 * 1024:
+            raise forms.ValidationError("Image file size must be under 2MB.")
+        
+        return image
+        
 
     def clean_date_of_birth(self):
         birth_date = self.cleaned_data.get('date_of_birth')
-        today = timezone.now().date()
-        min_birth_date = today - timezone.timedelta(days=12*365)  # 12 years ago
-        max_birth_date = today - timezone.timedelta(days=200*365)  # 200 years ago
-
         if birth_date:
+            today = timezone.now().date()
+            min_birth_date = today - timezone.timedelta(days=12*365)  # 12 years ago
+            max_birth_date = today - timezone.timedelta(days=200*365)  # 200 years ago
+
             if birth_date > today:
-                raise ValidationError('Birth date cannot be in the future.')
-            if birth_date < min_birth_date:
-                raise ValidationError('You must be at least 12 years old to register.')
-            if birth_date > max_birth_date:
-                raise ValidationError('You must be younger than 200 years old to register.')
+                raise forms.ValidationError('Birth date cannot be in the future.')
+
+            if birth_date > min_birth_date:
+                raise forms.ValidationError('You must be at least 12 years old to register.')
+
+            if birth_date < max_birth_date:
+                raise forms.ValidationError('You must be younger than 200 years old to register.')
+
         return birth_date
     
 class CustomAuthenticationForm(AuthenticationForm):
