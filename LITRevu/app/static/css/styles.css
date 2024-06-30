@@ -437,6 +437,7 @@ footer p {
 .review-container {
     display: flex;
     flex-direction: row;
+    margin-top: 8px;
 }
 
 .review-container:hover {
@@ -476,6 +477,7 @@ footer p {
 
 .reviews-list {
     padding-left: 40px;
+    padding-top: 0;
     max-width: calc(100% - 40px);
 }
 
@@ -505,6 +507,20 @@ footer p {
     font-size: 24px;
     margin-right: auto;
     margin-top: 6px;
+}
+
+.sample-text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    max-height: 64px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-bottom: 1px solid #ccc;
+}
+
+.no-margin {
+    margin: 0;
 }
 
 .item-title {

@@ -41,12 +41,7 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
     form_class = ReviewForm
     success_url = reverse_lazy('ticket_list')
     guest_user = None
-
-    # def dispatch(self, request, *args, **kwargs):
-    #     if request.method == 'POST' and not request.user.is_authenticated:
-    #         self.guest_user = CustomUser.objects.get_or_create(username='guest')[0]
-    #         login(request, self.guest_user)
-    #     return super().dispatch(request, *args, **kwargs)
+    template_name = 'review_list.html'
 
     def form_valid(self, form):
         try:
@@ -54,20 +49,18 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
             form.instance.ticket = get_object_or_404(Ticket, pk=self.kwargs['pk'])
             if form.is_valid():           
                 super().form_valid(form)
-            
                 return JsonResponse({'success': True, 'message': 'review created successfully!'})
 
         except Exception as e:
             error_message = f"An error occurred: {str(e)}"
             messages.error(self.request, error_message)
+            return JsonResponse({'success': False, 'error': error_message})
 
-        return JsonResponse({'success': False, 'error': error_message})
-
-    # def get_success_url(self):
-    #     ticket_pk = self.kwargs['pk']
-    #     if self.guest_user:
-    #         logout(self.request)
-    #     return reverse_lazy('review_list', kwargs={'pk': ticket_pk})
+    def get_success_url(self):
+        ticket_pk = self.kwargs['pk']
+        if self.guest_user:
+            logout(self.request)
+        return reverse_lazy('review_list', kwargs={'pk': ticket_pk})
     
 class ReviewUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Review

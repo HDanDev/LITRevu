@@ -80,6 +80,7 @@ window.autoFormFill = (targetModal, btn, targetId=null, formType=null) => {
         }
     }
     openModal(targetModal);
+    console.log('action:',action);
     return action;
 }
 
@@ -342,6 +343,7 @@ window.dislikeListener = (dislikeBtns) => {
 }
 
 window.uniqueBtnListener = (btn, form, callbackFunction, url) => {
+    console.log('uniquebtn',btn, form, callbackFunction, url);
     btn.addEventListener("click", (event) => {
         submitForm(event, form, callbackFunction, url);
     });

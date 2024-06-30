@@ -57,8 +57,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const starCreateTicketReviewRating = document.getElementsByClassName("rating-create-ticket-review-input");
     const labelCreateTicketReviewRating = document.getElementsByClassName("rating-create-ticket-review-label");
-    const starCreateSingleRating = document.getElementsByClassName("rating-create-single-input");
-    const labelCreateSingleRating = document.getElementsByClassName("rating-create-single-label");
+    const starCreateSingleRating = document.getElementsByClassName("rating-create-review-input");
+    const labelCreateSingleRating = document.getElementsByClassName("rating-create-review-label");
     const starEditSingleRating = document.getElementsByClassName("rating-edit-review-input");
     const labelEditSingleRating = document.getElementsByClassName("rating-edit-review-label");
     
@@ -113,6 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
     singleToDoublePageSwitcher();
     followUserManager(".block-btn", callbackMassBlock);
     followUserManager(".follow-btn", callbackMassFollow);
-    searchThroughList('filterInput', '.ticket-li', ['.ticket-title', '.ticket-description', '.tag'], true);
+    searchThroughList('filterInput', '.ticket-li', ['.ticket-title', '.ticket-description', '.tag', '.author'], true);
     setRandomColour(document.getElementById("rightPage"));
 });

@@ -52,7 +52,7 @@ class TicketListView(LoginRequiredMixin, ListView):
         
         return context
     
-class TicketCreateView(CreateView):
+class TicketCreateView(LoginRequiredMixin, CreateView):
     model = Ticket
     form_class = TicketForm
     template_name = 'ticket_form.html'
