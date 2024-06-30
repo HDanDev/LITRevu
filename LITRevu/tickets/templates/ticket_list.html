@@ -131,17 +131,17 @@ Tickets
                       <a class="colour-{{ col3 }}" href="{% url 'profile' %}">you</a>
                       {% endif %}
                     </p>
-                    {% if request.user != ticket.author %}
+                    {% if request.user != review.author %}
                     <div class="like-container">
-                      <form id="like-form-{{ ticket.pk }}" method="post" action="{% url 'ticket_like' ticket.pk %}" class="like-block">
+                      <form id="like-form-{{ review.pk }}" method="post" action="{% url 'review_like' review.pk %}" class="like-block">
                         {% csrf_token %}
                         <button class="like-btn icon-hover-box"><i class="icon-heart"></i></button>
-                        <span class="likes-count">{{ ticket.likes_count }}</span>
+                        <span class="likes-count">{{ review.likes_count }}</span>
                       </form>
-                      <form id="dislike-form-{{ ticket.pk }}" method="post" action="{% url 'ticket_dislike' ticket.pk %}" class="like-block">
+                      <form id="dislike-form-{{ review.pk }}" method="post" action="{% url 'review_dislike' review.pk %}" class="like-block">
                         {% csrf_token %}
                         <button class="dislike-btn icon-hover-box"><i class="icon-heart-broken"></i></button>
-                        <span class="dislikes-count">{{ ticket.dislikes_count }}</span>
+                        <span class="dislikes-count">{{ review.dislikes_count }}</span>
                       </form>
                     </div>
                     {% endif %}

@@ -35,6 +35,9 @@ class TicketListView(LoginRequiredMixin, ListView):
         for ticket in tickets:
             ticket.likes_count = ticket.get_likes_count()
             ticket.dislikes_count = ticket.get_dislikes_count()
+            for review in ticket.reviews.all():
+                review.likes_count = review.get_likes_count()
+                review.dislikes_count = review.get_dislikes_count()
             
         ticket_authors = tickets.values_list('author', flat=True)
         review_authors = Review.objects.filter(ticket__in=tickets).values_list('author', flat=True)

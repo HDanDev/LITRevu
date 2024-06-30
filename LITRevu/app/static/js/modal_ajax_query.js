@@ -670,7 +670,6 @@ window.brokenImgWatcher = () => {
 window.setBackgroundImage = (elementList, defaultImage) => {
     document.querySelectorAll(elementList).forEach(bgElement => {
         const bgSrc = bgElement.getAttribute('data-src');
-        console.log(bgSrc);
         const img = new Image();
         img.onload = () => {
             bgElement.style.backgroundImage = `url(${bgSrc})`;

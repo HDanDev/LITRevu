@@ -2,7 +2,9 @@ from django.db import models
 from users.models import CustomUser
 from tags.models import Tag
 from tickets.models import Ticket
+from likedislikes.models import LikeDislike
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.contenttypes.models import ContentType
 
 class Review(models.Model):
     title = models.CharField(max_length=128)
@@ -20,6 +22,20 @@ class Review(models.Model):
         if self.is_archived and not self.pk:
             self.comments.all().update(is_archived=True)
         super().save(*args, **kwargs)
+        
+    def get_likes_count(self):
+        return LikeDislike.objects.filter(
+            content_type=ContentType.objects.get_for_model(self),
+            object_id=self.pk,
+            vote=LikeDislike.LIKE
+        ).count()
+
+    def get_dislikes_count(self):
+        return LikeDislike.objects.filter(
+            content_type=ContentType.objects.get_for_model(self),
+            object_id=self.pk,
+            vote=LikeDislike.DISLIKE
+        ).count()
         
     def __str__(self):
         return self.title
