@@ -371,6 +371,10 @@ footer p {
     left: 0;
 }
 
+.author:hover {
+    cursor: pointer;
+}
+
 .blue {
     font-family: var(--main-font-style);
     color: rgb(124, 182, 209);

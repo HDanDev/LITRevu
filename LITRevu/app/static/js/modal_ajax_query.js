@@ -544,6 +544,20 @@ window.generateViewTicketModal = (ticketId) => {
     return itemContainer;
 }
 
+window.generateViewUserModal = (userId) => {
+    const user = usersData.find(u => u.id === userId);
+    const reviews = reviewsData.filter(r => r.author === userId);
+    const tickets = ticketsData.filter(t => t.author === userId);
+    const title = document.createElement('h2');
+    title.className = 'main-title item-infos';
+    title.innerHTML = `<span class="colour-2">${user.username}</span>`;
+
+    const viewReviewContainer = document.getElementById('viewUserContainer');
+    viewReviewContainer.innerHTML = "";
+    viewReviewContainer.appendChild(title);
+    // viewReviewContainer.appendChild(generateReviewsList(review));
+}
+
 window.generateTitle = (object, isTicket) => {  
     const header = document.createElement(isTicket ? 'h3' : 'h4');
     header.className = 'aligned item-infos';
@@ -639,6 +653,33 @@ window.setRandomColour = (target) => {
     target.querySelectorAll(".custom-colour-target").forEach(i => {
         i.classList.add(`colour-${Math.floor(Math.random() * 10)}`);
     })
+}
+
+window.brokenImgWatcher = () => {
+    const defaultImage = "/static/images/PPPlaceholder.PNG";
+    document.querySelectorAll('img').forEach(img => {
+        img.onerror = (event) => {
+            event.target.onerror = null;
+            event.target.src = defaultImage;
+        };
+    });
+    setBackgroundImage(".item-background", defaultImage);
+    setBackgroundImage(".review-img", defaultImage);
+}
+
+window.setBackgroundImage = (elementList, defaultImage) => {
+    document.querySelectorAll(elementList).forEach(bgElement => {
+        const bgSrc = bgElement.getAttribute('data-src');
+        console.log(bgSrc);
+        const img = new Image();
+        img.onload = () => {
+            bgElement.style.backgroundImage = `url(${bgSrc})`;
+        };
+        img.onerror = () => {
+            bgElement.style.backgroundImage = `url(${defaultImage})`;
+        };
+        img.src = bgSrc;
+    });
 }
 
 window.switchModal = (sourceModal, targetModal) => {}

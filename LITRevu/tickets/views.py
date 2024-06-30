@@ -21,6 +21,7 @@ class TicketListView(LoginRequiredMixin, ListView):
     model = Ticket
     template_name = 'ticket_list.html'
     context_object_name = 'tickets'
+    _context_users = None
     
     def get_queryset(self):
         blocked_users = UserBlock.objects.filter(blocker=self.request.user).values_list('blocked', flat=True)
@@ -34,10 +35,14 @@ class TicketListView(LoginRequiredMixin, ListView):
         for ticket in tickets:
             ticket.likes_count = ticket.get_likes_count()
             ticket.dislikes_count = ticket.get_dislikes_count()
-        
+            
+        ticket_authors = tickets.values_list('author', flat=True)
+        review_authors = Review.objects.filter(ticket__in=tickets).values_list('author', flat=True)
+        all_authors = set(ticket_authors).union(set(review_authors))
+        self._context_users = CustomUser.objects.filter(id__in=all_authors)
         return tickets
     
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):        
         context = super().get_context_data(**kwargs)
         blocked_users_ids = UserBlock.objects.filter(blocker=self.request.user).values_list('blocked', flat=True)
         blocked_users = CustomUser.objects.filter(id__in=blocked_users_ids)
@@ -49,6 +54,7 @@ class TicketListView(LoginRequiredMixin, ListView):
         context['review_form'] =  ReviewForm()
         context['ticket_update_form'] =  TicketUpdateForm()
         context['blocked_users'] = blocked_users
+        context['users'] = self._context_users
         
         return context
     

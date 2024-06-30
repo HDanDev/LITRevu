@@ -50,6 +50,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const viewReviewButtons = document.getElementsByClassName("view-review-btn");
     const viewReviewCancelButton = document.getElementById("viewReviewModalCloseBtn");
 
+    const viewUserModal = document.getElementById("viewUserModal");
+    const viewUserButtons = document.getElementsByClassName("author");
+    const viewUserCancelButton = document.getElementById("viewUserModalCloseBtn");
+
     //////////// List const list ////////////
 
     const ticketsLikeBtns = document.querySelectorAll(".like-btn");
@@ -96,6 +100,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
     openViewModal(viewReviewButtons, generateViewReviewModal, viewReviewModal);
     asyncModalFormCancel(viewReviewCancelButton);
+    
+    openViewModal(viewUserButtons, generateViewUserModal, viewUserModal);
+    asyncModalFormCancel(viewUserCancelButton);
 
     likeListener(ticketsLikeBtns);
     dislikeListener(ticketsDislikeBtns);
@@ -115,4 +122,5 @@ document.addEventListener("DOMContentLoaded", () => {
     followUserManager(".follow-btn", callbackMassFollow);
     searchThroughList('filterInput', '.ticket-li', ['.ticket-title', '.ticket-description', '.tag', '.author'], true);
     setRandomColour(document.getElementById("rightPage"));
+    brokenImgWatcher();
 });
