@@ -32,22 +32,25 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-window.asyncMultipleBtnsModalFormInit = (btnsList, modal, validationBtn, targetId=null, formType=null) => {
+window.asyncMultipleBtnsModalFormInit = (btnsList, modal, validationBtn, callbackFunction=null, targetId=null, formType=null) => {
     let modalForm = modal.getElementsByTagName('form')[0];
+    if (callbackFunction === null) callbackFunction = callbackCloseModal; 
     for (let i = 0; i < btnsList.length; i++) {
         btnsList[i].addEventListener("click", () => {
             let btn = btnsList[i];
-            action = autoFormFill(modal, btn, targetId, formType);
-            uniqueBtnListener(validationBtn, modalForm, callbackCloseModal, action);
+            let action = autoFormFill(modal, btn, targetId, formType);
+            uniqueBtnListener(validationBtn, modalForm, callbackFunction, action);
         });
     }
 }
 
-window.asyncSingleBtnModalFormInit = (btn, modal, validationBtn, targetId=null, formType=null) => {
+window.asyncSingleBtnModalFormInit = (btn, modal, validationBtn, callbackFunction=null, targetId=null, formType=null) => {
     let modalForm = modal.getElementsByTagName('form')[0];
+    if (callbackFunction === null) callbackFunction = callbackCloseModal; 
     btn.addEventListener("click", () => {
-        action = autoFormFill(modal, btn, targetId, formType);
-        uniqueBtnListener(validationBtn, modalForm, callbackCloseModal, action);
+        let action = autoFormFill(modal, btn, targetId, formType);
+        console.log(validationBtn, modalForm, callbackFunction, action);
+        uniqueBtnListener(validationBtn, modalForm, callbackFunction, action);
     });
 }
 
@@ -80,7 +83,6 @@ window.autoFormFill = (targetModal, btn, targetId=null, formType=null) => {
         }
     }
     openModal(targetModal);
-    console.log('action:',action);
     return action;
 }
 
@@ -278,6 +280,38 @@ window.callbackMassFollow = (responseData, source) => {
     massIconSwitcher(".follow-btn", responseData.followed_user, responseData.status, "user-minus", "user-plus");
 }
 
+window.callbackDeleteTicket = (formId, responseData) => {
+    console.log(responseData.id);
+    DOMRemove(responseData.id, "ticket");
+    callbackCloseModal(formId);
+}
+
+window.callbackDeleteReview = (formId, responseData) => {
+    console.log(responseData.id);
+    DOMRemove(responseData.id, "review");
+    callbackCloseModal(formId);
+}
+
+window.callbackCreateTicket = (formId, responseData) => {
+    console.log(responseData.id);
+    const parentList = document.getElementById("tickets-list");
+    console.log(parentList);
+    parentList.appendChild(generateTicket(responseData.id, responseData.img, responseData.title, responseData.description, responseData.tags, responseData.creation_date));
+    callbackCloseModal(formId);
+}
+
+window.callbackCreateReview = (formId, responseData) => {
+    console.log(responseData.id);
+    const review = document.getElementById("review-" + responseData.id);
+    const parentList = review.closest("ul");
+    parentList.appendChild(review);
+    callbackCloseModal(formId);
+}
+
+window.DOMRemove = (targetId, targetName) => {
+    document.getElementById(targetName + "-" + targetId).remove();
+}
+
 window.iconSwitcher = (condition, source, trueIcon, falseIcon) => {
     source.innerHTML = condition ? `<i class="icon-${trueIcon}"></i>` : `<i class="icon-${falseIcon}"></i>`;
 }
@@ -343,7 +377,6 @@ window.dislikeListener = (dislikeBtns) => {
 }
 
 window.uniqueBtnListener = (btn, form, callbackFunction, url) => {
-    console.log('uniquebtn',btn, form, callbackFunction, url);
     btn.addEventListener("click", (event) => {
         submitForm(event, form, callbackFunction, url);
     });
@@ -679,6 +712,73 @@ window.setBackgroundImage = (elementList, defaultImage) => {
         };
         img.src = bgSrc;
     });
+}
+
+window.generateTicket = (ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate) => {
+        const li = document.createElement('li');
+        li.id = `ticket-${ticketId}`;
+        li.classList.add('ticket-li');
+    
+        const itemContainer = document.createElement('div');
+        itemContainer.classList.add('item-container');
+        li.appendChild(itemContainer);
+    
+        if (ticketImg) {
+            const itemBackground = document.createElement('div');
+            itemBackground.classList.add('item-background');
+            itemBackground.dataset.src = ticketImg;
+            itemBackground.style.backgroundImage = `url(${ticketImg})`;
+            itemContainer.appendChild(itemBackground);
+        }
+    
+        const header = document.createElement('h3');
+        header.classList.add('aligned', 'item-infos', 'stylish-header');
+        itemContainer.appendChild(header);
+    
+        const titleLink = document.createElement('a');
+        titleLink.classList.add('ticket-title', 'item-title', 'view-ticket-btn', 'title', 'custom-colour-target');
+        titleLink.dataset.itemId = ticketId;
+        titleLink.href = '';
+        titleLink.textContent = ticketTitle;
+        header.appendChild(titleLink);
+    
+        const descriptionLink = document.createElement('a');
+        descriptionLink.classList.add('item-infos', 'view-ticket-btn');
+        descriptionLink.dataset.itemId = ticketId;
+        descriptionLink.href = '';
+        const descriptionParagraph = document.createElement('p');
+        descriptionParagraph.classList.add('ticket-description', 'sample-text');
+        descriptionParagraph.textContent = ticketDescription;
+        descriptionLink.appendChild(descriptionParagraph);
+        itemContainer.appendChild(descriptionLink);
+    
+        const tagContainer = document.createElement('div');
+        tagContainer.classList.add('tag-container', 'item-infos');
+        ticketTags.forEach(tag => {
+            const tagDiv = document.createElement('div');
+            tagDiv.classList.add('tag');
+            tagDiv.textContent = tag;
+            tagContainer.appendChild(tagDiv);
+        });
+        itemContainer.appendChild(tagContainer);
+    
+        const infoLikesBlock = document.createElement('div');
+        infoLikesBlock.classList.add('item-infos', 'info-likes-block');
+        const infoParagraph = document.createElement('p');
+        infoParagraph.classList.add('no-margin');
+        infoParagraph.innerHTML = `Posted on ${new Date(ticketCreationDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} by `;
+
+        const youLink = document.createElement('a');
+        youLink.classList.add('colour-col2');
+        youLink.href = '/profile/';
+        youLink.textContent = 'you';
+        infoParagraph.appendChild(youLink);
+
+        infoLikesBlock.appendChild(infoParagraph);
+    
+        itemContainer.appendChild(infoLikesBlock);
+    
+        return li;
 }
 
 window.switchModal = (sourceModal, targetModal) => {}

@@ -77,22 +77,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //////////// Functions init ////////////
 
-    asyncSingleBtnModalFormInit(createTicketButton, createModal, createConfirmButton);
+    asyncSingleBtnModalFormInit(createTicketButton, createModal, createConfirmButton, callbackCreateTicket);
     asyncModalFormCancel(createCancelButton);
 
-    asyncMultipleBtnsModalFormInit(editTicketButtons, editModal, editConfirmButton, editTicketName, FormTypeEnum.EDIT_TICKET);
+    asyncMultipleBtnsModalFormInit(editTicketButtons, editModal, editConfirmButton, null, editTicketName, FormTypeEnum.EDIT_TICKET);
     asyncModalFormCancel(editCancelButton);
 
-    asyncMultipleBtnsModalFormInit(deletionTicketButtons, deletionModal, deletionConfirmButton, deleteTicketName, FormTypeEnum.DELETE_TICKET);
+    asyncMultipleBtnsModalFormInit(deletionTicketButtons, deletionModal, deletionConfirmButton, callbackDeleteTicket, deleteTicketName, FormTypeEnum.DELETE_TICKET);
     asyncModalFormCancel(deletionCancelButton);
 
-    asyncMultipleBtnsModalFormInit(createReviewButtons, createReviewModal, createReviewConfirmButton);
+    asyncMultipleBtnsModalFormInit(createReviewButtons, createReviewModal, createReviewConfirmButton, callbackCreateReview);
     asyncModalFormCancel(createReviewCancelButton);
 
-    asyncMultipleBtnsModalFormInit(editReviewButtons, editReviewModal, editReviewConfirmButton, editReviewName, FormTypeEnum.EDIT_REVIEW);
+    asyncMultipleBtnsModalFormInit(editReviewButtons, editReviewModal, editReviewConfirmButton, null, editReviewName, FormTypeEnum.EDIT_REVIEW);
     asyncModalFormCancel(editReviewCancelButton);
 
-    asyncMultipleBtnsModalFormInit(deleteReviewButtons, deleteReviewModal, deleteReviewConfirmButton, deleteReviewName, FormTypeEnum.DELETE_REVIEW);
+    asyncMultipleBtnsModalFormInit(deleteReviewButtons, deleteReviewModal, deleteReviewConfirmButton, callbackDeleteReview, deleteReviewName, FormTypeEnum.DELETE_REVIEW);
     asyncModalFormCancel(deleteReviewCancelButton);
     
     openViewModal(viewTicketButtons, generateViewTicketModal, viewTicketModal);

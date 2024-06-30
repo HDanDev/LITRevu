@@ -481,7 +481,7 @@ footer p {
 
 .reviews-list {
     padding-left: 40px;
-    padding-top: 0;
+    padding-top: 12px;
     max-width: calc(100% - 40px);
 }
 

@@ -76,7 +76,17 @@ class TicketCreateView(LoginRequiredMixin, CreateView):
                 if form.is_valid():
                         
                     super().form_valid(form)
-                    response_data = {'success': True, 'message': 'Ticket created successfully.'}
+                    
+                    response_data = {
+                        'success': True,
+                        'message': 'Ticket created successfully.',
+                        'id': self.object.pk,
+                        'img': self.object.image.url if self.object.image else None,
+                        'title': self.object.title,
+                        'description': self.object.description,
+                        'tags': [tag.name for tag in self.object.tags.all()],
+                        'creation_date': self.object.created_at,
+                        }
                             
                     if form.cleaned_data.get('create_review') and form.cleaned_data.get('review_title'):
                         try:
@@ -89,7 +99,11 @@ class TicketCreateView(LoginRequiredMixin, CreateView):
                                 ticket=self.object,
                             )
                             review.save()
-                            response_data = {'success': True, 'message': 'Ticket and review created successfully.'}
+                            response_data = {
+                                'success': True,
+                                'message': 'Ticket and review created successfully.',
+                                'id': review.pk,
+                                }
                         except Exception as e:
                             response_data = {'success': False, 'error': str(e)}
                     
@@ -156,7 +170,7 @@ class ArchiveTicketView(LoginRequiredMixin, UserPassesTestMixin, View):
             reviews = Review.objects.filter(ticket=ticket)
             reviews.update(is_archived=True)
 
-            return JsonResponse({'success': True, 'message': 'Ticket successfully deleted'})
+            return JsonResponse({'success': True, 'message': 'Ticket successfully deleted', 'id': self.kwargs['pk']})
         
         except Exception as e:
             error_message = f"An error occurred: {str(e)}"

@@ -49,7 +49,7 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
             form.instance.ticket = get_object_or_404(Ticket, pk=self.kwargs['pk'])
             if form.is_valid():           
                 super().form_valid(form)
-                return JsonResponse({'success': True, 'message': 'review created successfully!'})
+                return JsonResponse({'success': True, 'message': 'review created successfully!', 'id': self.object.pk})
 
         except Exception as e:
             error_message = f"An error occurred: {str(e)}"
@@ -115,7 +115,7 @@ class ArchiveReviewView(LoginRequiredMixin, UserPassesTestMixin, View):
             comments = Comment.objects.filter(review=review)
             comments.update(is_archived=True)
 
-            return JsonResponse({'success': True, 'message': 'Review successfully deleted'})
+            return JsonResponse({'success': True, 'message': 'Review successfully deleted', 'id': self.kwargs['pk']})
         
         except Exception as e:
             error_message = f"An error occurred: {str(e)}"
