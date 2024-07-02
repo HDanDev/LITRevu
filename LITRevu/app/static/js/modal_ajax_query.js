@@ -600,7 +600,7 @@ window.generateTitle = (object, isTicket) => {
     titleA.innerHTML = `<span class="font-style">${object.title}</span>${isTicket ? '' : '<i class="icon-eye-plus"></i>'}`;
     header.appendChild(titleA);
 
-    if (object.author === jsUser) {
+    if (object.author === jsUser.id) {
         const editButton = createButton('edit-review-btn', 'edit-review', object.id, object.title, `/review/${object.id}/update`, 'icon-pencil', 'crud-btn');
         header.appendChild(editButton);
 
@@ -615,7 +615,7 @@ window.generateInfos = (object, optionalClass="") => {
     infoBlock.className = 'item-infos ' + optionalClass;
     infoBlock.innerHTML = `<span>Posted on ${object.createdAt} by </span>`;
 
-    if (object.author === jsUser) {
+    if (object.author === jsUser.id) {
         infoBlock.innerHTML += 'you';
     } else {
         const authorSpan = document.createElement('span');
@@ -712,73 +712,6 @@ window.setBackgroundImage = (elementList, defaultImage) => {
         };
         img.src = bgSrc;
     });
-}
-
-window.generateTicket = (ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate) => {
-        const li = document.createElement('li');
-        li.id = `ticket-${ticketId}`;
-        li.classList.add('ticket-li');
-    
-        const itemContainer = document.createElement('div');
-        itemContainer.classList.add('item-container');
-        li.appendChild(itemContainer);
-    
-        if (ticketImg) {
-            const itemBackground = document.createElement('div');
-            itemBackground.classList.add('item-background');
-            itemBackground.dataset.src = ticketImg;
-            itemBackground.style.backgroundImage = `url(${ticketImg})`;
-            itemContainer.appendChild(itemBackground);
-        }
-    
-        const header = document.createElement('h3');
-        header.classList.add('aligned', 'item-infos', 'stylish-header');
-        itemContainer.appendChild(header);
-    
-        const titleLink = document.createElement('a');
-        titleLink.classList.add('ticket-title', 'item-title', 'view-ticket-btn', 'title', 'custom-colour-target');
-        titleLink.dataset.itemId = ticketId;
-        titleLink.href = '';
-        titleLink.textContent = ticketTitle;
-        header.appendChild(titleLink);
-    
-        const descriptionLink = document.createElement('a');
-        descriptionLink.classList.add('item-infos', 'view-ticket-btn');
-        descriptionLink.dataset.itemId = ticketId;
-        descriptionLink.href = '';
-        const descriptionParagraph = document.createElement('p');
-        descriptionParagraph.classList.add('ticket-description', 'sample-text');
-        descriptionParagraph.textContent = ticketDescription;
-        descriptionLink.appendChild(descriptionParagraph);
-        itemContainer.appendChild(descriptionLink);
-    
-        const tagContainer = document.createElement('div');
-        tagContainer.classList.add('tag-container', 'item-infos');
-        ticketTags.forEach(tag => {
-            const tagDiv = document.createElement('div');
-            tagDiv.classList.add('tag');
-            tagDiv.textContent = tag;
-            tagContainer.appendChild(tagDiv);
-        });
-        itemContainer.appendChild(tagContainer);
-    
-        const infoLikesBlock = document.createElement('div');
-        infoLikesBlock.classList.add('item-infos', 'info-likes-block');
-        const infoParagraph = document.createElement('p');
-        infoParagraph.classList.add('no-margin');
-        infoParagraph.innerHTML = `Posted on ${new Date(ticketCreationDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} by `;
-
-        const youLink = document.createElement('a');
-        youLink.classList.add('colour-col2');
-        youLink.href = '/profile/';
-        youLink.textContent = 'you';
-        infoParagraph.appendChild(youLink);
-
-        infoLikesBlock.appendChild(infoParagraph);
-    
-        itemContainer.appendChild(infoLikesBlock);
-    
-        return li;
 }
 
 window.switchModal = (sourceModal, targetModal) => {}

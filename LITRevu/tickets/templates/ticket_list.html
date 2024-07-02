@@ -493,9 +493,12 @@ Tickets
 
 {% block js %}
 <script>
-  const jsUser = "{{ request.user.pk }}";
+  const jsUser = {
+    id: "{{ request.user.pk }}",
+    username: "{{ request.user.username }}" 
+  }
   const jsCsrfToken = "{{ csrf_token }}";
-  const ticketsData = [
+  let ticketsData = [
   {% for ticket in tickets %}
   {
       id: "{{ ticket.pk }}",
@@ -507,10 +510,10 @@ Tickets
       authorName: "{{ ticket.author }}",
       isFollowing: "{{ request.user|is_following:ticket.author }}",
       createdAt: "{{ ticket.created_at }}"
-  },
+  }{% if not forloop.last %},{% endif %}
   {% endfor %}
 ];
-const reviewsData = [
+let reviewsData = [
 {% for ticket in tickets %}
 {% for review in ticket.reviews.all %}
 {
@@ -529,16 +532,17 @@ const reviewsData = [
 {% endfor %}
 {% endfor %}
 ];
-const usersData = [
+let usersData = [
 {% for user in users %}
 {
     id: "{{ user.pk }}",
     username: "{{ user.username|escapejs }}",
     profilePicture: "{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}/static/images/litrevulogotitleless.PNG{% endif %}"
-},
+}{% if not forloop.last %},{% endif %}
 {% endfor %}
 ];
 </script>
+<script src="{% static 'js/DOMBuilder.js' %}"></script>
 <script src="{% static 'js/modal_ajax_query.js' %}"></script>
 <script src="{% static 'js/tickets_script.js' %}"></script>
 {% endblock%}

@@ -123,4 +123,40 @@ document.addEventListener("DOMContentLoaded", () => {
     searchThroughList('filterInput', '.ticket-li', ['.ticket-title', '.ticket-description', '.tag', '.author'], true);
     setRandomColour(document.getElementById("rightPage"));
     brokenImgWatcher();
+
+    window.generateTicket = (ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate) => {
+        const builder = new DOMBuilder(addTicketsDataEntry(ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate));
+    
+        asyncSingleBtnModalFormInit(builder.editButton, editModal, editConfirmButton, null, editTicketName, FormTypeEnum.EDIT_TICKET);
+        asyncSingleBtnModalFormInit(builder.deleteButton, deletionModal, deletionConfirmButton, callbackDeleteTicket, deleteTicketName, FormTypeEnum.DELETE_TICKET);
+        openViewModal([builder.titleLink, builder.descriptionLink], generateViewTicketModal, viewTicketModal);
+        setRandomColour(builder.li);
+
+        return builder.li;
+    }
+
+    window.addTicketsDataEntry = (ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate) => {
+        let ticketString = ""
+        ticketTags.forEach(tag => {
+            ticketString += `${tag}, `;
+        })
+        const newTicket = {
+            id: ticketId.toString(),
+            title: ticketTitle,
+            description: ticketDescription,
+            image: ticketImg,
+            tags: ticketString,
+            author: jsUser.id,
+            authorName: jsUser.username,
+            isFollowing: "false",
+            createdAt: ticketCreationDate
+        };
+        
+        ticketsData.push(newTicket);
+
+        console.log(newTicket);
+        console.log(ticketsData);
+        return newTicket;
+    }
+    
 });
