@@ -95,13 +95,15 @@ document.addEventListener("DOMContentLoaded", () => {
     asyncMultipleBtnsModalFormInit(deleteReviewButtons, deleteReviewModal, deleteReviewConfirmButton, callbackDeleteReview, deleteReviewName, FormTypeEnum.DELETE_REVIEW);
     asyncModalFormCancel(deleteReviewCancelButton);
     
-    openViewModal(viewTicketButtons, generateViewTicketModal, viewTicketModal);
+    const buildert = new DOMBuilder();
+
+    openViewModal(viewTicketButtons, (id) => buildert.generateViewTicketModal(id), viewTicketModal);
     asyncModalFormCancel(viewTicketCancelButton);
     
-    openViewModal(viewReviewButtons, generateViewReviewModal, viewReviewModal);
+    openViewModal(viewReviewButtons, (id) => buildert.generateViewReviewModal(id), viewReviewModal);
     asyncModalFormCancel(viewReviewCancelButton);
     
-    openViewModal(viewUserButtons, generateViewUserModal, viewUserModal);
+    openViewModal(viewUserButtons, (id) => buildert.generateViewUserModal(id), viewUserModal);
     asyncModalFormCancel(viewUserCancelButton);
 
     likeListener(ticketsLikeBtns);
@@ -126,10 +128,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.generateTicket = (ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate) => {
         const builder = new DOMBuilder(addTicketsDataEntry(ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate));
+        builder.generateTicket();
     
         asyncSingleBtnModalFormInit(builder.editButton, editModal, editConfirmButton, null, editTicketName, FormTypeEnum.EDIT_TICKET);
         asyncSingleBtnModalFormInit(builder.deleteButton, deletionModal, deletionConfirmButton, callbackDeleteTicket, deleteTicketName, FormTypeEnum.DELETE_TICKET);
-        openViewModal([builder.titleLink, builder.descriptionLink], generateViewTicketModal, viewTicketModal);
+        openViewModal([builder.titleLink, builder.descriptionLink], DOMBuilder.generateViewTicketModal, viewTicketModal);
         setRandomColour(builder.li);
 
         return builder.li;
@@ -158,5 +161,4 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log(ticketsData);
         return newTicket;
     }
-    
 });
