@@ -297,15 +297,15 @@ window.callbackCreateTicket = (formId, responseData) => {
     console.log(responseData.id);
     const parentList = document.getElementById("tickets-list");
     console.log(parentList);
-    parentList.appendChild(generateTicket(responseData.id, responseData.img, responseData.title, responseData.description, responseData.tags, responseData.creation_date));
+    generateTicket(parentList, responseData.id, responseData.img, responseData.title, responseData.description, responseData.tags, responseData.creation_date);
     callbackCloseModal(formId);
 }
 
 window.callbackCreateReview = (formId, responseData) => {
     console.log(responseData.id);
-    const review = document.getElementById("review-" + responseData.id);
-    const parentList = review.closest("ul");
-    parentList.appendChild(review);
+    const ticket = document.getElementById(`ticket-${responseData.ticket}`);
+    const parentList = ticket.querySelector('.reviews-list');
+    generateReview(parentList, responseData.id, responseData.cover_image, responseData.title, responseData.content, responseData.rating, responseData.creation_date, responseData.ticket);
     callbackCloseModal(formId);
 }
 

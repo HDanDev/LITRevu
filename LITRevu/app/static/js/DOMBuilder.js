@@ -1,52 +1,78 @@
 class DOMBuilder {
     constructor(
         ticket=null,
+        review=null,
     ) {
         this.ticket = ticket;
+        this.review = review;
         this.titleLink = null;
         this.editButton = null;
         this.deleteButton = null;
         this.descriptionLink = null;
         this.li = null;
+        this.addReviewBtn = null;
     }  
 
-    generateLi () {
+    generateLi (objectName="ticket", id=this.ticket.id) {
         const li = document.createElement('li');
-        li.id = `ticket-${this.ticket.id}`;
-        li.classList.add('ticket-li');
+        li.id = `${objectName}-${id}`;
+        li.classList.add(`${objectName}-li`);
         return li;
     }
 
-    generateItemContainer () {
+    generateItemContainer (objectName="item") {
         const itemContainer = document.createElement('div');
-        itemContainer.classList.add('item-container');
+        itemContainer.classList.add(`${objectName}-container`);
         return itemContainer;
     }
 
-    generateImage () {
+    generateImage (imgClassName="item-background", src=this.ticket.image) {
         const itemBackground = document.createElement('div');
-        itemBackground.classList.add('item-background');
-        itemBackground.dataset.src = this.ticket.image;
-        itemBackground.style.backgroundImage = `url(${this.ticket.image})`;
+        itemBackground.classList.add(imgClassName);
+        itemBackground.dataset.src = src;
+        itemBackground.style.backgroundImage = `url(${src})`;
         return itemBackground;
     }
 
-    generateHeader () {
-        const header = document.createElement('h3');
+    generateHeader (headerSize='h3') {
+        const header = document.createElement(headerSize);
         header.classList.add('aligned', 'item-infos', 'stylish-header');
         return header;
     }
 
-    generateTitle () {
+    generateTitle (id=this.ticket.id, titleClasses=[]) {
         const titleLink = document.createElement('a');
-        titleLink.classList.add('ticket-title', 'item-title', 'view-ticket-btn', 'title', 'custom-colour-target');
-        titleLink.dataset.itemId = this.ticket.id;
+        if (titleClasses.length > 0) {
+            titleClasses.forEach(cls => titleLink.classList.add(cls));
+        }
+        else {
+            titleLink.classList.add('ticket-title', 'item-title', 'view-ticket-btn', 'title', 'custom-colour-target');
+            titleLink.textContent = this.ticket.title;
+        }
+        titleLink.dataset.itemId = id;
         titleLink.href = '';
-        titleLink.textContent = this.ticket.title;
         return titleLink;
     }
 
-    generateButton (btnId=null, btnName=null, btnClasses=[], btnUrl=null, btnInner=null) {
+    generateTitleSpan () {
+        const spanTitle = document.createElement('span');
+        spanTitle.classList.add('font-style', 'title', 'custom-colour-target');
+        spanTitle.textContent = this.review.title;
+        return spanTitle;
+    }
+
+    generateRatingPreview () {
+        const ratingPreview = document.createElement('div');
+        ratingPreview.classList.add('rating-preview');
+        if (this.review.rating !== 0) {
+            for (let i = 0; i < this.review.rating; i++) {
+                ratingPreview.textContent += '☆';
+            }
+        }
+        return ratingPreview;
+    }
+
+    generateButton (btnId=null, btnName=null, btnClasses=[], objectId=this.ticket.id, objectName=this.ticket.title, btnUrl=null, btnInner=null) {
         const button = document.createElement('button');
         button.type = 'button';
         button.id = btnId;
@@ -54,21 +80,22 @@ class DOMBuilder {
         if (btnClasses.length > 0) {
             btnClasses.forEach(cls => button.classList.add(cls));
         }
-        button.dataset.itemId = this.ticket.id;
-        button.dataset.itemName = this.ticket.title;
+        button.dataset.itemId = objectId;
+        button.dataset.itemName = objectName;
         button.dataset.itemAction = btnUrl;
         button.innerHTML = btnInner;
         return button;
     }
 
-    generateDescription () {
+    generateDescription (objectName="ticket", id=this.ticket.id, content=this.ticket.description) {
         const descriptionLink = document.createElement('a');
-        descriptionLink.classList.add('item-infos', 'view-ticket-btn');
-        descriptionLink.dataset.itemId = this.ticket.id;
+        descriptionLink.classList.add('item-infos', `view-${objectName}-btn`);
+        if (objectName != "ticket") descriptionLink.classList.add('font-style');
+        descriptionLink.dataset.itemId = id;
         descriptionLink.href = '';
         const descriptionParagraph = document.createElement('p');
-        descriptionParagraph.classList.add('ticket-description', 'sample-text');
-        descriptionParagraph.textContent = this.ticket.description;
+        descriptionParagraph.classList.add(`${objectName}-description`, 'sample-text');
+        descriptionParagraph.textContent = content;
         descriptionLink.appendChild(descriptionParagraph);
         return descriptionLink;
     }
@@ -86,16 +113,21 @@ class DOMBuilder {
         return tagContainer;
     }
 
-    generateinfoLikesBlock () {
+    generateinfoLikesBlock (isMini=false, creationDate=this.ticket.createdAt) {
         const infoLikesBlock = document.createElement('div');
         infoLikesBlock.classList.add('item-infos', 'info-likes-block');
-
         const infoParagraph = document.createElement('p');
         infoParagraph.classList.add('no-margin');
-        infoParagraph.innerHTML = `Posted on ${new Date(this.ticket.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} by `;
+        if (isMini)
+            {
+                infoLikesBlock.classList.add('mini-likes');
+                infoParagraph.classList.add('mini-font');
+            } 
+        infoParagraph.innerHTML = `Posted on ${new Date(creationDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} by `;
     
         const youLink = document.createElement('a');
-        youLink.classList.add('colour-2');
+        if (!isMini) youLink.classList.add('colour-2');
+        else youLink.classList.add('colour-3');
         youLink.href = '/profile/';
         youLink.textContent = 'you';
 
@@ -112,7 +144,7 @@ class DOMBuilder {
     }
 
     generateTicket() {
-
+        const lowerCaseTicketString = "ticket";
         const li = this.generateLi();
         const itemContainer = this.generateItemContainer();
         li.appendChild(itemContainer);
@@ -128,10 +160,10 @@ class DOMBuilder {
         this.titleLink = this.generateTitle();
         header.appendChild(this.titleLink);
         
-        this.editButton = this.generateButton('edit-ticket-btn', 'edit-ticket', ['ticket-edit-btn', 'icon-hover-box'], `/ticket/update/${this.ticket.id}/`, '<i class="icon-pencil crud-btn"></i>');
+        this.editButton = this.generateButton(`edit-${lowerCaseTicketString}-btn`, `edit-${lowerCaseTicketString}`, [`${lowerCaseTicketString}-edit-btn`, 'icon-hover-box'], `/${lowerCaseTicketString}/update/${this.ticket.id}/`, '<i class="icon-pencil crud-btn"></i>');
         header.appendChild(this.editButton);
     
-        this.deleteButton = this.generateButton('delete-ticket-btn', 'delete-ticket', ['ticket-delete-btn', 'icon-hover-box'], `/ticket/delete/${this.ticket.id}/`, '<i class="icon-bin crud-btn"></i>');
+        this.deleteButton = this.generateButton(`delete-${lowerCaseTicketString}-btn`, `delete-${lowerCaseTicketString}`, [`${lowerCaseTicketString}-delete-btn`, 'icon-hover-box'], `/${lowerCaseTicketString}/delete/${this.ticket.id}/`, '<i class="icon-bin crud-btn"></i>');
         header.appendChild(this.deleteButton);
     
         this.descriptionLink = this.generateDescription();
@@ -151,6 +183,93 @@ class DOMBuilder {
         this.li = li;
 
         return li;
+    }
+
+    generateReview() {
+
+        const lowerCaseReviewString = "review";
+        const li = this.generateLi(lowerCaseReviewString, this.review.id);
+        const itemContainer = this.generateItemContainer(lowerCaseReviewString);
+        li.appendChild(itemContainer);
+    
+        if (this.review.cover_image) {
+            const itemBackground = this.generateImage("review-img", this.review.cover_image);
+            itemContainer.appendChild(itemBackground);
+        }
+        
+        const reviewInfos = document.createElement('div');
+        reviewInfos.classList.add('review-infos');
+    
+        const header = this.generateHeader('h4');
+        itemContainer.appendChild(header);
+    
+        this.titleLink = this.generateTitle(this.review.id, ['item-title', 'icon-hover-box', 'view-review-btn']);
+        const title = this.generateTitleSpan();
+        this.titleLink.appendChild(title);
+        header.appendChild(this.titleLink);
+        
+        this.editButton = this.generateButton(`edit-${lowerCaseReviewString}-btn`, `edit-${lowerCaseReviewString}`, [`${lowerCaseReviewString}-edit-btn`, 'icon-hover-box'], this.review.id, this.review.title, `/${lowerCaseReviewString}/${this.review.id}/edit/`, '<i class="icon-pencil crud-btn"></i>');
+        header.appendChild(this.editButton);
+    
+        this.deleteButton = this.generateButton(`delete-${lowerCaseReviewString}-btn`, `delete-${lowerCaseReviewString}`, [`${lowerCaseReviewString}-delete-btn`, 'icon-hover-box'], this.review.id, this.review.title, `/${lowerCaseReviewString}/${this.review.id}/delete/`, '<i class="icon-bin crud-btn"></i>');
+        header.appendChild(this.deleteButton);
+
+        const ratingPreview = this.generateRatingPreview();
+        header.appendChild(ratingPreview);
+        reviewInfos.appendChild(header);
+    
+        this.descriptionLink = this.generateDescription(lowerCaseReviewString, this.review.id, this.review.content);
+        reviewInfos.appendChild(this.descriptionLink);
+
+        itemContainer.appendChild(reviewInfos);
+    
+        const infoLikesBlock = this.generateinfoLikesBlock(true, this.review.createdAt);
+    
+        li.appendChild(infoLikesBlock);
+    
+        this.li = li;
+
+        return li;
+    }
+
+    generateAddReviewBtn (isFirst=false) {
+        const id = this.ticket != null ? this.ticket.id : this.review.ticket;
+        console.log(document.getElementById(`create-review-btn-${id}`));
+        document.getElementById(`create-review-btn-${id}`).remove();
+        console.log(id);
+        const addReviewBtn = this.generateButton (
+            `create-review-btn-${id}`, 
+            "create-review",
+            ["review-create-btn", "icon-hover-box"],
+            null,
+            null,
+            `/review/${id}/new/`,
+            null);
+
+        const iPlus = document.createElement('i');
+        iPlus.classList.add('icon-plus', 'double-icon');
+
+        const iFile = document.createElement('i');
+        iFile.classList.add('icon-file-text', 'double-icon');
+
+        addReviewBtn.appendChild(iPlus);
+        addReviewBtn.appendChild(iFile);
+
+        if (isFirst) {
+            const innerSpan = document.createElement('span');
+            innerSpan.classList.add('blue');
+            innerSpan.innerHTML = "Be the first to review!";
+            addReviewBtn.appendChild(innerSpan);
+        }
+
+        const ticketBlock = document.getElementById(`ticket-${id}`);
+        const reviewList = ticketBlock.querySelector('ul.reviews-list');
+
+        console.log(reviewList);
+
+        reviewList.appendChild(addReviewBtn);
+
+        this.addReviewBtn = addReviewBtn;
     }
     
     generateViewTicketModal = (ticketId) => {

@@ -95,15 +95,15 @@ document.addEventListener("DOMContentLoaded", () => {
     asyncMultipleBtnsModalFormInit(deleteReviewButtons, deleteReviewModal, deleteReviewConfirmButton, callbackDeleteReview, deleteReviewName, FormTypeEnum.DELETE_REVIEW);
     asyncModalFormCancel(deleteReviewCancelButton);
     
-    const buildert = new DOMBuilder();
+    const staticBuilder = new DOMBuilder();
 
-    openViewModal(viewTicketButtons, (id) => buildert.generateViewTicketModal(id), viewTicketModal);
+    openViewModal(viewTicketButtons, (id) => staticBuilder.generateViewTicketModal(id), viewTicketModal);
     asyncModalFormCancel(viewTicketCancelButton);
     
-    openViewModal(viewReviewButtons, (id) => buildert.generateViewReviewModal(id), viewReviewModal);
+    openViewModal(viewReviewButtons, (id) => staticBuilder.generateViewReviewModal(id), viewReviewModal);
     asyncModalFormCancel(viewReviewCancelButton);
     
-    openViewModal(viewUserButtons, (id) => buildert.generateViewUserModal(id), viewUserModal);
+    openViewModal(viewUserButtons, (id) => staticBuilder.generateViewUserModal(id), viewUserModal);
     asyncModalFormCancel(viewUserCancelButton);
 
     likeListener(ticketsLikeBtns);
@@ -126,8 +126,8 @@ document.addEventListener("DOMContentLoaded", () => {
     setRandomColour(document.getElementById("rightPage"));
     brokenImgWatcher();
 
-    window.generateTicket = (ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate) => {
-        const builder = new DOMBuilder(addTicketsDataEntry(ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate));
+    window.generateTicket = (targetList, ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate) => {
+        const builder = new DOMBuilder(addTicketsDataEntry(ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate), null);
         builder.generateTicket();
     
         asyncSingleBtnModalFormInit(builder.editButton, editModal, editConfirmButton, null, editTicketName, FormTypeEnum.EDIT_TICKET);
@@ -135,7 +135,21 @@ document.addEventListener("DOMContentLoaded", () => {
         openViewModal([builder.titleLink, builder.descriptionLink], DOMBuilder.generateViewTicketModal, viewTicketModal);
         setRandomColour(builder.li);
 
-        return builder.li;
+        targetList.appendChild(builder.li);
+    }
+
+    window.generateReview = (targetList, reviewId, reviewImg, reviewTitle, reviewDescription, reviewRating, reviewCreationDate, reviewTicket) => {
+        const builder = new DOMBuilder(null, addReviewsDataEntry(reviewId, reviewImg, reviewTitle, reviewDescription, reviewRating, reviewCreationDate, reviewTicket));
+        builder.generateReview();
+    
+        asyncSingleBtnModalFormInit(builder.editButton, editReviewModal, editReviewConfirmButton, null, editReviewName, FormTypeEnum.EDIT_REVIEW);
+        asyncSingleBtnModalFormInit(builder.deleteButton, deleteReviewModal, deleteReviewConfirmButton, callbackDeleteReview, deleteReviewName, FormTypeEnum.DELETE_REVIEW);
+        openViewModal([builder.titleLink, builder.descriptionLink], DOMBuilder.generateViewReviewModal, viewReviewModal);
+        setRandomColour(builder.li);
+
+        targetList.appendChild(builder.li);
+        builder.generateAddReviewBtn();
+        asyncSingleBtnModalFormInit(builder.addReviewBtn, createReviewModal, createReviewConfirmButton, callbackCreateReview);
     }
 
     window.addTicketsDataEntry = (ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate) => {
@@ -160,5 +174,26 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log(newTicket);
         console.log(ticketsData);
         return newTicket;
+    }
+
+    window.addReviewsDataEntry = (reviewId, reviewImg, reviewTitle, reviewDescription, reviewRating, reviewCreationDate, reviewTicket) => {
+        const newReview = {
+            id: reviewId.toString(),
+            title: reviewTitle,
+            content: reviewDescription,
+            coverImage: reviewImg,
+            rating: reviewRating,
+            author: jsUser.id,
+            authorName: jsUser.username,
+            isFollowing: "false",
+            createdAt: reviewCreationDate,
+            ticket: reviewTicket
+        };
+        
+        reviewsData.push(newReview);
+
+        console.log(newReview);
+        console.log(reviewsData);
+        return newReview;
     }
 });

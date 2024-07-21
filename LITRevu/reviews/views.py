@@ -49,7 +49,17 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
             form.instance.ticket = get_object_or_404(Ticket, pk=self.kwargs['pk'])
             if form.is_valid():           
                 super().form_valid(form)
-                return JsonResponse({'success': True, 'message': 'review created successfully!', 'id': self.object.pk})
+                return JsonResponse({
+                        'success': True,
+                        'message': 'Review created successfully.',
+                        'id': self.object.pk,
+                        'cover_image': self.object.cover_image.url if self.object.cover_image else None,
+                        'title': self.object.title,
+                        'content': self.object.content,
+                        'rating': self.object.rating,
+                        'creation_date': self.object.created_at,
+                        'ticket': self.object.ticket.pk,
+                        })
 
         except Exception as e:
             error_message = f"An error occurred: {str(e)}"
