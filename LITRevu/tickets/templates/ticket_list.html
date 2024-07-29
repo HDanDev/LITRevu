@@ -283,7 +283,7 @@ Tickets
           <label for="{{ review_form.rating.id_for_label }}">Rating:</label>
           <div id="editSingleRating" class="rating">
             {% for i in "543210" %}
-            <input type="radio" name="ratinge" id="stare-{{ i }}" value="{{ i }}" class="rating-edit-review-input">
+            <input type="radio" name="rating" id="stare-{{ i }}" value="{{ i }}" class="rating-edit-review-input">
             <label for="stare-{{ i }}" title="{{ i }} stars" class="rating-edit-review-label">☆</label>
             {% endfor %}
           </div>
@@ -385,7 +385,7 @@ Tickets
               <label for="{{ ticket_form.review_rating.id_for_label }}">Rating:</label>
               <div id="createTicketReviewRating" class="rating">
                 {% for i in "543210" %}
-                <input type="radio" name="ratingt" id="start-{{ i }}" value="{{ i }}" class="rating-create-ticket-review-input">
+                <input type="radio" name="rating" id="start-{{ i }}" value="{{ i }}" class="rating-create-ticket-review-input">
                 <label for="start-{{ i }}" title="{{ i }} stars" class="rating-create-ticket-review-label">☆</label>
                 {% endfor %}
               </div>
@@ -437,7 +437,7 @@ Tickets
           <label for="{{ review_form.rating.id_for_label }}">Rating:</label>
             <div id="createReviewRating" class="rating">
               {% for i in "543210" %}
-              <input type="radio" name="ratingc" id="starc-{{ i }}" value="{{ i }}" class="rating-create-review-input">
+              <input type="radio" name="rating" id="starc-{{ i }}" value="{{ i }}" class="rating-create-review-input">
               <label for="starc-{{ i }}" title="{{ i }} stars" class="rating-create-review-label">☆</label>
               {% endfor %}
             </div>

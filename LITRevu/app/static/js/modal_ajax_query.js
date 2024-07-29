@@ -378,10 +378,14 @@ window.dislikeListener = (dislikeBtns) => {
 }
 
 window.uniqueBtnListener = (btn, form, callbackFunction, url) => {
-    btn.addEventListener("click", (event) => {
+    const handleSubmit = (event) => {
         submitForm(event, form, callbackFunction, url);
-    });
-}
+    };
+
+    btn.removeEventListener("click", btn._handleSubmit);
+    btn.addEventListener("click", handleSubmit);
+    btn._handleSubmit = handleSubmit;
+};
 
 window.manageRating = (stars, labels) => {
     let previousStar = null;
