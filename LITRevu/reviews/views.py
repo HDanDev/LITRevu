@@ -90,10 +90,12 @@ class ReviewUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
                     'message': 'Review updated successfully.',
                     'review': {
                         'id': self.object.pk,
+                        'cover_image_url': self.object.cover_image.url if self.object.cover_image else None,
                         'title': self.object.title,
                         'content': self.object.content,
                         'rating': self.object.rating,
-                        'cover_image_url': self.object.cover_image.url if self.object.cover_image else None
+                        'creation_date': self.object.created_at,
+                        'ticket': self.object.ticket.pk,
                     }
                 })
             except Exception as e:

@@ -298,6 +298,11 @@ window.callbackCreateTicket = (formId, responseData) => {
     const parentList = document.getElementById("tickets-list");
     console.log(parentList);
     generateTicket(parentList, responseData.id, responseData.img, responseData.title, responseData.description, responseData.tags, responseData.creation_date);
+    if (responseData.create_review){
+        const ticket = document.getElementById(`ticket-${responseData.id}`);
+        const reviewList = ticket.querySelector('.reviews-list');
+        generateReview(reviewList, responseData.review_id, responseData.review_cover_image, responseData.review_title, responseData.review_content, responseData.review_rating, responseData.review_creation_date, responseData.id);
+    }
     callbackCloseModal(formId);
 }
 

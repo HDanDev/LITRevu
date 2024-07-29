@@ -143,6 +143,34 @@ class DOMBuilder {
         return ulReview;
     }
 
+    generateAddReviewBtn (id, isFirst=true) {
+        const addReviewBtn = this.generateButton (
+            `create-review-btn-${id}`, 
+            "create-review",
+            ["review-create-btn", "icon-hover-box"],
+            null,
+            null,
+            `/review/${id}/new/`,
+            null);
+
+        const iPlus = document.createElement('i');
+        iPlus.classList.add('icon-plus', 'double-icon');
+
+        const iFile = document.createElement('i');
+        iFile.classList.add('icon-file-text', 'double-icon');
+
+        addReviewBtn.appendChild(iPlus);
+        addReviewBtn.appendChild(iFile);
+
+        if (isFirst) {
+            const innerSpan = document.createElement('span');
+            innerSpan.classList.add('blue');
+            innerSpan.innerHTML = "Be the first to review!";
+            addReviewBtn.appendChild(innerSpan);
+        }
+        return addReviewBtn;
+    }
+
     generateTicket() {
         const lowerCaseTicketString = "ticket";
         const li = this.generateLi();
@@ -160,10 +188,10 @@ class DOMBuilder {
         this.titleLink = this.generateTitle();
         header.appendChild(this.titleLink);
         
-        this.editButton = this.generateButton(`edit-${lowerCaseTicketString}-btn`, `edit-${lowerCaseTicketString}`, [`${lowerCaseTicketString}-edit-btn`, 'icon-hover-box'], `/${lowerCaseTicketString}/update/${this.ticket.id}/`, '<i class="icon-pencil crud-btn"></i>');
+        this.editButton = this.generateButton(`edit-${lowerCaseTicketString}-btn`, `edit-${lowerCaseTicketString}`, [`${lowerCaseTicketString}-edit-btn`, 'icon-hover-box'], this.ticket.id, this.ticket.title, `/${lowerCaseTicketString}/${this.ticket.id}/edit/`, '<i class="icon-pencil crud-btn"></i>');
         header.appendChild(this.editButton);
     
-        this.deleteButton = this.generateButton(`delete-${lowerCaseTicketString}-btn`, `delete-${lowerCaseTicketString}`, [`${lowerCaseTicketString}-delete-btn`, 'icon-hover-box'], `/${lowerCaseTicketString}/delete/${this.ticket.id}/`, '<i class="icon-bin crud-btn"></i>');
+        this.deleteButton = this.generateButton(`delete-${lowerCaseTicketString}-btn`, `delete-${lowerCaseTicketString}`, [`${lowerCaseTicketString}-delete-btn`, 'icon-hover-box'], this.ticket.id, this.ticket.title, `/${lowerCaseTicketString}/${this.ticket.id}/delete/`, '<i class="icon-bin crud-btn"></i>');
         header.appendChild(this.deleteButton);
     
         this.descriptionLink = this.generateDescription();
@@ -177,6 +205,10 @@ class DOMBuilder {
         itemContainer.appendChild(infoLikesBlock);
     
         const ulReview = this.generateUlReview();
+
+        const addReviewBtn = this.generateAddReviewBtn(this.ticket.id);
+
+        ulReview.appendChild(addReviewBtn);
 
         itemContainer.appendChild(ulReview);
 
@@ -232,35 +264,13 @@ class DOMBuilder {
         return li;
     }
 
-    generateAddReviewBtn (isFirst=false) {
+    publicGenerateAddReviewBtn (isFirst=false) {
         const id = this.ticket != null ? this.ticket.id : this.review.ticket;
         console.log(document.getElementById(`create-review-btn-${id}`));
         document.getElementById(`create-review-btn-${id}`).remove();
         console.log(id);
-        const addReviewBtn = this.generateButton (
-            `create-review-btn-${id}`, 
-            "create-review",
-            ["review-create-btn", "icon-hover-box"],
-            null,
-            null,
-            `/review/${id}/new/`,
-            null);
 
-        const iPlus = document.createElement('i');
-        iPlus.classList.add('icon-plus', 'double-icon');
-
-        const iFile = document.createElement('i');
-        iFile.classList.add('icon-file-text', 'double-icon');
-
-        addReviewBtn.appendChild(iPlus);
-        addReviewBtn.appendChild(iFile);
-
-        if (isFirst) {
-            const innerSpan = document.createElement('span');
-            innerSpan.classList.add('blue');
-            innerSpan.innerHTML = "Be the first to review!";
-            addReviewBtn.appendChild(innerSpan);
-        }
+        const addReviewBtn = this.generateAddReviewBtn(id, isFirst);
 
         const ticketBlock = document.getElementById(`ticket-${id}`);
         const reviewList = ticketBlock.querySelector('ul.reviews-list');

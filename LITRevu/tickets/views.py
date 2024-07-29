@@ -86,6 +86,7 @@ class TicketCreateView(LoginRequiredMixin, CreateView):
                         'description': self.object.description,
                         'tags': [tag.name for tag in self.object.tags.all()],
                         'creation_date': self.object.created_at,
+                        'create_review': False,
                         }
                             
                     if form.cleaned_data.get('create_review') and form.cleaned_data.get('review_title'):
@@ -102,7 +103,19 @@ class TicketCreateView(LoginRequiredMixin, CreateView):
                             response_data = {
                                 'success': True,
                                 'message': 'Ticket and review created successfully.',
-                                'id': review.pk,
+                                'id': self.object.pk,
+                                'img': self.object.image.url if self.object.image else None,
+                                'title': self.object.title,
+                                'description': self.object.description,
+                                'tags': [tag.name for tag in self.object.tags.all()],
+                                'creation_date': self.object.created_at,
+                                'create_review': True,
+                                'review_id': review.pk,
+                                'review_title': review.title,
+                                'review_content': review.content,
+                                'review_rating': review.rating,
+                                'review_cover_image': review.cover_image.url if review.cover_image else None,
+                                'review_creation_date': self.object.created_at,
                                 }
                         except Exception as e:
                             response_data = {'success': False, 'error': str(e)}
