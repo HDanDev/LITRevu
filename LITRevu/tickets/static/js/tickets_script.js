@@ -136,6 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setRandomColour(builder.li);
 
         targetList.appendChild(builder.li);
+        asyncSingleBtnModalFormInit(builder.addReviewBtn, createReviewModal, createReviewConfirmButton, callbackCreateReview);
     }
 
     window.generateReview = (targetList, reviewId, reviewImg, reviewTitle, reviewDescription, reviewRating, reviewCreationDate, reviewTicket) => {

@@ -207,6 +207,7 @@ class DOMBuilder {
         const ulReview = this.generateUlReview();
 
         const addReviewBtn = this.generateAddReviewBtn(this.ticket.id);
+        this.addReviewBtn = addReviewBtn;
 
         ulReview.appendChild(addReviewBtn);
 
