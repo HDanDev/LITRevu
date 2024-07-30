@@ -151,6 +151,7 @@ class TicketUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
                         'id': self.object.pk,
                         'title': self.object.title,
                         'description': self.object.description,
+                        'tags': [tag.name for tag in self.object.tags.all()],
                         'image_url': self.object.image.url if self.object.image else None
                     }
                 })

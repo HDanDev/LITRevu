@@ -20,6 +20,7 @@ class FormTypeEnum {
 }
 
 let activeModal;
+const staticDOMBuilder = new DOMBuilder();
 
 document.addEventListener("DOMContentLoaded", function() {
     const navigationMenuBackground = document.getElementById('navigationMenuBackground');
@@ -311,6 +312,30 @@ window.callbackCreateReview = (formId, responseData) => {
     const ticket = document.getElementById(`ticket-${responseData.ticket}`);
     const parentList = ticket.querySelector('.reviews-list');
     generateReview(parentList, responseData.id, responseData.cover_image, responseData.title, responseData.content, responseData.rating, responseData.creation_date, responseData.ticket);
+    callbackCloseModal(formId);
+}
+
+window.callbackUpdateTicket = (formId, responseData) => {
+    staticDOMBuilder.updateTicket(responseData.ticket.id, responseData.ticket.image_url, responseData.ticket.title, responseData.ticket.description, responseData.ticket.tags);
+    const ticket = ticketsData.find(t => t.id == responseData.ticket.id);
+    let ticketString = "";
+    responseData.ticket.tags.forEach(tag => {
+        ticketString += `${tag}, `;
+    });
+    ticket.title = responseData.ticket.title;
+    ticket.description = responseData.ticket.description;
+    ticket.image = responseData.ticket.image_url;
+    ticket.tags = ticketString;
+    callbackCloseModal(formId);
+}
+
+window.callbackUpdateReview = (formId, responseData) => {
+    staticDOMBuilder.updateReview(responseData.review.id, responseData.review.cover_image_url, responseData.review.title, responseData.review.rating, responseData.review.content);
+    const review = reviewsData.find(r => r.id == responseData.review.id);
+    review.title = responseData.review.title;
+    review.content = responseData.review.content;
+    review.coverImage = responseData.review.cover_image_url;
+    review.rating = responseData.review.rating;
     callbackCloseModal(formId);
 }
 

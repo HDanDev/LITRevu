@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
     asyncSingleBtnModalFormInit(createTicketButton, createModal, createConfirmButton, callbackCreateTicket);
     asyncModalFormCancel(createCancelButton);
 
-    asyncMultipleBtnsModalFormInit(editTicketButtons, editModal, editConfirmButton, null, editTicketName, FormTypeEnum.EDIT_TICKET);
+    asyncMultipleBtnsModalFormInit(editTicketButtons, editModal, editConfirmButton, callbackUpdateTicket, editTicketName, FormTypeEnum.EDIT_TICKET);
     asyncModalFormCancel(editCancelButton);
 
     asyncMultipleBtnsModalFormInit(deletionTicketButtons, deletionModal, deletionConfirmButton, callbackDeleteTicket, deleteTicketName, FormTypeEnum.DELETE_TICKET);
@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
     asyncMultipleBtnsModalFormInit(createReviewButtons, createReviewModal, createReviewConfirmButton, callbackCreateReview);
     asyncModalFormCancel(createReviewCancelButton);
 
-    asyncMultipleBtnsModalFormInit(editReviewButtons, editReviewModal, editReviewConfirmButton, null, editReviewName, FormTypeEnum.EDIT_REVIEW);
+    asyncMultipleBtnsModalFormInit(editReviewButtons, editReviewModal, editReviewConfirmButton, callbackUpdateReview, editReviewName, FormTypeEnum.EDIT_REVIEW);
     asyncModalFormCancel(editReviewCancelButton);
 
     asyncMultipleBtnsModalFormInit(deleteReviewButtons, deleteReviewModal, deleteReviewConfirmButton, callbackDeleteReview, deleteReviewName, FormTypeEnum.DELETE_REVIEW);

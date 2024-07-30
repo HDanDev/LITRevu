@@ -466,4 +466,83 @@ class DOMBuilder {
         button.innerHTML = `<i class="${iconClass} ${crudClass}"></i>`;
         return button;
     }
+
+    updateTicket = (ticketId, newImage, newTitle, newDescription, newTags) => {
+        console.log("withing upadate ticket");
+        const ticket = document.getElementById(`ticket-${ticketId}`);
+
+        if (newImage) {
+            const itemBackground = ticket.querySelector('.item-background');
+            if (itemBackground) {
+                itemBackground.style.backgroundImage = `url(${newImage})`;
+                itemBackground.setAttribute('data-src', newImage);
+            }
+            else {
+                const itemContainer = ticket.querySelector('.item-container');
+                const newItemBackground = document.createElement('div');
+                itemBackground.style.backgroundImage = `url(${newImage})`;
+                newItemBackground.classList.add('item-background');
+                itemBackground.setAttribute('data-src', newImage);
+                itemContainer.prepend(itemBackground);
+            }
+        }
+
+        if (newTitle) {
+            const titleElement = ticket.querySelector('.ticket-title');
+            titleElement.textContent = newTitle;
+        }
+
+        if (newDescription) {
+            const descriptionElement = ticket.querySelector('.ticket-description');
+            descriptionElement.textContent = newDescription;
+        }
+
+        if (newTags) {
+            console.log(newTags);
+            const tagContainer = ticket.querySelector('.tag-container');
+            tagContainer.innerHTML = '';
+            newTags.forEach(tag => {
+                const tagDiv = document.createElement('div');
+                tagDiv.className = 'tag';
+                tagDiv.textContent = tag;
+                tagContainer.appendChild(tagDiv);
+            });
+        }
+    }
+
+    updateReview = (reviewId, newCoverImage, newTitle, newRating, newContent) => {
+        console.log("withing upadate review");
+        const review = document.getElementById(`review-${reviewId}`);
+  
+        if (newCoverImage) {
+            const reviewImg = review.querySelector('.review-img');
+            if (reviewImg) {
+                reviewImg.style.backgroundImage = `url(${newCoverImage})`;
+                reviewImg.setAttribute('data-src', newCoverImage);
+            }
+            else {
+                const itemContainer = review.querySelector('.review-container');
+                const newItemBackground = document.createElement('div');
+                itemBackground.style.backgroundImage = `url(${newImage})`;
+                newItemBackground.classList.add('review-img');
+                itemBackground.setAttribute('data-src', newImage);
+                itemContainer.prepend(itemBackground);
+            }
+        }
+  
+        if (newTitle) {
+          const titleElement = review.querySelector('.item-title .title');
+          titleElement.textContent = newTitle;
+        }
+  
+        if (newRating !== undefined) {
+          const ratingPreview = review.querySelector('.rating-preview');
+          ratingPreview.innerHTML = ' ☆ '.repeat(newRating);
+        }
+  
+        if (newContent) {
+          const contentElement = review.querySelector('.sample-text');
+          contentElement.textContent = newContent;
+        }
+    }
 }
