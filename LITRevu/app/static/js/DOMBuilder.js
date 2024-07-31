@@ -425,8 +425,59 @@ class DOMBuilder {
             followingList.appendChild(listItem);
         });
         viewReviewContainer.appendChild(followingList);
+        viewReviewContainer.appendChild(this.generateFollowBlock('test', following));
 
         // viewReviewContainer.appendChild(generateReviewsList(review));
+    }
+
+    generateFollowBlock = (title, userList) => {
+        const mainDiv = document.createElement('div');
+
+        const h3 = document.createElement('h3');
+        h3.className = "profile-info";
+        h3.textContent = title;
+
+        const ul = document.createElement('ul');
+
+            const blockedUsers = JSON.parse(document.getElementById('blocked-users-script').textContent);
+            const followingUsers = JSON.parse(document.getElementById('following-users-script').textContent);
+            const followersUsers = JSON.parse(document.getElementById('followers-users-script').textContent);
+
+        userList.forEach(user => {
+            const listItem = document.createElement('li');
+            listItem.className = 'profile-info';
+    
+            const userLink = document.createElement('a');
+            userLink.href = `/user_detail/${user.id}`;
+            userLink.textContent = user.username;
+    
+            const followButton = document.createElement('button');
+            followButton.className = 'follow-btn icon-hover-box';
+            followButton.dataset.userId = user.id;
+            followButton.dataset.url = `/toggle_follow/${user.id}`;
+    
+            const followIcon = document.createElement('i');
+            followIcon.className = user.followers_status ? 'icon-user-minus' : 'icon-user-plus';
+            followButton.appendChild(followIcon);
+    
+            const blockButton = document.createElement('button');
+            blockButton.className = 'block-btn icon-hover-box';
+            blockButton.dataset.userId = user.id;
+            blockButton.dataset.url = `/toggle_block/${user.id}`;
+    
+            const blockIcon = document.createElement('i');
+            blockIcon.className = blockedUsers.includes(user.id) ? 'icon-checkmark not-validation' : 'icon-blocked not-validation';
+            blockButton.appendChild(blockIcon);
+    
+            listItem.appendChild(userLink);
+            listItem.appendChild(followButton);
+            listItem.appendChild(blockButton);
+            ul.appendChild(listItem);
+        });
+
+        mainDiv.appendChild(h3);
+        mainDiv.appendChild(ul);
+        return mainDiv;
     }
     
     generateTitleView = (object, isTicket) => {  

@@ -16,6 +16,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.db import transaction, IntegrityError
 from django.core.exceptions import ValidationError
+from django.db.models import Case, When, BooleanField
     
 class TicketListView(LoginRequiredMixin, ListView):
     model = Ticket
@@ -48,7 +49,32 @@ class TicketListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):        
         context = super().get_context_data(**kwargs)
         blocked_users_ids = UserBlock.objects.filter(blocker=self.request.user).values_list('blocked', flat=True)
-        blocked_users = CustomUser.objects.filter(id__in=blocked_users_ids)
+        blocked_users = CustomUser.objects.filter(id__in=blocked_users_ids) 
+        followers_status = Case(
+            When(followers__follower=self.request.user, followers__status=True, then=True),
+            default=False,
+            output_field=BooleanField()
+        )
+        
+        followed_users = CustomUser.objects.filter(
+            followers__follower=self.request.user,
+            followers__status=True
+        ).exclude(pk=self.request.user.pk).annotate(
+            followers_status=followers_status
+        )
+
+        following_users = CustomUser.objects.filter(
+            following__followed=self.request.user,
+            following__status=True
+        ).exclude(
+            pk=self.request.user.pk
+        ).annotate(
+            followers_status=followers_status
+        )
+
+        followed_user_ids = followed_users.values_list('id', flat=True)
+        following_users_ids = following_users.values_list('id', flat=True)
+        blocked_users_ids = blocked_users.values_list('id', flat=True)
         colour_numbers = generate_random_numbers()[:10]
         context.update({
             'col{}'.format(i): colour_numbers[i] for i in range(min(len(colour_numbers), 10))
@@ -57,6 +83,9 @@ class TicketListView(LoginRequiredMixin, ListView):
         context['review_form'] =  ReviewForm()
         context['ticket_update_form'] =  TicketUpdateForm()
         context['blocked_users'] = blocked_users
+        context['blocked_users_ids'] = list(blocked_users_ids)
+        context['following_users_ids'] = list(followed_user_ids)
+        context['followers_users_ids'] = list(following_users_ids)
         context['users'] = self._context_users
         context['absolute_url'] = self.request.build_absolute_uri('/')
         
