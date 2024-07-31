@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
     openViewModal(viewReviewButtons, (id) => staticBuilder.generateViewReviewModal(id), viewReviewModal);
     asyncModalFormCancel(viewReviewCancelButton);
     
-    openViewModal(viewUserButtons, (id) => staticBuilder.generateViewUserModal(id), viewUserModal);
+    openViewModal(viewUserButtons, async (id) => await staticBuilder.generateViewUserModal(id, await getUserFollows(id)), viewUserModal);
     asyncModalFormCancel(viewUserCancelButton);
 
     likeListener(ticketsLikeBtns);

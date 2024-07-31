@@ -60,3 +60,31 @@ def toggle_block(request, pk):
         'is_blocked': is_blocked,
         'blocked_user': blocked_user.id,
     })
+    
+@login_required
+def get_followers_and_followings(request, user_pk):
+    try:
+        user = get_object_or_404(CustomUser, pk=user_pk)
+        
+        following = UserFollow.objects.filter(follower=user, status=True).select_related('followed')
+        following_list = [{'id': f.followed.id, 'username': f.followed.username} for f in following]
+
+        followers = UserFollow.objects.filter(followed=user, status=True).select_related('follower')
+        followers_list = [{'id': f.follower.id, 'username': f.follower.username} for f in followers]
+
+        is_success = True
+        error = ''
+    except Exception as e:
+        is_success = False
+        error = str(e)
+        following_list = []
+        followers_list = []
+
+    return JsonResponse({
+        'success': is_success,
+        'message': 'Successfully retrieved follow data',
+        'error': error,
+        'id': user_pk,
+        'following': following_list,
+        'followers': followers_list
+    })

@@ -391,8 +391,12 @@ class DOMBuilder {
         return itemContainer;
     }
     
-    generateViewUserModal = (userId) => {
-        const user = usersData.find(u => u.id === userId);
+    generateViewUserModal = async (userId, followData) => {
+        const user = usersData.find(u => u.id === userId);   
+        if (!user) {
+            console.error('User not found');
+            return;
+        }
         const reviews = reviewsData.filter(r => r.author === userId);
         const tickets = ticketsData.filter(t => t.author === userId);
         const title = document.createElement('h2');
@@ -402,6 +406,26 @@ class DOMBuilder {
         const viewReviewContainer = document.getElementById('viewUserContainer');
         viewReviewContainer.innerHTML = "";
         viewReviewContainer.appendChild(title);
+
+        const followers = followData.followers || [];
+        const following = followData.following || [];
+    
+        const followersList = document.createElement('ul');
+        followers.forEach(follower => {
+            const listItem = document.createElement('li');
+            listItem.textContent = follower.username + ' (' + follower.id + ')';
+            followersList.appendChild(listItem);
+        });
+        viewReviewContainer.appendChild(followersList);
+    
+        const followingList = document.createElement('ul');
+        following.forEach(follow => {
+            const listItem = document.createElement('li');
+            listItem.textContent = follow.username + ' (' + follow.id + ')';
+            followingList.appendChild(listItem);
+        });
+        viewReviewContainer.appendChild(followingList);
+
         // viewReviewContainer.appendChild(generateReviewsList(review));
     }
     

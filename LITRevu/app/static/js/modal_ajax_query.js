@@ -339,6 +339,17 @@ window.callbackUpdateReview = (formId, responseData) => {
     callbackCloseModal(formId);
 }
 
+window.callbackGetUserFollows = (responseData, notRequiredSource) => {
+    if (responseData.success && !checkIfExistsInArray(followersData, responseData.id)) {
+        followersData.push({
+            id: responseData.id,
+            following: responseData.following,
+            followers: responseData.followers
+        });
+    }
+    else console.log(responseData.error);
+}
+
 window.DOMRemove = (targetId, targetName) => {
     document.getElementById(targetName + "-" + targetId).remove();
 }
@@ -532,6 +543,70 @@ window.searchThroughList = (inputId, querySelectorValue, subQuerySelectorValue, 
             }
         });
     });
+}
+
+window.getUserFollowsBackend = async (id) => {
+    const url = `${absoluteUrl}user/${id}/followers_and_followings/`;
+    const jsonBody = JSON.stringify({ user_pk: id });
+
+    try {
+        await ajaxCall(url, jsCsrfToken, jsonBody, callbackGetUserFollows);
+        let result = getUserFollowsFrontend(id);
+        if (!result){
+            const maxRetries = 5;
+            const delay = 1000; // Delay in milliseconds
+            try {
+                for (let attempt = 0; attempt < maxRetries; attempt++) {
+                    result = getUserFollowsFrontend(id);
+                    if (result) {
+                        break;
+                    }
+                    console.log(`Attempt ${attempt + 1} data not implemented yet...`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+                if (!result) {
+                    console.error('Failed to fetch user list after multiple attempts');
+                    return null;
+                }
+                return {
+                    following: result.following,
+                    followers: result.followers
+                };
+            } catch (error) {
+                console.error('Error fetching user list:', error);
+            }
+        }
+    } catch (error) {
+        console.error('Failed to fetch user follow data:', error);
+        return null;
+    }
+}
+
+window.getUserFollowsFrontend = (id) => {
+    const targetFollowData = getItemInArray(followersData, id);
+    if (targetFollowData != null) {
+        return {
+            following: targetFollowData.following,
+            followers: targetFollowData.followers
+        }
+    } 
+}
+
+window.getUserFollows = async (id) => {
+    let result = getUserFollowsFrontend(id);
+    const targetFollowData = getItemInArray(followersData, id);
+    if (!targetFollowData) {
+        result = await getUserFollowsBackend(id);
+    }
+    return result;
+}
+
+window.checkIfExistsInArray = (array, id) => {
+    return array.some(item => String(item.id) === String(id));
+}
+
+window.getItemInArray = (array, id) => {
+    return array.find(item => String(item.id) === String(id));
 }
 
 window.setRandomColour = (target) => {

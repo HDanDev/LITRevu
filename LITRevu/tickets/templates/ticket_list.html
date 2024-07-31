@@ -493,6 +493,7 @@ Tickets
 
 {% block js %}
 <script>
+  const absoluteUrl = "{{ absolute_url }}";
   const jsUser = {
     id: "{{ request.user.pk }}",
     username: "{{ request.user.username }}" 
@@ -541,6 +542,7 @@ let usersData = [
 }{% if not forloop.last %},{% endif %}
 {% endfor %}
 ];
+let followersData = [];
 </script>
 <script src="{% static 'js/DOMBuilder.js' %}"></script>
 <script src="{% static 'js/modal_ajax_query.js' %}"></script>

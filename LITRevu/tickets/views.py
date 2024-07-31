@@ -58,6 +58,7 @@ class TicketListView(LoginRequiredMixin, ListView):
         context['ticket_update_form'] =  TicketUpdateForm()
         context['blocked_users'] = blocked_users
         context['users'] = self._context_users
+        context['absolute_url'] = self.request.build_absolute_uri('/')
         
         return context
     
