@@ -132,6 +132,9 @@ window.asyncModalFormCancel = (cancelBtn) => {
 }
 
 window.openModal = (modal) => {
+    if (activeModal) {
+        closeModal(activeModal);
+    }
     modal.style.display = 'flex';
     activeModal = modal;
 }
@@ -150,13 +153,17 @@ window.onclick = (event) => {
 
 window.openViewModal = (openModalViewButtons, generatingFunction, targetModal) => {
     Array.prototype.forEach.call(openModalViewButtons, (btn) => {
-        btn.onclick = (event) => {
-            event.preventDefault();
-            console.log(generatingFunction);
-            generatingFunction(btn.getAttribute("data-item-id"));
-            openModal(targetModal);
-        }
+        openViewModalSubscriber (btn, generatingFunction, targetModal)
     });
+}
+
+window.openViewModalSubscriber = (btn, generatingFunction, targetModal) => {
+    btn.onclick = (event) => {
+        console.log(btn);
+        event.preventDefault();
+        generatingFunction(btn.getAttribute("data-item-id"));
+        openModal(targetModal);
+    }
 }
 
 window.submitForm = async (event, form, callback, url) => {

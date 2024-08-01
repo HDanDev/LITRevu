@@ -5,12 +5,25 @@ class DOMBuilder {
     ) {
         this.ticket = ticket;
         this.review = review;
-        this.titleLink = null;
-        this.editButton = null;
-        this.deleteButton = null;
-        this.descriptionLink = null;
         this.li = null;
-        this.addReviewBtn = null;
+        this.createReviewModal = null;
+        this.createReviewConfirmButton = null;
+        this.callbackCreateReview = null;
+        this.editModal = null;
+        this.editConfirmButton = null;
+        this.editTicketName = null;
+        this.deletionModal = null;
+        this.deletionConfirmButton = null;
+        this.callbackDeleteTicket = null;
+        this.deleteTicketName = null;
+        this.viewTicketModal = null;
+        this.editReviewModal = null;
+        this.editReviewConfirmButton = null;
+        this.editReviewName = null;
+        this.deleteReviewModal = null;
+        this.deleteReviewConfirmButton = null;
+        this.callbackDeleteReview = null;
+        this.deleteReviewName = null;
     }  
 
     generateLi (objectName="ticket", id=this.ticket.id) {
@@ -185,17 +198,21 @@ class DOMBuilder {
         const header = this.generateHeader();
         itemContainer.appendChild(header);
     
-        this.titleLink = this.generateTitle();
-        header.appendChild(this.titleLink);
+        const titleLink = this.generateTitle();
+        openViewModalSubscriber(titleLink, this.generateViewTicketModal, this.viewTicketModal);
+        header.appendChild(titleLink);
         
-        this.editButton = this.generateButton(`edit-${lowerCaseTicketString}-btn`, `edit-${lowerCaseTicketString}`, [`${lowerCaseTicketString}-edit-btn`, 'icon-hover-box'], this.ticket.id, this.ticket.title, `/${lowerCaseTicketString}/${this.ticket.id}/edit/`, '<i class="icon-pencil crud-btn"></i>');
-        header.appendChild(this.editButton);
+        const editButton = this.generateButton(`edit-${lowerCaseTicketString}-btn`, `edit-${lowerCaseTicketString}`, [`${lowerCaseTicketString}-edit-btn`, 'icon-hover-box'], this.ticket.id, this.ticket.title, `/${lowerCaseTicketString}/${this.ticket.id}/edit/`, '<i class="icon-pencil crud-btn"></i>');
+        asyncSingleBtnModalFormInit(editButton, this.editModal, this.editConfirmButton, null, this.editTicketName, FormTypeEnum.EDIT_TICKET);
+        header.appendChild(editButton);
     
-        this.deleteButton = this.generateButton(`delete-${lowerCaseTicketString}-btn`, `delete-${lowerCaseTicketString}`, [`${lowerCaseTicketString}-delete-btn`, 'icon-hover-box'], this.ticket.id, this.ticket.title, `/${lowerCaseTicketString}/${this.ticket.id}/delete/`, '<i class="icon-bin crud-btn"></i>');
-        header.appendChild(this.deleteButton);
+        const deleteButton = this.generateButton(`delete-${lowerCaseTicketString}-btn`, `delete-${lowerCaseTicketString}`, [`${lowerCaseTicketString}-delete-btn`, 'icon-hover-box'], this.ticket.id, this.ticket.title, `/${lowerCaseTicketString}/${this.ticket.id}/delete/`, '<i class="icon-bin crud-btn"></i>');
+        asyncSingleBtnModalFormInit(deleteButton, this.deletionModal, this.deletionConfirmButton, this.callbackDeleteTicket, this.deleteTicketName, FormTypeEnum.DELETE_TICKET);
+        header.appendChild(deleteButton);
     
-        this.descriptionLink = this.generateDescription();
-        itemContainer.appendChild(this.descriptionLink);
+        const descriptionLink = this.generateDescription();
+        openViewModalSubscriber(descriptionLink, this.generateViewTicketModal, this.viewTicketModal);
+        itemContainer.appendChild(descriptionLink);
     
         const tagContainer = this.generateTagContainer();
         itemContainer.appendChild(tagContainer);
@@ -207,7 +224,7 @@ class DOMBuilder {
         const ulReview = this.generateUlReview();
 
         const addReviewBtn = this.generateAddReviewBtn(this.ticket.id);
-        this.addReviewBtn = addReviewBtn;
+        asyncSingleBtnModalFormInit(addReviewBtn, this.createReviewModal, this.createReviewConfirmButton, this.callbackCreateReview);
 
         ulReview.appendChild(addReviewBtn);
 
@@ -219,7 +236,6 @@ class DOMBuilder {
     }
 
     generateReview() {
-
         const lowerCaseReviewString = "review";
         const li = this.generateLi(lowerCaseReviewString, this.review.id);
         const itemContainer = this.generateItemContainer(lowerCaseReviewString);
@@ -236,24 +252,27 @@ class DOMBuilder {
         const header = this.generateHeader('h4');
         itemContainer.appendChild(header);
     
-        this.titleLink = this.generateTitle(this.review.id, ['item-title', 'icon-hover-box', 'view-review-btn']);
+        const titleLink = this.generateTitle(this.review.id, ['item-title', 'icon-hover-box', 'view-review-btn']);
         const title = this.generateTitleSpan();
-        this.titleLink.appendChild(title);
-        header.appendChild(this.titleLink);
+        titleLink.appendChild(title);
+        openViewModalSubscriber(titleLink, this.generateViewReviewModal, this.viewReviewModal);
+        header.appendChild(titleLink);
         
-        this.editButton = this.generateButton(`edit-${lowerCaseReviewString}-btn`, `edit-${lowerCaseReviewString}`, [`${lowerCaseReviewString}-edit-btn`, 'icon-hover-box'], this.review.id, this.review.title, `/${lowerCaseReviewString}/${this.review.id}/edit/`, '<i class="icon-pencil crud-btn"></i>');
-        header.appendChild(this.editButton);
+        const editButton = this.generateButton(`edit-${lowerCaseReviewString}-btn`, `edit-${lowerCaseReviewString}`, [`${lowerCaseReviewString}-edit-btn`, 'icon-hover-box'], this.review.id, this.review.title, `/${lowerCaseReviewString}/${this.review.id}/edit/`, '<i class="icon-pencil crud-btn"></i>');
+        asyncSingleBtnModalFormInit(editButton, this.editReviewModal, this.editReviewConfirmButton, null, this.editReviewName, FormTypeEnum.EDIT_REVIEW);
+        header.appendChild(editButton);
     
-        this.deleteButton = this.generateButton(`delete-${lowerCaseReviewString}-btn`, `delete-${lowerCaseReviewString}`, [`${lowerCaseReviewString}-delete-btn`, 'icon-hover-box'], this.review.id, this.review.title, `/${lowerCaseReviewString}/${this.review.id}/delete/`, '<i class="icon-bin crud-btn"></i>');
-        header.appendChild(this.deleteButton);
+        const deleteButton = this.generateButton(`delete-${lowerCaseReviewString}-btn`, `delete-${lowerCaseReviewString}`, [`${lowerCaseReviewString}-delete-btn`, 'icon-hover-box'], this.review.id, this.review.title, `/${lowerCaseReviewString}/${this.review.id}/delete/`, '<i class="icon-bin crud-btn"></i>');
+        asyncSingleBtnModalFormInit(deleteButton, this.deleteReviewModal, this.deleteReviewConfirmButton, this.callbackDeleteReview, this.deleteReviewName, FormTypeEnum.DELETE_REVIEW);
+        header.appendChild(deleteButton);
 
         const ratingPreview = this.generateRatingPreview();
         header.appendChild(ratingPreview);
         reviewInfos.appendChild(header);
     
-        this.descriptionLink = this.generateDescription(lowerCaseReviewString, this.review.id, this.review.content);
-        reviewInfos.appendChild(this.descriptionLink);
-
+        const descriptionLink = this.generateDescription(lowerCaseReviewString, this.review.id, this.review.content);
+        openViewModalSubscriber(descriptionLink, this.generateViewReviewModal, this.viewReviewModal);
+        reviewInfos.appendChild(descriptionLink);
         itemContainer.appendChild(reviewInfos);
     
         const infoLikesBlock = this.generateinfoLikesBlock(true, this.review.createdAt);
@@ -267,20 +286,15 @@ class DOMBuilder {
 
     publicGenerateAddReviewBtn (isFirst=false) {
         const id = this.ticket != null ? this.ticket.id : this.review.ticket;
-        console.log(document.getElementById(`create-review-btn-${id}`));
         document.getElementById(`create-review-btn-${id}`).remove();
-        console.log(id);
 
         const addReviewBtn = this.generateAddReviewBtn(id, isFirst);
+        asyncSingleBtnModalFormInit(addReviewBtn, this.createReviewModal, this.createReviewConfirmButton, this.callbackCreateReview);
 
         const ticketBlock = document.getElementById(`ticket-${id}`);
         const reviewList = ticketBlock.querySelector('ul.reviews-list');
 
-        console.log(reviewList);
-
         reviewList.appendChild(addReviewBtn);
-
-        this.addReviewBtn = addReviewBtn;
     }
     
     generateViewTicketModal = (ticketId) => {
@@ -328,7 +342,9 @@ class DOMBuilder {
             ticketReviewsFilteredList.forEach(review => {
                 const listItem = document.createElement('li');
                 listItem.id = `review-${review.id}`;
-                listItem.appendChild(this.generateReviewsList(review, true));
+                const generatedReviewsList = this.generateReviewsList(review, true);
+                listItem.appendChild(generatedReviewsList.reviewContainer);
+                listItem.appendChild(generatedReviewsList.reviewInfos);
                 reviewsList.appendChild(listItem);
             });
         }
@@ -337,7 +353,7 @@ class DOMBuilder {
         createReviewButton.id = `create-review-btn-${ticket.id}`;
         createReviewButton.name = 'create-review';
         createReviewButton.className = 'review-create-btn icon-hover-box';
-        createReviewButton.dataset.itemAction = `/review/create/${ticket.id}`;
+        createReviewButton.dataset.itemAction = `/review/${ticket.id}/new/`;
         createReviewButton.innerHTML = `<i class="icon-plus double-icon"></i><i class="icon-file-text double-icon"></i>`;
     
         if (ticketReviewsFilteredList.length === 0) {
@@ -346,6 +362,7 @@ class DOMBuilder {
             span.textContent = 'Be the first to review !';
             createReviewButton.appendChild(span);
         }
+        asyncSingleBtnModalFormInit(createReviewButton, this.createReviewModal, this.createReviewConfirmButton, this.callbackCreateReview);
         reviewsList.appendChild(createReviewButton);
         itemContainer.appendChild(reviewsList);
     
@@ -364,31 +381,45 @@ class DOMBuilder {
         const viewReviewContainer = document.getElementById('viewReviewContainer');
         viewReviewContainer.innerHTML = "";
         viewReviewContainer.appendChild(title);
-        viewReviewContainer.appendChild(this.generateReviewsList(review));
+        const generatedReviewsList = this.generateReviewsList(review);
+        viewReviewContainer.appendChild(generatedReviewsList.reviewContainer);
+        viewReviewContainer.appendChild(generatedReviewsList.reviewInfos);
       }
     
       generateReviewsList = (review, isInList=false) => {
         const itemContainer = document.createElement('div');
-        itemContainer.className = 'item-container';
+        itemContainer.className = 'review-container';
     
         if (review.coverImage) {
             const backgroundDiv = document.createElement('div');
-            backgroundDiv.className = 'item-background';
+            backgroundDiv.className = 'review-img';
             backgroundDiv.style.backgroundImage = `url(${review.coverImage})`;
             itemContainer.appendChild(backgroundDiv);
         }
     
-        itemContainer.appendChild(this.generateTitleView(review, !isInList));
+        const descriptionBlock = document.createElement('div');
+        descriptionBlock.className = "form";
     
         const reviewContent = document.createElement('p');
         reviewContent.className = 'item-infos';
-        reviewContent.innerHTML = isInList 
-        ? `<a href="/review/${review.id}/detail">${review.content}</a>`
-        : `<p>${review.content}</p>`;
-        itemContainer.appendChild(reviewContent);
-        itemContainer.appendChild(this.generateInfos(review, isInList ? 'mini-font' : ''));
+        if (isInList) {
+            const a = document.createElement('a');
+            a.textContent = review.content;
+            a.dataset.itemId = review.id;
+            openViewModalSubscriber(a, this.generateViewReviewModal, this.viewReviewModal);
+            reviewContent.appendChild(a);
+        }
+        else {
+            reviewContent.innerHTML = `<p>${review.content}</p>`;
+
+        }
+
+        descriptionBlock.appendChild(this.generateTitleView(review, false, isInList));
+        descriptionBlock.appendChild(reviewContent);
+
+        itemContainer.appendChild(descriptionBlock);
     
-        return itemContainer;
+        return {reviewContainer: itemContainer, reviewInfos: this.generateInfos(review, isInList ? 'mini-font' : '')} ;
     }
     
     generateViewUserModal = async (userId, followData) => {
@@ -478,22 +509,49 @@ class DOMBuilder {
         return mainDiv;
     }
     
-    generateTitleView = (object, isTicket) => {  
-        const header = document.createElement(isTicket ? 'h3' : 'h4');
-        header.className = 'aligned item-infos';
-    
-        const titleA = document.createElement(isTicket ? 'span' : 'a');
-        titleA.className = `item-title ${isTicket ? '' : 'icon-hover-box'}`;
-        titleA.innerHTML = `<span class="font-style">${object.title}</span>${isTicket ? '' : '<i class="icon-eye-plus"></i>'}`;
-        header.appendChild(titleA);
+    generateTitleView = (object, isTicket, isInList=false) => {  
+        let header = null;
+
+        const titleReviewInner = isInList ? '<i class="icon-eye-plus"></i>' : ''; 
+        if (isTicket) header = this.generateTitleTicketReviewSpliter(object, 'h3', 'span');
+        else header = this.generateTitleTicketReviewSpliter(object, 'h4', 'a', ' stylish-header', 'icon-hover-box view-review-btn', titleReviewInner);
     
         if (object.author === jsUser.id) {
-            const editButton = this.createButton('edit-review-btn', 'edit-review', object.id, object.title, `/review/${object.id}/update`, 'icon-pencil', 'crud-btn');
+            const editButton = this.createButton('edit-review-btn', 'edit-review', object.id, object.title, `/review/${object.id}/edit/`, 'icon-pencil', 'crud-btn');
             header.appendChild(editButton);
     
-            const deleteButton = this.createButton('delete-review-btn', 'delete-review', object.id, object.title, `/review/${object.id}/delete`, 'icon-bin', 'crud-btn');
+            const deleteButton = this.createButton('delete-review-btn', 'delete-review', object.id, object.title, `/review/${object.id}/delete/`, 'icon-bin', 'crud-btn');
             header.appendChild(deleteButton);
+                
+            asyncSingleBtnModalFormInit(editButton, this.editReviewModal, this.editReviewConfirmButton, null, this.editReviewName, FormTypeEnum.EDIT_REVIEW);
+            asyncSingleBtnModalFormInit(deleteButton, this.deleteReviewModal, this.deleteReviewConfirmButton, this.callbackDeleteReview, this.deleteReviewName, FormTypeEnum.DELETE_REVIEW);
+        }   
+
+        if (!isTicket) {
+            const rating = document.createElement('div');
+            rating.className = "rating-preview";
+            rating.innerHTML = ' ☆ '.repeat(object.rating);
+            header.appendChild(rating);
         }
+
+        return header;
+    }
+
+    generateTitleTicketReviewSpliter = (object, typeOfH, typeOfA, headerClassName="", titleClassName="", titleInner="") => {
+        const header = document.createElement(typeOfH);
+        header.className = 'aligned item-infos' + headerClassName;
+    
+        const titleA = document.createElement(typeOfA);
+        titleA.className = `item-title ${titleClassName}`;
+        titleA.innerHTML = `<span class="font-style title colour-${Math.floor(Math.random() * 10)}">${object.title}</span>${titleInner}`;
+
+        if (titleInner != '') {
+            titleA.dataset.itemId = object.id;
+            openViewModalSubscriber(titleA, this.generateViewReviewModal, this.viewReviewModal);
+        }
+
+        header.appendChild(titleA);
+
         return header;
     }
     
@@ -509,7 +567,7 @@ class DOMBuilder {
             authorSpan.textContent = object.authorName;
             infoBlock.appendChild(authorSpan);
     
-            const followButton = this.createFollowButton(object.author, `/toggle_follow/${object.author}`, jsCsrfToken, object.isFollowing);
+            const followButton = this.createFollowButton(object.author, `/toggle-follow/${object.author}/`, jsCsrfToken, object.isFollowing);
             infoBlock.appendChild(followButton);
         }
         return infoBlock;
