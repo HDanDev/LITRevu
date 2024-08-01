@@ -397,8 +397,8 @@ class DOMBuilder {
             console.error('User not found');
             return;
         }
-        const reviews = reviewsData.filter(r => r.author === userId);
-        const tickets = ticketsData.filter(t => t.author === userId);
+        // const reviews = reviewsData.filter(r => r.author === userId);
+        // const tickets = ticketsData.filter(t => t.author === userId);
         const title = document.createElement('h2');
         title.className = 'main-title item-infos';
         title.innerHTML = `<span class="colour-2">${user.username}</span>`;
@@ -409,23 +409,9 @@ class DOMBuilder {
 
         const followers = followData.followers || [];
         const following = followData.following || [];
-    
-        const followersList = document.createElement('ul');
-        followers.forEach(follower => {
-            const listItem = document.createElement('li');
-            listItem.textContent = follower.username + ' (' + follower.id + ')';
-            followersList.appendChild(listItem);
-        });
-        viewReviewContainer.appendChild(followersList);
-    
-        const followingList = document.createElement('ul');
-        following.forEach(follow => {
-            const listItem = document.createElement('li');
-            listItem.textContent = follow.username + ' (' + follow.id + ')';
-            followingList.appendChild(listItem);
-        });
-        viewReviewContainer.appendChild(followingList);
-        viewReviewContainer.appendChild(this.generateFollowBlock('test', following));
+
+        viewReviewContainer.appendChild(this.generateFollowBlock(`People who follows ${user.username}:`, followers));
+        viewReviewContainer.appendChild(this.generateFollowBlock(`People ${user.username} follows:`, following));
 
         // viewReviewContainer.appendChild(generateReviewsList(review));
     }
@@ -439,39 +425,47 @@ class DOMBuilder {
 
         const ul = document.createElement('ul');
 
-            const blockedUsers = JSON.parse(document.getElementById('blocked-users-script').textContent);
-            const followingUsers = JSON.parse(document.getElementById('following-users-script').textContent);
-            const followersUsers = JSON.parse(document.getElementById('followers-users-script').textContent);
+        const blockedUsers = JSON.parse(document.getElementById('blocked-users-script').textContent);
+        const followingUsers = JSON.parse(document.getElementById('following-users-script').textContent);
 
         userList.forEach(user => {
             const listItem = document.createElement('li');
             listItem.className = 'profile-info';
     
             const userLink = document.createElement('a');
-            userLink.href = `/user_detail/${user.id}`;
-            userLink.textContent = user.username;
-    
-            const followButton = document.createElement('button');
-            followButton.className = 'follow-btn icon-hover-box';
-            followButton.dataset.userId = user.id;
-            followButton.dataset.url = `/toggle_follow/${user.id}`;
-    
-            const followIcon = document.createElement('i');
-            followIcon.className = user.followers_status ? 'icon-user-minus' : 'icon-user-plus';
-            followButton.appendChild(followIcon);
-    
-            const blockButton = document.createElement('button');
-            blockButton.className = 'block-btn icon-hover-box';
-            blockButton.dataset.userId = user.id;
-            blockButton.dataset.url = `/toggle_block/${user.id}`;
-    
-            const blockIcon = document.createElement('i');
-            blockIcon.className = blockedUsers.includes(user.id) ? 'icon-checkmark not-validation' : 'icon-blocked not-validation';
-            blockButton.appendChild(blockIcon);
-    
             listItem.appendChild(userLink);
-            listItem.appendChild(followButton);
-            listItem.appendChild(blockButton);
+            
+            if (jsUser.id != user.id) {
+                userLink.href = `/user/${user.id}/`;
+                userLink.textContent = user.username;
+    
+                const followButton = document.createElement('button');
+                followButton.className = 'follow-btn icon-hover-box';
+                followButton.dataset.userId = user.id;
+                followButton.dataset.url = `/toggle-follow/${user.id}/`;
+                followBtnListenerSetup(followButton, callbackMassFollow);
+        
+                const followIcon = document.createElement('i');
+                followIcon.className = followingUsers.includes(user.id) ? 'icon-user-minus' : 'icon-user-plus';
+                followButton.appendChild(followIcon);
+        
+                const blockButton = document.createElement('button');
+                blockButton.className = 'block-btn icon-hover-box';
+                blockButton.dataset.userId = user.id;
+                blockButton.dataset.url = `/toggle-block/${user.id}/`;
+                followBtnListenerSetup(blockButton, callbackMassBlock);
+        
+                const blockIcon = document.createElement('i');
+                blockIcon.className = blockedUsers.includes(user.id) ? 'icon-checkmark not-validation' : 'icon-blocked not-validation';
+                blockButton.appendChild(blockIcon);
+                listItem.appendChild(followButton);
+                listItem.appendChild(blockButton);
+            }
+            else {
+                userLink.href = '/profile/';
+                userLink.textContent = 'You';
+            }
+    
             ul.appendChild(listItem);
         });
 

@@ -546,7 +546,6 @@ let followersData = [];
 </script>
   {{ blocked_users_ids|json_script:"blocked-users-script" }}
   {{ following_users_ids|json_script:"following-users-script" }}
-  {{ followers_users_ids|json_script:"followers-users-script" }}
 <script src="{% static 'js/DOMBuilder.js' %}"></script>
 <script src="{% static 'js/modal_ajax_query.js' %}"></script>
 <script src="{% static 'js/tickets_script.js' %}"></script>

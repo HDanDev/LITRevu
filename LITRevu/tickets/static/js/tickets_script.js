@@ -171,9 +171,6 @@ document.addEventListener("DOMContentLoaded", () => {
         };
         
         ticketsData.push(newTicket);
-
-        console.log(newTicket);
-        console.log(ticketsData);
         return newTicket;
     }
 
@@ -192,9 +189,6 @@ document.addEventListener("DOMContentLoaded", () => {
         };
         
         reviewsData.push(newReview);
-
-        console.log(newReview);
-        console.log(reviewsData);
         return newReview;
     }
 });

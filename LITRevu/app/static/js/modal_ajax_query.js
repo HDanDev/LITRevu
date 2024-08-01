@@ -506,13 +506,18 @@ window.imagePreviewManager = (imageInputId, previewPlaceholder) => {
 
 window.followUserManager = (btnClassName, callback) => {
     document.querySelectorAll(btnClassName).forEach((button) => {
-        button.addEventListener('click', (event) => {
-            const btn = event.target.closest('button');
-            const userId = btn.getAttribute('data-user-id');
-            const url = btn.getAttribute('data-url');
-            const jsonBody = JSON.stringify({ user_id: userId });
-            ajaxCall(url, jsCsrfToken, jsonBody, callback, btn);
-        });
+        followBtnListenerSetup(button, callback);
+    });
+}
+
+window.followBtnListenerSetup = (btn, callback) => {
+    btn.addEventListener('click', (event) => {
+        const btn = event.target.closest('button');
+        const userId = btn.getAttribute('data-user-id');
+        const url = btn.getAttribute('data-url');
+        const jsonBody = JSON.stringify({ user_id: userId });
+        console.log(btn, userId, url, jsonBody);
+        ajaxCall(url, jsCsrfToken, jsonBody, callback, btn);
     });
 }
 

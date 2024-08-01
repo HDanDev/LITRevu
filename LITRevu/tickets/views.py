@@ -55,13 +55,6 @@ class TicketListView(LoginRequiredMixin, ListView):
             default=False,
             output_field=BooleanField()
         )
-        
-        followed_users = CustomUser.objects.filter(
-            followers__follower=self.request.user,
-            followers__status=True
-        ).exclude(pk=self.request.user.pk).annotate(
-            followers_status=followers_status
-        )
 
         following_users = CustomUser.objects.filter(
             following__followed=self.request.user,
@@ -72,7 +65,6 @@ class TicketListView(LoginRequiredMixin, ListView):
             followers_status=followers_status
         )
 
-        followed_user_ids = followed_users.values_list('id', flat=True)
         following_users_ids = following_users.values_list('id', flat=True)
         blocked_users_ids = blocked_users.values_list('id', flat=True)
         colour_numbers = generate_random_numbers()[:10]
@@ -84,8 +76,7 @@ class TicketListView(LoginRequiredMixin, ListView):
         context['ticket_update_form'] =  TicketUpdateForm()
         context['blocked_users'] = blocked_users
         context['blocked_users_ids'] = list(blocked_users_ids)
-        context['following_users_ids'] = list(followed_user_ids)
-        context['followers_users_ids'] = list(following_users_ids)
+        context['following_users_ids'] = list(following_users_ids)
         context['users'] = self._context_users
         context['absolute_url'] = self.request.build_absolute_uri('/')
         

@@ -113,7 +113,13 @@ def profile_view(request):
     email_form = UpdateEmailForm(instance=request.user)
     username_form = UpdateUsernameForm(instance=request.user)
     password_form = UpdatePasswordForm(request.user)
-    blocked_users_ids = UserBlock.objects.filter(blocker=request.user).values_list('blocked', flat=True)
+    blocked_users_ids = UserBlock.objects.filter(
+        blocker=request.user
+        ).exclude(
+            pk=request.user.pk
+            ).values_list(
+                'blocked', flat=True
+                )
     blocked_users = CustomUser.objects.filter(id__in=blocked_users_ids)
 
     followers_status = Case(
