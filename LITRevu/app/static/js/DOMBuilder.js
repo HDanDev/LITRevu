@@ -410,18 +410,20 @@ class DOMBuilder {
         const followers = followData.followers || [];
         const following = followData.following || [];
 
-        viewReviewContainer.appendChild(this.generateFollowBlock(`People who follows ${user.username}:`, followers));
-        viewReviewContainer.appendChild(this.generateFollowBlock(`People ${user.username} follows:`, following));
+        const currentPlayerColourClass = `colour-${Math.floor(Math.random() * 10)}`;
+
+        viewReviewContainer.appendChild(this.generateFollowBlock(`People who follows <span class="colour-2">${user.username}</span>:`, followers, currentPlayerColourClass));
+        viewReviewContainer.appendChild(this.generateFollowBlock(`People <span class="colour-2">${user.username}</span> follows:`, following, currentPlayerColourClass));
 
         // viewReviewContainer.appendChild(generateReviewsList(review));
     }
 
-    generateFollowBlock = (title, userList) => {
+    generateFollowBlock = (title, userList, classColour) => {
         const mainDiv = document.createElement('div');
 
         const h3 = document.createElement('h3');
-        h3.className = "profile-info";
-        h3.textContent = title;
+        h3.classList.add("profile-info");
+        h3.innerHTML = title;
 
         const ul = document.createElement('ul');
 
@@ -438,6 +440,7 @@ class DOMBuilder {
             if (jsUser.id != user.id) {
                 userLink.href = `/user/${user.id}/`;
                 userLink.textContent = user.username;
+                userLink.classList.add(`colour-${Math.floor(Math.random() * 10)}`);
     
                 const followButton = document.createElement('button');
                 followButton.className = 'follow-btn icon-hover-box';
@@ -463,6 +466,7 @@ class DOMBuilder {
             }
             else {
                 userLink.href = '/profile/';
+                userLink.classList.add(classColour, 'title');
                 userLink.textContent = 'You';
             }
     
