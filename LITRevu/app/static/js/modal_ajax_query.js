@@ -20,6 +20,9 @@ class FormTypeEnum {
 }
 
 let activeModal;
+let ticketSet = 1;
+let isLoadingFeed = false;
+let hasNotReachedSetsEnd = true;
 const staticDOMBuilder = new DOMBuilder();
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -195,7 +198,7 @@ window.ajaxCallFromForm = async (url, callback, formData, form) => {
     handleResponse(response, callback, form);
 }
 
-window.ajaxCall = async (url, token, jsonBody, callback, source=null) => {
+window.ajaxCallPost = async (url, token, jsonBody, callback, source=null) => {
     let response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -203,6 +206,17 @@ window.ajaxCall = async (url, token, jsonBody, callback, source=null) => {
             'X-CSRFToken': token,
         },
         body: jsonBody
+    });
+    handleResponse(response, callback, null, source);
+}
+
+window.ajaxCallGet = async (url, token, callback, source=null) => {
+    let response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': token,
+        }
     });
     handleResponse(response, callback, null, source);
 }
@@ -311,7 +325,7 @@ window.callbackCreateTicket = (formId, responseData) => {
         const reviewList = ticket.querySelector('.reviews-list');
         generateReview(reviewList, responseData.review_id, responseData.review_cover_image, responseData.review_title, responseData.review_content, responseData.review_rating, responseData.review_creation_date, responseData.id);
     }
-    callbackCloseModal(formId);
+    if (formId) callbackCloseModal(formId);
 }
 
 window.callbackCreateReview = (formId, responseData) => {
@@ -355,6 +369,28 @@ window.callbackGetUserFollows = (responseData, notRequiredSource) => {
         });
     }
     else console.log(responseData.error);
+}
+
+window.callbackFeedFiller = (responseData, notRequiredSource) => {
+
+    responseData.data.forEach(ticket => {
+        const ticketList = document.getElementById("tickets-list");
+        generateTicket(ticketList, ticket.id, ticket.img, ticket.title, ticket.description, ticket.tags, ticket.creation_date);
+        if (ticket.reviews && ticket.reviews.length > 0) {
+            const targetTicket = document.getElementById(`ticket-${ticket.id}`);
+            const reviewList = targetTicket.querySelector('.reviews-list');
+            ticket.reviews.forEach(review => {
+                generateReview(reviewList, review.id, review.cover_image, review.title, review.content, review.rating, review.creation_date, ticket.id);
+            });
+            }
+    });
+
+    console.log('Feed filled!');
+    // document.getElementById('ticket-container').insertAdjacentHTML('beforeend', responseData.data);
+    document.getElementById('loading').style.display = 'none';
+    isLoadingFeed = false;
+    hasNotReachedSetsEnd = responseData.has_more_sets;
+    // setRandomColour(document.getElementById("rightPage"));
 }
 
 window.DOMRemove = (targetId, targetName) => {
@@ -524,7 +560,7 @@ window.followBtnListenerSetup = (btn, callback) => {
         const url = btn.getAttribute('data-url');
         const jsonBody = JSON.stringify({ user_id: userId });
         console.log(btn, userId, url, jsonBody);
-        ajaxCall(url, jsCsrfToken, jsonBody, callback, btn);
+        ajaxCallPost(url, jsCsrfToken, jsonBody, callback, btn);
     });
 }
 
@@ -562,7 +598,7 @@ window.getUserFollowsBackend = async (id) => {
     const jsonBody = JSON.stringify({ user_pk: id });
 
     try {
-        await ajaxCall(url, jsCsrfToken, jsonBody, callbackGetUserFollows);
+        await ajaxCallPost(url, jsCsrfToken, jsonBody, callbackGetUserFollows);
         let result = getUserFollowsFrontend(id);
         if (!result){
             const maxRetries = 5;

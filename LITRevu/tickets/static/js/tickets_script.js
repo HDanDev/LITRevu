@@ -202,4 +202,17 @@ document.addEventListener("DOMContentLoaded", () => {
         reviewsData.push(newReview);
         return newReview;
     }
+
+    window.scrollFeedFillerManager = () => {
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10 && !isLoadingFeed && !activeModal && hasNotReachedSetsEnd) {
+            console.log('is scrolled');
+            isLoadingFeed = true;
+            ticketSet += 1;
+            document.getElementById('loading').style.display = 'block';
+    
+            ajaxCallGet(`ticket/?ticketSet=${ticketSet}`, jsCsrfToken, callbackFeedFiller, source=null);
+        };
+    }
+
+    window.addEventListener('scroll', window.scrollFeedFillerManager);
 });

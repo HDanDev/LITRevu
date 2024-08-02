@@ -6,7 +6,7 @@ from reviews.models import Review
 from tickets.models import Ticket, Tag
 from reviews.forms import ReviewForm
 from tickets.forms import TicketForm, TicketUpdateForm
-from follows.models import UserBlock
+from follows.models import UserBlock, UserFollow
 from users.models import CustomUser
 from app.utils import generate_random_numbers
 from django.contrib import messages
@@ -17,36 +17,39 @@ from django.shortcuts import get_object_or_404, redirect
 from django.db import transaction, IntegrityError
 from django.core.exceptions import ValidationError
 from django.db.models import Case, When, BooleanField
-    
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.template.loader import render_to_string
+
 class TicketListView(LoginRequiredMixin, ListView):
     model = Ticket
     template_name = 'ticket_list.html'
     context_object_name = 'tickets'
+    paginate_by = 2
     _context_users = None
     
     def get_queryset(self):
-        blocked_users = UserBlock.objects.filter(blocker=self.request.user).values_list('blocked', flat=True)
-
+        followed_users = UserFollow.objects.filter(follower=self.request.user, status=True).values_list('followed', flat=True)
+        
         tickets = Ticket.objects.prefetch_related('tags', 'reviews').filter(
-            is_archived=False
-        ).exclude(
-            author__in=blocked_users
-        ).distinct()
+            is_archived=False,
+            author__in=followed_users
+        ).order_by('-created_at').distinct()
 
         for ticket in tickets:
             ticket.likes_count = ticket.get_likes_count()
             ticket.dislikes_count = ticket.get_dislikes_count()
-            for review in ticket.reviews.all():
+            for review in ticket.reviews.filter(is_archived=False):
                 review.likes_count = review.get_likes_count()
                 review.dislikes_count = review.get_dislikes_count()
-            
+        
         ticket_authors = tickets.values_list('author', flat=True)
         review_authors = Review.objects.filter(ticket__in=tickets).values_list('author', flat=True)
         all_authors = set(ticket_authors).union(set(review_authors))
         self._context_users = CustomUser.objects.filter(id__in=all_authors)
+        
         return tickets
     
-    def get_context_data(self, **kwargs):        
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         blocked_users_ids = UserBlock.objects.filter(blocker=self.request.user).values_list('blocked', flat=True)
         blocked_users = CustomUser.objects.filter(id__in=blocked_users_ids) 
@@ -57,8 +60,8 @@ class TicketListView(LoginRequiredMixin, ListView):
         )
 
         following_users = CustomUser.objects.filter(
-            following__followed=self.request.user,
-            following__status=True
+            followers__followed=self.request.user,
+            followers__status=True
         ).exclude(
             pk=self.request.user.pk
         ).annotate(
@@ -81,6 +84,96 @@ class TicketListView(LoginRequiredMixin, ListView):
         context['absolute_url'] = self.request.build_absolute_uri('/')
         
         return context
+
+    # def get(self, request, *args, **kwargs):
+    #     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+    #         ticketSet = request.GET.get('ticketSet', 1)
+    #         tickets = self.get_queryset()
+    #         paginator = Paginator(tickets, self.paginate_by)
+    #         try:
+    #             tickets = paginator.page(ticketSet)
+    #         except PageNotAnInteger:
+    #             tickets = paginator.page(1)
+    #         except EmptyPage:
+    #             tickets = []
+    #         except Exception as e:
+    #             error_message = f"An error occurred: {str(e)}"
+    #             messages.error(self.request, error_message)
+    #             return {
+    #                 'success': False,
+    #                 'error': error_message
+    #                 }
+    #         data = render_to_string(
+    #             'partial_ticket_list.html',
+    #             {'tickets': tickets,
+    #              'user': request.user})
+    #         has_more_sets = tickets.has_next() if tickets else False
+    #         return JsonResponse(
+    #             {'data': data,
+    #              'success': True,
+    #              'has_more_sets': has_more_sets,
+    #              'message': 'Ticket set successfully added.'
+    #             })
+    #     else:
+    #         return super().get(request, *args, **kwargs)
+        
+    def get(self, request, *args, **kwargs):
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            ticketSet = request.GET.get('ticketSet', 1)
+            tickets = self.get_queryset()
+            paginator = Paginator(tickets, self.paginate_by)
+            
+            try:
+                tickets = paginator.page(ticketSet)
+            except PageNotAnInteger:
+                tickets = paginator.page(1)
+            except EmptyPage:
+                tickets = []
+            except Exception as e:
+                error_message = f"An error occurred: {str(e)}"
+                return JsonResponse({
+                    'success': False,
+                    'error': error_message
+                })
+            
+            ticket_list = []
+            for ticket in tickets:
+                ticket_dict = {
+                    'id': ticket.pk,
+                    'img': ticket.image.url if ticket.image else None,
+                    'title': ticket.title,
+                    'description': ticket.description,
+                    'tags': [tag.name for tag in ticket.tags.all()],
+                    'creation_date': ticket.created_at,
+                    'author': {
+                        'id': ticket.author.id,
+                        'username': ticket.author.username,
+                        } if ticket.author else None,
+                    'reviews': [{
+                        'id': review.pk,
+                        'cover_image': review.cover_image.url if review.cover_image else None,
+                        'title': review.title,
+                        'content': review.content,
+                        'rating': review.rating,
+                        'creation_date': review.created_at,
+                        'author': {
+                            'id': review.author.id,
+                            'username': review.author.username,
+                            } if review.author else None
+                        } for review in ticket.reviews.filter(is_archived=False)]
+                }
+                ticket_list.append(ticket_dict)
+            
+            has_more_sets = tickets.has_next() if tickets else False
+            
+            return JsonResponse({
+                'data': ticket_list,
+                'success': True,
+                'has_more_sets': has_more_sets,
+                'message': 'Ticket set successfully added.'
+            })
+        else:
+            return super().get(request, *args, **kwargs)
     
 class TicketCreateView(LoginRequiredMixin, CreateView):
     model = Ticket
