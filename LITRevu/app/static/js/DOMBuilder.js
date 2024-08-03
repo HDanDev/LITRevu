@@ -24,6 +24,7 @@ class DOMBuilder {
         this.deleteReviewConfirmButton = null;
         this.callbackDeleteReview = null;
         this.deleteReviewName = null;
+        this.viewUserModal = null;
     }  
 
     generateLi (objectName="ticket", id=this.ticket.id) {
@@ -137,17 +138,28 @@ class DOMBuilder {
                 infoParagraph.classList.add('mini-font');
             } 
         infoParagraph.innerHTML = `Posted on ${new Date(creationDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} by `;
-    
-        const youLink = document.createElement('a');
-        if (!isMini) youLink.classList.add('colour-2');
-        else youLink.classList.add('colour-3');
-        youLink.href = '/profile/';
-        youLink.textContent = 'you';
+        const object = this.ticket ? this.ticket : this.review;
+        const authorLink = this.generateUserLink(object, isMini);
 
-        infoParagraph.appendChild(youLink);
+        infoParagraph.appendChild(authorLink);
         infoLikesBlock.appendChild(infoParagraph);
 
         return infoLikesBlock;
+    }
+
+    generateUserLink(object, isMini) {
+        const userLink = document.createElement('a');
+        if (object.author && object.author != jsUser.id) {
+            userLink.classList.add(`colour-${Math.floor(Math.random() * 10)}`, 'author');
+            userLink.textContent = object.authorName;     
+            openViewModalSubscriber(userLink, this.generateViewUserModal, this.viewUserModal, object.author);
+        }
+        else {
+            !isMini ? userLink.classList.add('colour-2', 'author') : userLink.classList.add('colour-3', 'author');
+            userLink.href = '/profile/';
+            userLink.textContent = 'you';
+        }
+        return userLink;
     }
 
     generateUlReview () {
@@ -560,13 +572,10 @@ class DOMBuilder {
         infoBlock.className = 'item-infos ' + optionalClass;
         infoBlock.innerHTML = `<span>Posted on ${object.createdAt} by </span>`;
     
-        if (object.author === jsUser.id) {
-            infoBlock.innerHTML += 'you';
-        } else {
-            const authorSpan = document.createElement('span');
-            authorSpan.textContent = object.authorName;
-            infoBlock.appendChild(authorSpan);
-    
+        const authorName = this.generateUserLink(object, false);
+        infoBlock.appendChild(authorName);
+
+        if (object.author && object.author != jsUser.id) {    
             const followButton = this.createFollowButton(object.author, `/toggle-follow/${object.author}/`, jsCsrfToken, object.isFollowing);
             infoBlock.appendChild(followButton);
         }

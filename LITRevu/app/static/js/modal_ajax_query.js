@@ -160,11 +160,11 @@ window.openViewModal = (openModalViewButtons, generatingFunction, targetModal) =
     });
 }
 
-window.openViewModalSubscriber = (btn, generatingFunction, targetModal) => {
-    btn.onclick = (event) => {
-        console.log(btn);
+window.openViewModalSubscriber = (btn, generatingFunction, targetModal, directItemId=null) => {
+    btn.onclick = async (event) => {
         event.preventDefault();
-        generatingFunction(btn.getAttribute("data-item-id"));
+        console.log('direct id : ', directItemId);
+        directItemId ? generatingFunction(directItemId, await getUserFollows(directItemId)) : generatingFunction(btn.getAttribute("data-item-id"));
         openModal(targetModal);
     }
 }
@@ -375,17 +375,16 @@ window.callbackFeedFiller = (responseData, notRequiredSource) => {
 
     responseData.data.forEach(ticket => {
         const ticketList = document.getElementById("tickets-list");
-        generateTicket(ticketList, ticket.id, ticket.img, ticket.title, ticket.description, ticket.tags, ticket.creation_date);
+        generateTicket(ticketList, ticket.id, ticket.img, ticket.title, ticket.description, ticket.tags, ticket.creation_date, ticket.author);
         if (ticket.reviews && ticket.reviews.length > 0) {
             const targetTicket = document.getElementById(`ticket-${ticket.id}`);
             const reviewList = targetTicket.querySelector('.reviews-list');
             ticket.reviews.forEach(review => {
-                generateReview(reviewList, review.id, review.cover_image, review.title, review.content, review.rating, review.creation_date, ticket.id);
+                generateReview(reviewList, review.id, review.cover_image, review.title, review.content, review.rating, review.creation_date, ticket.id, review.author);
             });
-            }
+        }
     });
 
-    console.log('Feed filled!');
     // document.getElementById('ticket-container').insertAdjacentHTML('beforeend', responseData.data);
     document.getElementById('loading').style.display = 'none';
     isLoadingFeed = false;

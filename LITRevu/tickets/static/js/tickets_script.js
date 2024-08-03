@@ -115,6 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
     staticBuilder.callbackDeleteReview = callbackDeleteReview;
     staticBuilder.deleteReviewName = deleteReviewName;
     staticBuilder.viewReviewModal = viewReviewModal;
+    staticBuilder.viewUserModal = viewUserModal;
 
     openViewModal(viewTicketButtons, (id) => staticBuilder.generateViewTicketModal(id), viewTicketModal);
     asyncModalFormCancel(viewTicketCancelButton);
@@ -145,18 +146,18 @@ document.addEventListener("DOMContentLoaded", () => {
     setRandomColour(document.getElementById("rightPage"));
     brokenImgWatcher();
 
-    window.generateTicket = (targetList, ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate) => {
+    window.generateTicket = (targetList, ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate, ticketAuthor=null) => {
         staticBuilder.review = null;
-        staticBuilder.ticket = addTicketsDataEntry(ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate);
+        staticBuilder.ticket = addTicketsDataEntry(ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate, ticketAuthor=null);
         staticBuilder.generateTicket();
         setRandomColour(staticBuilder.li);
 
         targetList.appendChild(staticBuilder.li);
     }
 
-    window.generateReview = (targetList, reviewId, reviewImg, reviewTitle, reviewDescription, reviewRating, reviewCreationDate, reviewTicket) => {
+    window.generateReview = (targetList, reviewId, reviewImg, reviewTitle, reviewDescription, reviewRating, reviewCreationDate, reviewTicket, reviewAuthor=null) => {
         staticBuilder.ticket = null;
-        staticBuilder.review = addReviewsDataEntry(reviewId, reviewImg, reviewTitle, reviewDescription, reviewRating, reviewCreationDate, reviewTicket);
+        staticBuilder.review = addReviewsDataEntry(reviewId, reviewImg, reviewTitle, reviewDescription, reviewRating, reviewCreationDate, reviewTicket, reviewAuthor=null);
         staticBuilder.generateReview();
         setRandomColour(staticBuilder.li);
 
@@ -164,39 +165,41 @@ document.addEventListener("DOMContentLoaded", () => {
         staticBuilder.publicGenerateAddReviewBtn();
     }
 
-    window.addTicketsDataEntry = (ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate) => {
+    window.addTicketsDataEntry = (ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate, ticketAuthor=null) => {
         let ticketString = ""
         ticketTags.forEach(tag => {
             ticketString += `${tag}, `;
         })
+        if (!ticketAuthor) ticketAuthor = jsUser;
         const newTicket = {
             id: ticketId.toString(),
             title: ticketTitle,
             description: ticketDescription,
             image: ticketImg,
             tags: ticketString,
-            author: jsUser.id,
-            authorName: jsUser.username,
+            author: ticketAuthor.id,
+            authorName: ticketAuthor.username,
             isFollowing: "false",
-            createdAt: ticketCreationDate
+            createdAt: ticketCreationDate,
         };
         
         ticketsData.push(newTicket);
         return newTicket;
     }
 
-    window.addReviewsDataEntry = (reviewId, reviewImg, reviewTitle, reviewDescription, reviewRating, reviewCreationDate, reviewTicket) => {
+    window.addReviewsDataEntry = (reviewId, reviewImg, reviewTitle, reviewDescription, reviewRating, reviewCreationDate, reviewTicket, reviewAuthor=null) => {
+        if (!reviewAuthor) reviewAuthor = jsUser;
         const newReview = {
             id: reviewId.toString(),
             title: reviewTitle,
             content: reviewDescription,
             coverImage: reviewImg,
             rating: reviewRating,
-            author: jsUser.id,
-            authorName: jsUser.username,
+            author: reviewAuthor.id,
+            authorName: reviewAuthor.username,
             isFollowing: "false",
             createdAt: reviewCreationDate,
-            ticket: reviewTicket
+            ticket: reviewTicket,
         };
         
         reviewsData.push(newReview);
