@@ -9,7 +9,9 @@ register = template.Library()
 def is_following(user, other_user):
     if user and user.is_authenticated:
         try:
-            user_follow = UserFollow.objects.get(follower=user, followed=other_user)
+            user_follow = UserFollow.objects.get(
+                follower=user, followed=other_user
+                )
             return user_follow.status
         except UserFollow.DoesNotExist:
             pass

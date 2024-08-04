@@ -1,11 +1,18 @@
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes 
+from django.utils.encoding import force_bytes
 from django.core.mail import EmailMessage
 from django.contrib.auth.tokens import default_token_generator
 
+
 class EmailUtils:
-    def __init__(self, user, domain, email, title ='Activate your account.', template = 'acc_active_email.html' ) -> None:
+    def __init__(self,
+                 user,
+                 domain,
+                 email,
+                 title='Activate your account.',
+                 template='acc_active_email.html'
+                 ) -> None:
         self._user = user
         self._domain = domain
         self._email = email
