@@ -1,0 +1,11 @@
+:root {
+    --menu-background-colour: #333;
+    --menu-text-colour: white;
+    --main-text-colour: #333;
+    --main-background-colour: wheat;
+    --success-colour: #a8dfa5;
+    --warning-colour: rgb(199, 147, 80);
+    --error-colour: rgb(199, 87, 87);
+    --main-font-style: 'Quicksand', sans-serif, 'Roboto Mono', monospace, 'Courier New', Courier, 'Comfortaa', sans-serif, "Times New Roman", Times, serif;
+    --main-font-size: 16px;
+}

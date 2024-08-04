@@ -1,0 +1,33 @@
+{% extends 'single_page_template.html' %}
+{% load static %}
+{% block title %}LITRevu - Login{% endblock %}
+{% block optional_css %}
+<link rel="stylesheet" href="{% static 'css/users_styles.css' %}">
+{% endblock %}
+{% block content_title %}
+Login
+{% endblock %}
+
+{% block content %}
+    <form id="login-form" action="{% url 'login' %}" method="post">
+        {% csrf_token %}
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" value="{{ form.username.value|default:'' }}" required>
+            {% if form.username.errors %}
+                <div class="error">{{ form.username.errors }}</div>
+            {% endif %}
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            {% if form.password.errors %}
+                <div class="error">{{ form.password.errors }}</div>
+            {% endif %}
+        </div>
+        {% if form.non_field_errors %}
+            <div class="error">{{ form.non_field_errors }}</div>
+        {% endif %}
+        <button type="submit" class="icon-hover-box feedback validation-btn"><i class="icon-checkmark"></i></button>
+    </form>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Publications et critiques de livres et articles / Publications, analysis and reviews of books or articles">
+    <meta name="author" content="LITRevu">
+    <meta property="og:title" content="LITRevu">
+    <meta property="og:description" content="Publications et critiques de livres et articles / Publications, analysis and reviews of books or articles">
+    <meta property="og:image" content="{% static 'images/litrevulogotitleless.PNG' %}">
+    <meta property="og:url" content="https://litrevu.dhannay.com/">
+    <meta property="og:type" content="website">
+    <title>{% block title %}LITRevu{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/variables-wt.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/icomoon.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    {% block optional_css %}{% endblock %}
+    <link rel="apple-touch-icon" href="{% static 'images/litrevulogotitleless.PNG' %}">
+    <link rel="icon" href="{% static 'images/litrevulogotitleless.PNG' %}" type="image/x-icon">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#317EFB">
+</head>
+<body>
+
+<header>
+    <!-- Navigation menu -->
+    <div id="navigationMenuBackground" class="navigation-menu-background"></div>
+    <img id="topLogo" class="top-logo" src="{% static 'images/litrevulogotitlelessw.PNG' %}"/>
+    <div id="lineDesign" class="line-design"></div>
+    <nav>
+        <ul class="navigation-menu">
+            {% if user.is_authenticated %}
+            <li class="navigation-menu-left-item nav-pink"><a href="/"><i class="icon-books nav-pink"></i>Home</a></li>
+            <li class="nav-blue"><a href="{% url 'profile' %}"><i class="icon-user nav-blue"></i>Profile</a></li>
+            <li class="nav-red"><a href="{% url 'logout' %}"><i class="icon-switch nav-red"></i>Logout</a></li>
+            {% else %}
+            <li class="navigation-menu-right-item"><a href="{% url 'login' %}"><i class="icon-unlocked"></i>Login</a></li>
+            <li><a href="{% url 'register' %}"><i class="icon-quill"></i>Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</header>
+<div class="background"></div>
+<div class="main-layout">
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}   
+    {% block main_content %}
+    {% endblock %}
+
+    <footer>
+        {% block credits %}
+        <p>Illustration made by macrovector&copy; </p>
+        {% endblock %}
+        <!-- Footer content -->
+        <p>&copy; LITRevu Powered by Django, HDanDev 2024</p>
+    </footer>
+</div>
+
+{% block modals %}
+{% endblock %}
+
+<!-- Scripts --> 
+{% block js %}
+{% endblock %}
+</body>
+</html>

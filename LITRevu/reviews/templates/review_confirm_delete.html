@@ -1,0 +1,19 @@
+{% extends 'single_page_template.html' %}
+{% load static %}
+
+{% block title %}Delete Review{% endblock %}
+{% block optional_css %}
+<link rel="stylesheet" href="{% static 'css/reviews_styles.css' %}">
+{% endblock %}
+{% block content_title %}
+Delete Review
+{% endblock %}
+
+{% block content %}
+<p>Are you sure you want to delete "{{ review.title }}"?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="icon-hover-box feedback validation-btn"><i class="icon-checkmark"></i></button>
+</form>
+<a href="{% url 'review_list' %}">Cancel</a>
+{% endblock %}

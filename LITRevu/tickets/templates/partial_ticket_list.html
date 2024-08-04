@@ -1,0 +1,140 @@
+{% load static %}
+{% load custom_tags %}
+<ul id="tickets-list">
+    {% for ticket in tickets %}
+      {% if not ticket.is_archived %}
+      <li id="ticket-{{ ticket.pk }}" class="ticket-li">
+        <div class="item-container">
+          {% if ticket.image %}
+          <div class="item-background" data-src="{{ ticket.image.url }}" style="background-image:url({{ ticket.image.url }})"></div>
+          {% endif %}
+        <h3 class="aligned item-infos stylish-header">
+        <a class="ticket-title item-title view-ticket-btn title custom-colour-target" data-item-id="{{ ticket.pk }}" href="">{{ ticket.title }}</a>
+          {% if request.user == ticket.author or request.user.is_superuser %}
+            <button type="button" id="edit-ticket-btn" name="edit-ticket" class="ticket-edit-btn icon-hover-box" data-item-id="{{ ticket.pk }}" data-item-name="{{ ticket.title }}" data-item-action="{% url 'ticket_update' ticket.pk %}"><i class="icon-pencil crud-btn"></i></button>
+            <button type="button" id="delete-ticket-btn" name="delete-ticket" class="ticket-delete-btn icon-hover-box" data-item-id="{{ ticket.pk }}" data-item-name="{{ ticket.title }}" data-item-action="{% url 'ticket_delete' ticket.pk %}"><i class="icon-bin crud-btn"></i></button>
+          {% endif %}
+        </h3>
+        <a class="item-infos view-ticket-btn" data-item-id="{{ ticket.pk }}" href=""><p class="ticket-description sample-text">{{ ticket.description }}</p></a>
+        <div class="tag-container item-infos">
+          {% for tag in ticket.tags.all %}
+          <div class="tag">{{ tag.name }}</div>
+          {% endfor %}
+        </div>
+        <div class="item-infos info-likes-block">
+          <p class="no-margin">
+            <span>Posted on {{ ticket.created_at|date:"F j, Y" }} by </span>
+            {% if request.user != ticket.author %}
+            <span class="custom-colour-target author" data-item-id="{{ ticket.author.pk }}">{{ ticket.author }}</span>    
+            <button class="follow-btn icon-hover-box" data-user-id="{{ ticket.author.pk }}" data-url="{% url 'toggle_follow' ticket.author.pk %}">
+              {% if request.user|is_following:ticket.author %}
+                <i class="icon-user-minus"></i>
+              {% else %}
+                <i class="icon-user-plus"></i>
+              {% endif %}
+            </button>
+            <button class="block-btn icon-hover-box" data-user-id="{{ ticket.author.pk }}" data-url="{% url 'toggle_block' ticket.author.pk %}">
+                {% if ticket.author in blocked_users %}
+                    <i class="icon-checkmark not-validation"></i>
+                {% else %}
+                    <i class="icon-blocked not-validation"></i>
+                {% endif %}
+            </button>
+            {% else %}
+            <a class="colour-{{ col2 }}" href="{% url 'profile' %}">you</a>
+            {% endif %}
+          </p>
+          {% if request.user != ticket.author %}
+          <div class="like-container">
+            <form id="like-form-{{ ticket.pk }}" method="post" action="{% url 'ticket_like' ticket.pk %}" class="like-block">
+              {% csrf_token %}
+              <button class="like-btn icon-hover-box"><i class="icon-heart"></i></button>
+              <span class="likes-count">{{ ticket.likes_count }}</span>
+            </form>
+            <form id="dislike-form-{{ ticket.pk }}" method="post" action="{% url 'ticket_dislike' ticket.pk %}" class="like-block">
+              {% csrf_token %}
+              <button class="dislike-btn icon-hover-box"><i class="icon-heart-broken"></i></button>
+              <span class="dislikes-count">{{ ticket.dislikes_count }}</span>
+            </form>
+          </div>
+          {% endif %}
+        </div>
+        <ul class="item-infos reviews-list">
+          {% for review in ticket.reviews.all %}
+            {% if not review.is_archived %}
+              <li id="review-{{ review.pk }}">
+                <div class="review-container">
+                  {% if review.cover_image %}
+                  <div class="review-img" data-src="{{ review.cover_image.url }}" style="background-image:url({{ review.cover_image.url }})"></div>
+                  {% endif %}
+                  <div class="review-infos">
+                    <h4 class="aligned item-infos stylish-header">
+                      <a class="item-title icon-hover-box view-review-btn" data-item-id="{{ review.pk }}" href="" class="aligned icon-hover-box">
+                      <span class="font-style title custom-colour-target">{{ review.title }}</span>
+                      </a>
+                      {% if request.user == review.author or request.user.is_superuser %}
+                        <button type="button" id="edit-review-btn" name="edit-review" class="review-edit-btn icon-hover-box" data-item-id="{{ review.pk }}" data-item-name="{{ review.title }}" data-item-action="{% url 'review_update' review.pk %}"><i class="icon-pencil crud-btn"></i></button>
+                        <button type="button" id="delete-review-btn" name="delete-review" class="review-delete-btn icon-hover-box" data-item-id="{{ review.pk }}" data-item-name="{{ review.title }}" data-item-action="{% url 'review_delete' review.pk %}"><i class="icon-bin crud-btn"></i></button>
+                      {% endif %}
+                      <div class="rating-preview">
+                      {% if review.rating != 0 %}
+                        {% for _ in "x"|rjust:review.rating %}
+                        ☆
+                        {% endfor %}
+                      {% endif %}
+                      </div>
+                    </h4>
+                    <a class="item-infos view-review-btn font-style" data-item-id="{{ review.pk }}" href=""><p class="sample-text">{{ review.content }}</p></a>
+                  </div>
+                </div>
+                <div class="item-infos info-likes-block mini-likes">
+                  <p class="mini-font">
+                    <span>Posted on {{ review.created_at|date:"F j, Y" }} by </span>
+                    {% if request.user != review.author %}
+                    <span class="custom-colour-target author" data-item-id="{{ review.author.pk }}">{{ review.author }}</span>
+                    <button class="follow-btn icon-hover-box" data-user-id="{{ review.author.pk }}" data-url="{% url 'toggle_follow' review.author.pk %}">
+                      {% if request.user|is_following:review.author %}
+                          <i class="icon-user-minus"></i>
+                      {% else %}
+                          <i class="icon-user-plus"></i>
+                      {% endif %}
+                    </button>
+                    <button class="block-btn icon-hover-box" data-user-id="{{ review.author.pk }}" data-url="{% url 'toggle_block' review.author.pk %}">
+                        {% if review.author in blocked_users %}
+                            <i class="icon-checkmark not-validation"></i>
+                        {% else %}
+                            <i class="icon-blocked not-validation"></i>
+                        {% endif %}
+                    </button>
+                    {% else %}
+                    <a class="colour-{{ col3 }}" href="{% url 'profile' %}">you</a>
+                    {% endif %}
+                  </p>
+                  {% if request.user != review.author %}
+                  <div class="like-container">
+                    <form id="like-form-{{ review.pk }}" method="post" action="{% url 'review_like' review.pk %}" class="like-block">
+                      {% csrf_token %}
+                      <button class="like-btn icon-hover-box"><i class="icon-heart"></i></button>
+                      <span class="likes-count">{{ review.likes_count }}</span>
+                    </form>
+                    <form id="dislike-form-{{ review.pk }}" method="post" action="{% url 'review_dislike' review.pk %}" class="like-block">
+                      {% csrf_token %}
+                      <button class="dislike-btn icon-hover-box"><i class="icon-heart-broken"></i></button>
+                      <span class="dislikes-count">{{ review.dislikes_count }}</span>
+                    </form>
+                  </div>
+                  {% endif %}
+                </div>
+              </li>
+            {% endif %}
+          {% endfor %}
+          <button type="button" id="create-review-btn-{{ ticket.pk }}" name="create-review" class="review-create-btn icon-hover-box" data-item-action="{% url 'review_create' ticket.pk %}"><i class="icon-plus double-icon"></i><i class="icon-file-text double-icon"></i>
+          {% if ticket.reviews.all|length == 0 %}
+          <span class="blue">Be the first to review !</span>
+          {% endif %}
+        </button>
+        </ul>
+      </li>
+      {% endif %}
+    {% endfor %}
+  </ul>

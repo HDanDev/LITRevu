@@ -1,0 +1,11 @@
+{% extends 'single_page_template.html' %}
+{% load static %}
+{% block title %}LITRevu - 500{% endblock %}
+{% block optional_css %}
+<link rel="stylesheet" href="{% static 'css/errors_styles.css' %}">
+{% endblock %}
+{% block content %}
+    <h1>500 - Server Error</h1>
+    <p>Sorry, something went wrong on our end.</p>
+    <a href="/">Go to Home</a>
+{% endblock %}

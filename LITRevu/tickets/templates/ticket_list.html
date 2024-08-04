@@ -1,0 +1,417 @@
+{% extends 'double_page_template.html' %}
+{% load static %}
+{% load custom_tags %}
+
+{% block title %}Ticket List{% endblock %}
+{% block optional_css %}
+<link rel="stylesheet" href="{% static 'css/tickets_styles.css' %}">
+{% endblock %}
+{% block content_title %}
+Tickets
+{% endblock %}
+{% block content %}
+{% endblock %}
+
+{% block second_page_title %}
+<span class="colour-{{ col1 }}">Tickets</span> you might like
+{% endblock %}
+{% block second_page_content %}
+  {% if request.user.is_authenticated %}
+    <div class="top-actions-block">
+      <button type="button" id="create-ticket-btn" name="create-ticket" class="ticket-create-btn icon-hover-box" data-item-action="{% url 'ticket_form' %}"><i class="icon-plus double-icon"></i><i class="icon-pen double-icon"></i></button>
+      <div class="icon-hover-box search-block"><i class="icon-search"></i><input type="text" id="filterInput" placeholder="Search..."></div>
+    </div>
+    <div id="ticket-container">
+      {% include "partial_ticket_list.html" %}
+    </div>
+    <div id="loading" style="display: none;">Loading...</div>
+  {% endif %}
+{% endblock %}
+{% block modals %}
+
+<div id="deleteTicketModal" class="modal">
+  <form id="deleteTicketForm" class="notepad margin-auto" method="post">
+    <div class="page right">
+      <div class="page-content">
+        <h2 class="main-title">Are you sure you want to delete "<span id="deleteTicketName"></span>"?</h2>
+        {% csrf_token %}
+        <div class="validation-btns">
+          <button class="icon-hover-box cancel-footer-btn" id="deleteTicketModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
+          <button class="icon-hover-box delete-footer-btn" id="deleteTicketModalConfirmBtn"><i class="icon-bin validation-icon"></i></button>
+        </div>
+      </div>
+      <i class="icon-cross close icon-hover-box" id="deleteTicketModalCloseBtn"></i>
+    </div>
+    <div class="spiral single-page-spiral"></div>
+  </form>
+</div>
+
+<div id="deleteReviewModal" class="modal">
+  <form id="deleteReviewForm" class="notepad margin-auto" method="post">
+    <div class="page right">
+      <div class="page-content">
+        <h2 class="main-title">Are you sure you want to delete "<span id="deleteReviewName"></span>"?</h2>
+        {% csrf_token %}
+        <div class="validation-btns">
+          <button class="icon-hover-box cancel-footer-btn" id="deleteReviewModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
+          <button class="icon-hover-box delete-footer-btn" id="deleteReviewModalConfirmBtn"><i class="icon-bin validation-icon"></i></button>
+        </div>
+      </div>
+      <i class="icon-cross close icon-hover-box" id="deleteReviewModalCloseBtn"></i>
+    </div>
+    <div class="spiral single-page-spiral"></div>
+  </form>
+</div>
+
+<div id="editTicketModal" class="modal">
+  <form id="editTicketForm" class="notepad margin-auto" method="post">
+    <div class="page right">
+      <div class="page-content">
+        <h2 class="main-title item-infos">"<span id="editTicketName"></span>" ticket edition</h2>
+        {% csrf_token %}
+        {{ ticket_update_form.non_field_errors }}
+        <div class="item-infos">
+          <label for="{{ ticket_update_form.title.id_for_label }}">Title:</label>
+          {{ ticket_update_form.title }}
+          {% if ticket_update_form.title.errors %}
+            <div class="error">{{ ticket_update_form.title.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos">
+          <label for="{{ ticket_update_form.description.id_for_label }}">Description:</label>
+          {{ ticket_update_form.description }}
+          {% if ticket_update_form.description.errors %}
+            <div class="error">{{ ticket_update_form.description.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos">
+          <label for="{{ ticket_update_form.tags.id_for_label }}">Tags:</label>
+          {{ ticket_update_form.tags }}
+          {% if ticket_update_form.tags.errors %}
+            <div class="error">{{ ticket_update_form.tags.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos">
+          <label for="{{ ticket_update_form.image.id_for_label }}">Image:</label>        
+          <div>
+            <img id="editTicketFormImagePreview" src="{% static 'images/PPPlaceholder.PNG' %}" alt="Profile Picture" class="image-preview">
+          </div>
+          {{ ticket_update_form.image.label_tag }} 
+          <input type="file" name="{{ ticket_update_form.image.name }}" id="editTicketFormImageInput" class="{{ ticket_update_form.image.css_classes }}" {{ ticket_update_form.image.attrs|safe }} />
+          {% if ticket_update_form.image.errors %}
+            <div class="error">{{ ticket_update_form.image.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos validation-btns">
+          <button class="icon-hover-box cancel-footer-btn" id="editTicketModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
+          <button class="icon-hover-box confirm-footer-btn" id="editTicketModalConfirmBtn"><i class="icon-checkmark validation-icon"></i></button>
+        </div>
+      </div>
+      <i class="icon-cross close icon-hover-box" id="editTicketModalCloseBtn"></i>
+    </div>
+    <div class="spiral single-page-spiral"></div>
+  </form>
+</div>
+
+<div id="editReviewModal" class="modal">
+  <form id="editReviewForm" class="notepad margin-auto" method="post">
+    <div class="page right">
+      <div class="page-content">
+        <h2 class="main-title item-infos">"<span id="editReviewName"></span>" review edition</h2>
+        {% csrf_token %}
+        <div class="item-infos">
+          <label for="{{ review_form.title.id_for_label }}">Title:</label>
+          {{ review_form.title }}
+          {% if review_form.title.errors %}
+            <div class="error">{{ review_form.title.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos">
+          <label for="{{ review_form.content.id_for_label }}">Content:</label>
+          {{ review_form.content }}
+          {% if review_form.content.errors %}
+            <div class="error">{{ review_form.content.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos">
+          <label for="{{ review_form.cover_image.id_for_label }}">Image:</label>        
+          <div>
+            <img id="editReviewFormImagePreview" src="{% static 'images/PPPlaceholder.PNG' %}" alt="Profile Picture" class="image-preview">  
+          </div>
+          {{ review_form.cover_image.label_tag }} 
+          <input type="file" name="{{ review_form.cover_image.name }}" id="editReviewFormImageInput" class="{{ review_form.cover_image.css_classes }}" {{ review_form.cover_image.attrs|safe }} />
+          {% if review_form.cover_image.errors %}
+            <div class="error">{{ review_form.cover_image.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos">
+          <label for="{{ review_form.rating.id_for_label }}">Rating:</label>
+          <div id="editSingleRating" class="rating">
+            {% for i in "543210" %}
+            <input type="radio" name="rating" id="stare-{{ i }}" value="{{ i }}" class="rating-edit-review-input">
+            <label for="stare-{{ i }}" title="{{ i }} stars" class="rating-edit-review-label">☆</label>
+            {% endfor %}
+          </div>
+          {% if review_form.rating.errors %}
+            <div class="error">{{ review_form.rating.error }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos validation-btns">
+          <button class="icon-hover-box cancel-footer-btn" id="editReviewModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
+          <button class="icon-hover-box confirm-footer-btn" id="editReviewModalConfirmBtn"><i class="icon-checkmark validation-icon"></i></button>
+        </div>
+      </div>
+      <i class="icon-cross close icon-hover-box" id="editReviewModalCloseBtn"></i>
+    </div>
+    <div class="spiral single-page-spiral"></div>
+  </form>
+</div>
+
+<div id="createTicketModal" class="modal">
+  <form id="createTicketForm" class="notepad margin-auto" method="post">
+    <div id="ticketFormPage" class="page left double-page-layout">
+      <div class="page-content">
+          <h2 class="main-title item-infos">Ticket creation</h2>
+          {% csrf_token %}
+          {{ ticket_form.non_field_errors }}
+          <div class="item-infos">
+            <label for="{{ ticket_form.title.id_for_label }}">Title:</label>
+            {{ ticket_form.title }}
+            {% if ticket_form.title.errors %}
+              <div class="error">{{ ticket_form.title.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="item-infos">
+            <label for="{{ ticket_form.description.id_for_label }}">Description:</label>
+            {{ ticket_form.description }}
+            {% if ticket_form.description.errors %}
+              <div class="error">{{ ticket_form.description.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="item-infos">
+            <label for="{{ ticket_form.tags.id_for_label }}">Tags:</label>
+            {{ ticket_form.tags }}
+            {% if ticket_form.tags.errors %}
+              <div class="error">{{ ticket_form.tags.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="item-infos">
+            <label for="{{ ticket_form.image.id_for_label }}">Image:</label>        
+            <div>
+              <img id="createTicketFormImagePreview" src="{% static 'images/PPPlaceholder.PNG' %}" alt="Profile Picture" class="image-preview">      
+            </div>
+            {{ ticket_form.image.label_tag }} 
+            <input type="file" name="{{ ticket_form.image.name }}" id="createTicketFormImageInput" class="{{ ticket_form.image.css_classes }}" {{ ticket_form.image.attrs|safe }} />
+            {% if ticket_form.image.errors %}
+              <div class="error">{{ ticket_form.image.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="item-infos">
+            <label for="id_create_review">Create a review:</label>
+            {{ ticket_form.create_review }}
+          </div>
+          <div class="item-infos validation-btns">
+            <button type="button" class="icon-hover-box cancel-footer-btn" id="createTicketModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
+            <button type="submit" class="icon-hover-box confirm-footer-btn" id="createTicketModalConfirmBtn"><i class="icon-checkmark validation-icon"></i></button>
+          </div>
+      </div>
+  </div>      
+  <div id="reviewFormPage" class="page right double-page-layout d-none">
+    <div class="page-content">
+        <h2 class="main-title item-infos">Review creation</h2>
+        <div class="main-content">
+          <div id="reviewForm">
+            <div class="item-infos">
+              <label for="{{ ticket_form.review_title.id_for_label }}">Title:</label>
+              {{ ticket_form.review_title }}
+              {% if ticket_form.review_title.errors %}
+                <div class="error">{{ ticket_form.review_title.errors }}</div>
+              {% endif %}
+            </div>
+            <div class="item-infos">
+              <label for="{{ ticket_form.review_content.id_for_label }}">Content:</label>
+              {{ ticket_form.review_content }}
+              {% if ticket_form.review_content.errors %}
+                <div class="error">{{ ticket_form.review_content.errors }}</div>
+              {% endif %}
+            </div>
+            <div class="item-infos">
+              <label for="{{ ticket_form.review_cover_image.id_for_label }}">Image:</label>        
+              <div>
+                <img id="reviewFormImagePreview" src="{% static 'images/PPPlaceholder.PNG' %}" alt="Profile Picture" class="image-preview">      
+              </div>
+              {{ ticket_form.review_cover_image.label_tag }} 
+              <input type="file" name="{{ ticket_form.review_cover_image.name }}" id="reviewFormImageInput" class="{{ ticket_form.review_cover_image.css_classes }}" {{ ticket_form.review_cover_image.attrs|safe }} />
+              {% if ticket_form.review_cover_image.errors %}
+                <div class="error">{{ ticket_form.review_cover_image.errors }}</div>
+              {% endif %}
+            </div>
+            <div class="item-infos">
+              <label for="{{ ticket_form.review_rating.id_for_label }}">Rating:</label>
+              <div id="createTicketReviewRating" class="rating">
+                {% for i in "543210" %}
+                <input type="radio" name="rating" id="start-{{ i }}" value="{{ i }}" class="rating-create-ticket-review-input">
+                <label for="start-{{ i }}" title="{{ i }} stars" class="rating-create-ticket-review-label">☆</label>
+                {% endfor %}
+              </div>
+              {% if ticket_form.review_rating.errors %}
+                <div class="error">{{ ticket_form.review_rating.error }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <i class="icon-cross close close-left icon-hover-box" id="createTicketModalCloseBtn"></i>
+    <div id="spiralDoublePage" class="spiral double-page-spiral-modal"></div>
+  </form>
+</div>
+
+<div id="createReviewModal" class="modal">
+  <form id="createReviewForm" class="notepad margin-auto" method="post">
+    <div class="page right">
+      <div class="page-content">
+        <h2 class="main-title item-infos">Review creation</h2>
+        {% csrf_token %}
+        <div class="item-infos">
+          <label for="{{ review_form.title.id_for_label }}">Title:</label>
+          {{ review_form.title }}
+          {% if review_form.title.errors %}
+            <div class="error">{{ review_form.title.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos">
+          <label for="{{ review_form.content.id_for_label }}">Content:</label>
+          {{ review_form.content }}
+          {% if review_form.content.errors %}
+            <div class="error">{{ review_form.content.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos">
+          <label for="{{ review_form.cover_image.id_for_label }}">Image:</label>          
+          <div>
+            <img id="createReviewFormImagePreview" src="{% static 'images/PPPlaceholder.PNG' %}" alt="Profile Picture" class="image-preview">    
+          </div>
+          {{ review_form.cover_image.label_tag }} 
+          <input type="file" name="{{ review_form.cover_image.name }}" id="createReviewFormImageInput" class="{{ review_form.cover_image.css_classes }}" {{ review_form.cover_image.attrs|safe }} />
+          {% if review_form.cover_image.errors %}
+            <div class="error">{{ review_form.cover_image.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos">
+          <label for="{{ review_form.rating.id_for_label }}">Rating:</label>
+            <div id="createReviewRating" class="rating">
+              {% for i in "543210" %}
+              <input type="radio" name="rating" id="starc-{{ i }}" value="{{ i }}" class="rating-create-review-input">
+              <label for="starc-{{ i }}" title="{{ i }} stars" class="rating-create-review-label">☆</label>
+              {% endfor %}
+            </div>
+          {% if review_form.rating.errors %}
+            <div class="error">{{ review_form.rating.error }}</div>
+          {% endif %}
+        </div>
+        <div class="item-infos validation-btns">
+          <button class="icon-hover-box cancel-footer-btn" id="createReviewModalCancelBtn"><i class="icon-blocked validation-icon"></i></button>
+          <button class="icon-hover-box confirm-footer-btn" id="createReviewModalConfirmBtn"><i class="icon-checkmark validation-icon"></i></button>
+        </div>
+      </div>
+      <i class="icon-cross close icon-hover-box" id="createReviewModalCloseBtn"></i>
+    </div>
+    <div class="spiral single-page-spiral"></div>
+  </form>
+</div>
+
+<div id="viewTicketModal" class="modal">
+  <div class="notepad margin-auto" method="post">
+    <div class="page right">
+      <div class="page-content" id="viewTicketContainer">
+      </div>
+      <i class="icon-cross close icon-hover-box" id="viewTicketModalCloseBtn"></i>
+    </div>
+    <div class="spiral single-page-spiral"></div>
+  </div>
+</div>
+
+<div id="viewReviewModal" class="modal">
+  <div class="notepad margin-auto" method="post">
+    <div class="page right">
+      <div class="page-content" id="viewReviewContainer">
+      </div>
+      <i class="icon-cross close icon-hover-box" id="viewReviewModalCloseBtn"></i>
+    </div>
+    <div class="spiral single-page-spiral"></div>
+  </div>
+</div>
+
+<div id="viewUserModal" class="modal">
+  <div class="notepad margin-auto" method="post">
+    <div class="page right">
+      <div class="page-content" id="viewUserContainer">
+      </div>
+      <i class="icon-cross close icon-hover-box" id="viewUserModalCloseBtn"></i>
+    </div>
+    <div class="spiral single-page-spiral"></div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+  const absoluteUrl = "{{ absolute_url }}";
+  const jsUser = {
+    id: "{{ request.user.pk }}",
+    username: "{{ request.user.username }}" 
+  }
+  const jsCsrfToken = "{{ csrf_token }}";
+  let ticketsData = [
+  {% for ticket in tickets %}
+  {
+      id: "{{ ticket.pk }}",
+      title: "{{ ticket.title|escapejs }}",
+      description: "{{ ticket.description|escapejs }}",
+      image: "{% if ticket.image %}{{ ticket.image.url }}{% else %}/static/images/litrevulogotitleless.PNG{% endif %}",
+      tags: "{{ ticket.tags.all|join:',' }}",
+      author: "{{ ticket.author.pk }}",
+      authorName: "{{ ticket.author }}",
+      isFollowing: "{{ request.user|is_following:ticket.author }}",
+      createdAt: "{{ ticket.created_at }}"
+  }{% if not forloop.last %},{% endif %}
+  {% endfor %}
+];
+let reviewsData = [
+{% for ticket in tickets %}
+{% for review in ticket.reviews.all %}
+{
+    id: "{{ review.pk }}",
+    title: "{{ review.title|escapejs }}",
+    content: "{{ review.content|escapejs }}",
+    coverImage: "{% if review.cover_image %}{{ review.cover_image.url }}{% else %}/static/images/litrevulogotitleless.PNG{% endif %}",
+    rating: "{{ review.rating }}",
+    author: "{{ review.author.pk }}",
+    authorName: "{{ review.author }}",
+    isFollowing: "{{ request.user|is_following:review.author }}",
+    ticket: "{{ review.ticket.pk }}",
+    createdAt: "{{ review.created_at }}",
+    isArchived: "{{ review.is_archived }}"
+},
+{% endfor %}
+{% endfor %}
+];
+let usersData = [
+{% for user in users %}
+{
+    id: "{{ user.pk }}",
+    username: "{{ user.username|escapejs }}",
+    profilePicture: "{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}/static/images/litrevulogotitleless.PNG{% endif %}"
+}{% if not forloop.last %},{% endif %}
+{% endfor %}
+];
+let followersData = [];
+</script>
+  {{ blocked_users_ids|json_script:"blocked-users-script" }}
+  {{ following_users_ids|json_script:"following-users-script" }}
+<script src="{% static 'js/DOMBuilder.js' %}"></script>
+<script src="{% static 'js/modal_ajax_query.js' %}"></script>
+<script src="{% static 'js/tickets_script.js' %}"></script>
+{% endblock%}

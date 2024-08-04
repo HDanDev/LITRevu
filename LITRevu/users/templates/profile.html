@@ -1,0 +1,226 @@
+{% extends 'double_page_template.html' %}
+{% load static %}
+{% block title %}LITRevu - Profile{% endblock %}
+{% block optional_css %}
+<link rel="stylesheet" href="{% static 'css/users_styles.css' %}">
+{% endblock %}
+
+{% block content_title %}
+<span class="colour-{{ col1 }}">Edit Profile</span>
+{% endblock %}
+
+{% block content %}
+<div class="profile-section">
+    <div class="profile-info">
+        <div id="userProfileEmail">Email: {{ user.email }}</div>
+        <button type="button" class="icon-hover-box" id="openEditEmailModalBtn"><i class="icon-pencil"></i></button>
+    </div>
+    <div id="feedbackProfileEmailDiv"></div>
+</div>
+
+<div class="profile-section">
+    <div class="profile-info">
+        <div id="userProfileUsername">Username: {{ user.username }}</div>
+        <button type="button" class="icon-hover-box" id="openEditUsernameModalBtn"><i class="icon-pencil"></i></button>
+    </div>
+    <div id="feedbackProfileUsernameDiv"></div>
+</div>
+
+<div class="profile-section">
+    <button type="button" class="icon-hover-box no-margin" id="openEditPasswordModalBtn">
+        <div class="profile-info">
+            <div id="userProfilePassword" class="button-exception">Change Password</div>
+            <i class="icon-pencil margin-16"></i>
+        </div>
+        <div id="feedbackProfilePasswordDiv"></div>
+    </button>
+</div>
+
+<form method="post" enctype="multipart/form-data" class="profile-info profile-form" id="updateProfileForm" action="{% url 'update_profile' %}">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="{{ form.profile_picture.id_for_label }}">Profile Picture:</label>
+        <div>
+        {% if user.profile_picture %}
+            <img id="profile-picture-preview" src="{{ user.profile_picture.url }}" alt="Profile Picture" class="image-preview">
+        {% else %}
+            <img id="profile-picture-preview" src="{% static 'images/PPPlaceholder.PNG' %}" alt="Profile Picture" class="image-preview">
+        {% endif %}
+        </div>
+        {{ form.profile_picture }}
+        {% if form.profile_picture.errors %}
+            <div class="error">{{ form.profile_picture.errors }}</div>
+        {% endif %}
+    </div>
+    <div class="form-group">
+        <label for="{{ form.date_of_birth.id_for_label }}">Date of Birth:</label>
+        {{ form.date_of_birth }}
+        {% if form.date_of_birth.errors %}
+            <div class="error">{{ form.date_of_birth.errors }}</div>
+        {% endif %}
+    </div>
+    <button type="submit" class="icon-hover-box feedback validation-btn"><i class="icon-checkmark"></i></button>
+</form>
+{% endblock %}
+
+{% block second_page_title %}
+<span class="colour-{{ col2 }}">Relations</span>
+{% endblock %}
+
+{% block second_page_content %}
+<div>
+    <h3 class="profile-info">People you follow</h3>
+    <ul>
+    {% for user in followed_users %}
+    <li class="profile-info">
+        <a href="{% url 'user_detail' user.pk %}">{{ user.username }}</a>
+        <button class="follow-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}">
+            {% if user.followers_status %}
+                <i class="icon-user-minus"></i>
+            {% else %}
+                <i class="icon-user-plus"></i>
+            {% endif %}
+        </button>
+        <button class="block-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_block' user.pk %}">
+            {% if user in blocked_users %}
+                <i class="icon-checkmark not-validation"></i>
+            {% else %}
+                <i class="icon-blocked not-validation"></i>
+            {% endif %}
+        </button>
+    </li>
+    {% endfor %}
+    </ul>
+</div>
+<div>
+    <h3 class="profile-info">People following you</h3>
+    <ul>
+    {% for user in following_users %}
+    <li class="profile-info">
+        <a href="{% url 'user_detail' user.pk %}">{{ user.username }}</a>
+        <button class="follow-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}">
+            {% if user.followers_status %}
+                <i class="icon-user-minus"></i>
+            {% else %}
+                <i class="icon-user-plus"></i>
+            {% endif %}
+        </button>
+        <button class="block-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_block' user.pk %}">
+            {% if user in blocked_users %}
+                <i class="icon-checkmark not-validation"></i>
+            {% else %}
+                <i class="icon-blocked not-validation"></i>
+            {% endif %}
+        </button>
+    </li>
+    {% endfor %}
+    </ul>
+</div>
+<div>
+    <h3 class="profile-info">Blocked</h3>
+    <ul>
+    {% for user in blocked_users %}
+    <li class="profile-info">
+        <a href="{% url 'user_detail' user.pk %}">{{ user.username }}</a>
+        <button class="block-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_block' user.pk %}">
+            <i class="icon-checkmark not-validation"></i>
+        </button>
+    </li>
+    {% endfor %}
+    </ul>
+</div>
+<div>
+    <h3 class="profile-info">Find new people</h3>
+    <div class="icon-hover-box search-block"><i class="icon-search"></i><input type="text" id="filterInput" placeholder="Search..."></div>
+    <ul>
+    {% for user in users_list %}
+    <li class="user-li profile-info profile-info-less-padding d-none">
+        <a href="{% url 'user_detail' user.pk %}">{{ user.username }}</a>
+        <button class="follow-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_follow' user.pk %}">
+            {% if user.followers_status %}
+                <i class="icon-user-minus"></i>
+            {% else %}
+                <i class="icon-user-plus"></i>
+            {% endif %}
+        </button>
+        <button class="block-btn icon-hover-box" data-user-id="{{ user.pk }}" data-url="{% url 'toggle_block' user.pk %}">
+            {% if user.pk in blocked_user_ids %}
+                <i class="icon-checkmark not-validation"></i>
+            {% else %}
+                <i class="icon-blocked not-validation"></i>
+            {% endif %}
+        </button>
+    </li>
+    {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+
+{% block modals %}
+<div id="updateEmailModal" class="modal">
+    <div class="notepad margin-auto">
+        <div class="page right">
+            <div class="page-content">
+                <h2 class="main-title">Edit Email</h2>
+                <div class="main-content">
+                    <form id="updateEmailForm" method="post" action="{% url 'update_email' %}">
+                        {% csrf_token %}
+                        {{ email_form.as_p }}
+                        <button type="submit" name="update_email" id="updateEmailFormValidationBtn" class="icon-hover-box feedback validation-btn"><i class="icon-checkmark"></i></button>
+                    </form>
+                </div>
+            </div>
+            <i class="icon-cross close icon-hover-box" id="closeEditEmailModalBtn"></i>
+        </div>
+        <div class="spiral single-page-spiral"></div>
+    </div>
+</div>
+
+<div id="updateUsernameModal" class="modal">
+    <div class="notepad margin-auto">
+        <div class="page right">
+            <div class="page-content">
+                <h2 class="main-title">Edit Username</h2>
+                <div class="main-content">
+                    <form id="updateUsernameForm" method="post" action="{% url 'update_username' %}">
+                        {% csrf_token %}
+                        {{ username_form.as_p }}
+                        <button type="submit" name="update_username" id="updateUsernameFormValidationBtn" class="icon-hover-box feedback validation-btn"><i class="icon-checkmark"></i></button>
+                    </form>
+                </div>
+            </div>
+            <i class="icon-cross close icon-hover-box" id="closeEditUsernameModalBtn"></i>
+        </div>
+        <div class="spiral single-page-spiral"></div>
+    </div>
+</div>
+
+<div id="updatePasswordModal" class="modal">
+    <div class="notepad margin-auto">
+        <div class="page right">
+            <div class="page-content">
+                <h2 class="main-title">Edit Password</h2>
+                <div class="main-content">
+                    <form id="updatePasswordForm" method="post" action="{% url 'update_password' %}">
+                        {% csrf_token %}
+                        {{ password_form.as_p }}
+                        <button type="submit" name="update_password" id="updatePasswordFormValidationBtn" class="icon-hover-box feedback validation-btn"><i class="icon-checkmark"></i></button>
+                    </form>
+                </div>
+            </div>
+            <i class="icon-cross close icon-hover-box" id="closeEditPasswordModalBtn"></i>
+        </div>
+        <div class="spiral single-page-spiral"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    const jsCsrfToken = "{{ csrf_token }}";
+</script>
+<script src="{% static 'js/DOMBuilder.js' %}"></script>
+<Script src="{% static 'js/modal_ajax_query.js' %}"></Script>
+<script src="{% static 'js/users.js' %}"></script>
+<script src="{% static 'js/user_profile_script.js' %}"></script>
+{% endblock %}
