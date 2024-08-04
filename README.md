@@ -49,7 +49,13 @@ Welcome to LITRevu, a django web application that allows you to request or publi
    pip install -r requirements.txt
    ```
 
-5. **Set up the database**
+5. **Move within managing scope**
+
+   ```sh
+   cd LITRevu
+   ```
+
+6. **Set up the database**
 
    Apply the migrations to set up the SQLite database.
 
@@ -57,7 +63,7 @@ Welcome to LITRevu, a django web application that allows you to request or publi
    py manage.py migrate
    ```
 
-6. **Set up MailHog**
+7. **Set up MailHog**
 
    Ensure MailHog is installed and running to capture emails sent by the application.
    
