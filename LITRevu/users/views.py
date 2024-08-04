@@ -115,25 +115,31 @@ def profile_view(request):
     password_form = UpdatePasswordForm(request.user)
     blocked_users_ids = UserBlock.objects.filter(
         blocker=request.user
-        ).exclude(
-            pk=request.user.pk
-            ).values_list(
-                'blocked', flat=True
-                )
+    ).exclude(
+        pk=request.user.pk
+    ).values_list(
+        'blocked', flat=True
+    )
     blocked_users = CustomUser.objects.filter(id__in=blocked_users_ids)
 
-    followers_status = Case(
+    is_following = Case(
         When(followers__follower=request.user, followers__status=True, then=True),
         default=False,
         output_field=BooleanField()
     )
-       
+
+    is_follower = Case(
+        When(following__followed=request.user, following__status=True, then=True),
+        default=False,
+        output_field=BooleanField()
+    )
+
     followed_users = CustomUser.objects.filter(
         followers__follower=request.user,
         followers__status=True
     ).exclude(pk=request.user.pk).annotate(
-        followers_status=followers_status
-    )
+        followers_status=is_following
+    ).distinct()
 
     following_users = CustomUser.objects.filter(
         following__followed=request.user,
@@ -141,15 +147,16 @@ def profile_view(request):
     ).exclude(
         pk=request.user.pk
     ).annotate(
-        followers_status=followers_status
-    )
+        followers_status=is_follower
+    ).distinct()
 
     followed_user_ids = followed_users.values_list('id', flat=True)
     users_list = CustomUser.objects.exclude(
         pk=request.user.pk
     ).exclude(
         pk__in=followed_user_ids
-    )
+    ).distinct()
+
     colour_numbers = generate_random_numbers()[:10]
     context = {
         'form': form, 
@@ -159,11 +166,11 @@ def profile_view(request):
         'followed_users': followed_users,
         'following_users': following_users,
         'users_list': users_list,
-        'blocked_users' : blocked_users,
+        'blocked_users': blocked_users,
     }
     context.update({
         'col{}'.format(i): colour_numbers[i] for i in range(min(len(colour_numbers), 10))
-        })
+    })
 
     return render(request, 'profile.html', context)
 

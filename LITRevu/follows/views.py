@@ -6,7 +6,10 @@ from follows.models import UserFollow, UserBlock
 
 @login_required
 def toggle_follow(request, pk):
-    try: 
+    try:
+        if request.user.pk == pk:
+            error = 'You are not allowed to follow yourself'
+            raise ValueError(error)
         followed_user = get_object_or_404(CustomUser, pk=pk)
         user_follow, created = UserFollow.objects.get_or_create(
             follower=request.user,
@@ -21,7 +24,7 @@ def toggle_follow(request, pk):
             error = ''
     except Exception as e:
         isSuccess = False
-        error = e
+        error = str(e)
 
     return JsonResponse({
         'success': isSuccess,
@@ -34,6 +37,11 @@ def toggle_follow(request, pk):
 @login_required
 def toggle_block(request, pk):
     try:
+        print(request.user.pk, type(request.user.pk))
+        print(pk, type(pk))
+        if request.user.pk == pk:
+            error = 'You are not allowed to block yourself'
+            raise ValueError(error)
         blocked_user = get_object_or_404(CustomUser, pk=pk)
         user_block, created = UserBlock.objects.get_or_create(
             blocker=request.user,
