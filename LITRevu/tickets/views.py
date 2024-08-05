@@ -12,7 +12,7 @@ from app.utils import generate_random_numbers
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.db.models import Case, When, BooleanField
+from django.db.models import Case, When, BooleanField, Q
 from django.db import transaction
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
@@ -30,8 +30,9 @@ class TicketListView(LoginRequiredMixin, ListView):
             ).values_list('followed', flat=True)
 
         tickets = Ticket.objects.prefetch_related('tags', 'reviews').filter(
-            is_archived=False,
-            author__in=followed_users
+            Q(is_archived=False) &
+            (Q(author__in=followed_users) |
+            Q(author=self.request.user))
         ).order_by('-created_at').distinct()
 
         for ticket in tickets:
