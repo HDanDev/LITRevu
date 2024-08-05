@@ -367,12 +367,12 @@ window.callbackGetUserFollows = (responseData, notRequiredSource) => {
 window.callbackFeedFiller = (responseData, notRequiredSource) => {
     responseData.data.forEach(ticket => {
         const ticketList = document.getElementById("tickets-list");
-        generateTicket(ticketList, ticket.id, ticket.img, ticket.title, ticket.description, ticket.tags, ticket.creation_date, ticket.author, ticket.likes_count, ticket.dislikes_count);
+        generateTicket(ticketList, ticket.id, ticket.img, ticket.title, ticket.description, ticket.tags, ticket.creation_date, ticket.author, ticket.likes_count, ticket.dislikes_count, false);
         if (ticket.reviews && ticket.reviews.length > 0) {
             const targetTicket = document.getElementById(`ticket-${ticket.id}`);
             const reviewList = targetTicket.querySelector('.reviews-list');
             ticket.reviews.forEach(review => {
-                generateReview(reviewList, review.id, review.cover_image, review.title, review.content, review.rating, review.creation_date, ticket.id, review.author, review.likes_count, review.dislikes_count);
+                generateReview(reviewList, review.id, review.cover_image, review.title, review.content, review.rating, review.creation_date, ticket.id, review.author, review.likes_count, review.dislikes_count, false);
             });
         }
     });

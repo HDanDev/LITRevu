@@ -152,22 +152,22 @@ document.addEventListener("DOMContentLoaded", () => {
     setRandomColour(document.getElementById("rightPage"));
     brokenImgWatcher();
 
-    window.generateTicket = (targetList, ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate, ticketAuthor=null, ticketLikesCount=null, ticketDislikesCount=null) => {
+    window.generateTicket = (targetList, ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate, ticketAuthor=null, ticketLikesCount=null, ticketDislikesCount=null, isPrepend=true) => {
         staticBuilder.review = null;
         staticBuilder.ticket = addTicketsDataEntry(ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate, ticketAuthor, ticketLikesCount, ticketDislikesCount);
         staticBuilder.generateTicket();
         setRandomColour(staticBuilder.li);
 
-        targetList.appendChild(staticBuilder.li);
+        isPrepend ? targetList.prepend(staticBuilder.li) : targetList.appendChild(staticBuilder.li);
     }
 
-    window.generateReview = (targetList, reviewId, reviewImg, reviewTitle, reviewDescription, reviewRating, reviewCreationDate, reviewTicket, reviewAuthor=null, ticketLikesCount=null, ticketDislikesCount=null) => {
+    window.generateReview = (targetList, reviewId, reviewImg, reviewTitle, reviewDescription, reviewRating, reviewCreationDate, reviewTicket, reviewAuthor=null, ticketLikesCount=null, ticketDislikesCount=null, isPrepend=true) => {
         staticBuilder.ticket = null;
         staticBuilder.review = addReviewsDataEntry(reviewId, reviewImg, reviewTitle, reviewDescription, reviewRating, reviewCreationDate, reviewTicket, reviewAuthor, ticketLikesCount, ticketDislikesCount);
         staticBuilder.generateReview();
         setRandomColour(staticBuilder.li);
 
-        targetList.appendChild(staticBuilder.li);
+        isPrepend ? targetList.prepend(staticBuilder.li) : targetList.appendChild(staticBuilder.li);
         staticBuilder.publicGenerateAddReviewBtn();
     }
 

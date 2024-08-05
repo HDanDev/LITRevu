@@ -7,13 +7,13 @@
 <link rel="stylesheet" href="{% static 'css/tickets_styles.css' %}">
 {% endblock %}
 {% block content_title %}
-Tickets
+<span class="colour-{{ col1 }}">Tickets</span> you might like
 {% endblock %}
 {% block content %}
 {% endblock %}
 
 {% block second_page_title %}
-<span class="colour-{{ col1 }}">Tickets</span> you might like
+Your friends' <span class="colour-{{ col5 }}">Tickets</span>
 {% endblock %}
 {% block second_page_content %}
   {% if request.user.is_authenticated %}
