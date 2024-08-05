@@ -325,14 +325,16 @@ class DOMBuilder {
         titleLink.appendChild(title);
         openViewModalSubscriber(titleLink, this.generateViewReviewModal, this.viewReviewModal);
         header.appendChild(titleLink);
+
+        if (this.review.author == jsUser.id) {
+            const editButton = this.generateButton(`edit-${lowerCaseReviewString}-btn`, `edit-${lowerCaseReviewString}`, [`${lowerCaseReviewString}-edit-btn`, 'icon-hover-box'], this.review.id, this.review.title, `/${lowerCaseReviewString}/${this.review.id}/edit/`, '<i class="icon-pencil crud-btn"></i>');
+            asyncSingleBtnModalFormInit(editButton, this.editReviewModal, this.editReviewConfirmButton, null, this.editReviewName, FormTypeEnum.EDIT_REVIEW);
+            header.appendChild(editButton);
         
-        const editButton = this.generateButton(`edit-${lowerCaseReviewString}-btn`, `edit-${lowerCaseReviewString}`, [`${lowerCaseReviewString}-edit-btn`, 'icon-hover-box'], this.review.id, this.review.title, `/${lowerCaseReviewString}/${this.review.id}/edit/`, '<i class="icon-pencil crud-btn"></i>');
-        asyncSingleBtnModalFormInit(editButton, this.editReviewModal, this.editReviewConfirmButton, null, this.editReviewName, FormTypeEnum.EDIT_REVIEW);
-        header.appendChild(editButton);
-    
-        const deleteButton = this.generateButton(`delete-${lowerCaseReviewString}-btn`, `delete-${lowerCaseReviewString}`, [`${lowerCaseReviewString}-delete-btn`, 'icon-hover-box'], this.review.id, this.review.title, `/${lowerCaseReviewString}/${this.review.id}/delete/`, '<i class="icon-bin crud-btn"></i>');
-        asyncSingleBtnModalFormInit(deleteButton, this.deleteReviewModal, this.deleteReviewConfirmButton, this.callbackDeleteReview, this.deleteReviewName, FormTypeEnum.DELETE_REVIEW);
-        header.appendChild(deleteButton);
+            const deleteButton = this.generateButton(`delete-${lowerCaseReviewString}-btn`, `delete-${lowerCaseReviewString}`, [`${lowerCaseReviewString}-delete-btn`, 'icon-hover-box'], this.review.id, this.review.title, `/${lowerCaseReviewString}/${this.review.id}/delete/`, '<i class="icon-bin crud-btn"></i>');
+            asyncSingleBtnModalFormInit(deleteButton, this.deleteReviewModal, this.deleteReviewConfirmButton, this.callbackDeleteReview, this.deleteReviewName, FormTypeEnum.DELETE_REVIEW);
+            header.appendChild(deleteButton);
+        }
 
         const ratingPreview = this.generateRatingPreview();
         header.appendChild(ratingPreview);
