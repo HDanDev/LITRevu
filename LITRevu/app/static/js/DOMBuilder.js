@@ -25,6 +25,9 @@ class DOMBuilder {
         this.callbackDeleteReview = null;
         this.deleteReviewName = null;
         this.viewUserModal = null;
+        this.csrfToken = null;
+        this.blockedUsers = null;
+        this.followingUsers = null;
     }  
 
     generateLi (objectName="ticket", id=this.ticket.id) {
@@ -142,12 +145,63 @@ class DOMBuilder {
         const authorLink = this.generateUserLink(object, isMini);
 
         infoParagraph.appendChild(authorLink);
+            
+        if (object.author != jsUser.id) {
+            const followBlockBtns = this.generateFollowBlockBtns(object.author);
+    
+            infoParagraph.appendChild(followBlockBtns.followButton);
+            infoParagraph.appendChild(followBlockBtns.blockButton);
+        } 
+
         infoLikesBlock.appendChild(infoParagraph);
+
+        if (object.author != jsUser.id) infoLikesBlock.appendChild(this.generateLikeBlock());
 
         return infoLikesBlock;
     }
 
-    generateUserLink(object, isMini) {
+    generateLikeBlock () {
+        const container = document.createElement('div');
+        container.classList.add('like-container');
+        const item = this.ticket ? this.ticket : this.review;
+        const itemType = this.ticket ? 'ticket' : 'review';
+        container.appendChild(this.generateLikeForm(item, 'like', itemType));
+        container.appendChild(this.generateLikeForm(item, 'dislike', itemType));
+        return container;
+    }
+
+    generateLikeForm (item, likeType, itemType) {
+        const id = item.author
+        const form = document.createElement('form');
+        const isLike = likeType == 'like' ? true : false;
+
+        form.id = `${likeType}-form-${id}`;
+        form.method = 'post';
+        form.action = `/${itemType}/${id}/${likeType}/`;
+        form.classList.add('like-block');
+
+        const csrfHiddenInput = document.createElement('input');
+        csrfHiddenInput.type = "hidden";
+        csrfHiddenInput.name = "csrfmiddlewaretoken";
+        csrfHiddenInput.value = this.csrfToken;
+
+        form.appendChild(csrfHiddenInput);
+
+        const btn = document.createElement('button'); 
+        btn.classList.add(`${likeType}-btn`, "icon-hover-box");
+        btn.innerHTML = `<i class="icon-heart${isLike ? '' : '-broken'}"></i>`;
+        const count = document.createElement('span');
+        count.classList.add(`${likeType}s-count`);
+        count.textContent = isLike ? item.likesCount : item.dislikesCount;
+
+        form.appendChild(btn);
+        form.appendChild(count);
+        likeEventSubscriber(btn);
+
+        return form;
+    }
+
+    generateUserLink (object, isMini) {
         const userLink = document.createElement('a');
         if (object.author && object.author != jsUser.id) {
             userLink.classList.add(`colour-${Math.floor(Math.random() * 10)}`, 'author');
@@ -213,14 +267,16 @@ class DOMBuilder {
         const titleLink = this.generateTitle();
         openViewModalSubscriber(titleLink, this.generateViewTicketModal, this.viewTicketModal);
         header.appendChild(titleLink);
+
+        if (this.ticket.author == jsUser.id) {
+            const editButton = this.generateButton(`edit-${lowerCaseTicketString}-btn`, `edit-${lowerCaseTicketString}`, [`${lowerCaseTicketString}-edit-btn`, 'icon-hover-box'], this.ticket.id, this.ticket.title, `/${lowerCaseTicketString}/${this.ticket.id}/edit/`, '<i class="icon-pencil crud-btn"></i>');
+            asyncSingleBtnModalFormInit(editButton, this.editModal, this.editConfirmButton, null, this.editTicketName, FormTypeEnum.EDIT_TICKET);
+            header.appendChild(editButton);
         
-        const editButton = this.generateButton(`edit-${lowerCaseTicketString}-btn`, `edit-${lowerCaseTicketString}`, [`${lowerCaseTicketString}-edit-btn`, 'icon-hover-box'], this.ticket.id, this.ticket.title, `/${lowerCaseTicketString}/${this.ticket.id}/edit/`, '<i class="icon-pencil crud-btn"></i>');
-        asyncSingleBtnModalFormInit(editButton, this.editModal, this.editConfirmButton, null, this.editTicketName, FormTypeEnum.EDIT_TICKET);
-        header.appendChild(editButton);
-    
-        const deleteButton = this.generateButton(`delete-${lowerCaseTicketString}-btn`, `delete-${lowerCaseTicketString}`, [`${lowerCaseTicketString}-delete-btn`, 'icon-hover-box'], this.ticket.id, this.ticket.title, `/${lowerCaseTicketString}/${this.ticket.id}/delete/`, '<i class="icon-bin crud-btn"></i>');
-        asyncSingleBtnModalFormInit(deleteButton, this.deletionModal, this.deletionConfirmButton, this.callbackDeleteTicket, this.deleteTicketName, FormTypeEnum.DELETE_TICKET);
-        header.appendChild(deleteButton);
+            const deleteButton = this.generateButton(`delete-${lowerCaseTicketString}-btn`, `delete-${lowerCaseTicketString}`, [`${lowerCaseTicketString}-delete-btn`, 'icon-hover-box'], this.ticket.id, this.ticket.title, `/${lowerCaseTicketString}/${this.ticket.id}/delete/`, '<i class="icon-bin crud-btn"></i>');
+            asyncSingleBtnModalFormInit(deleteButton, this.deletionModal, this.deletionConfirmButton, this.callbackDeleteTicket, this.deleteTicketName, FormTypeEnum.DELETE_TICKET);
+            header.appendChild(deleteButton);
+        }
     
         const descriptionLink = this.generateDescription();
         openViewModalSubscriber(descriptionLink, this.generateViewTicketModal, this.viewTicketModal);
@@ -253,8 +309,8 @@ class DOMBuilder {
         const itemContainer = this.generateItemContainer(lowerCaseReviewString);
         li.appendChild(itemContainer);
     
-        if (this.review.cover_image) {
-            const itemBackground = this.generateImage("review-img", this.review.cover_image);
+        if (this.review.coverImage) {
+            const itemBackground = this.generateImage("review-img", this.review.coverImage);
             itemContainer.appendChild(itemBackground);
         }
         
@@ -269,14 +325,16 @@ class DOMBuilder {
         titleLink.appendChild(title);
         openViewModalSubscriber(titleLink, this.generateViewReviewModal, this.viewReviewModal);
         header.appendChild(titleLink);
+
+        if (this.review.author == jsUser.id) {
+            const editButton = this.generateButton(`edit-${lowerCaseReviewString}-btn`, `edit-${lowerCaseReviewString}`, [`${lowerCaseReviewString}-edit-btn`, 'icon-hover-box'], this.review.id, this.review.title, `/${lowerCaseReviewString}/${this.review.id}/edit/`, '<i class="icon-pencil crud-btn"></i>');
+            asyncSingleBtnModalFormInit(editButton, this.editReviewModal, this.editReviewConfirmButton, null, this.editReviewName, FormTypeEnum.EDIT_REVIEW);
+            header.appendChild(editButton);
         
-        const editButton = this.generateButton(`edit-${lowerCaseReviewString}-btn`, `edit-${lowerCaseReviewString}`, [`${lowerCaseReviewString}-edit-btn`, 'icon-hover-box'], this.review.id, this.review.title, `/${lowerCaseReviewString}/${this.review.id}/edit/`, '<i class="icon-pencil crud-btn"></i>');
-        asyncSingleBtnModalFormInit(editButton, this.editReviewModal, this.editReviewConfirmButton, null, this.editReviewName, FormTypeEnum.EDIT_REVIEW);
-        header.appendChild(editButton);
-    
-        const deleteButton = this.generateButton(`delete-${lowerCaseReviewString}-btn`, `delete-${lowerCaseReviewString}`, [`${lowerCaseReviewString}-delete-btn`, 'icon-hover-box'], this.review.id, this.review.title, `/${lowerCaseReviewString}/${this.review.id}/delete/`, '<i class="icon-bin crud-btn"></i>');
-        asyncSingleBtnModalFormInit(deleteButton, this.deleteReviewModal, this.deleteReviewConfirmButton, this.callbackDeleteReview, this.deleteReviewName, FormTypeEnum.DELETE_REVIEW);
-        header.appendChild(deleteButton);
+            const deleteButton = this.generateButton(`delete-${lowerCaseReviewString}-btn`, `delete-${lowerCaseReviewString}`, [`${lowerCaseReviewString}-delete-btn`, 'icon-hover-box'], this.review.id, this.review.title, `/${lowerCaseReviewString}/${this.review.id}/delete/`, '<i class="icon-bin crud-btn"></i>');
+            asyncSingleBtnModalFormInit(deleteButton, this.deleteReviewModal, this.deleteReviewConfirmButton, this.callbackDeleteReview, this.deleteReviewName, FormTypeEnum.DELETE_REVIEW);
+            header.appendChild(deleteButton);
+        }
 
         const ratingPreview = this.generateRatingPreview();
         header.appendChild(ratingPreview);
@@ -310,7 +368,6 @@ class DOMBuilder {
     }
     
     generateViewTicketModal = (ticketId) => {
-        console.log(ticketId);
         const ticket = ticketsData.find(t => t.id === ticketId);
         const title = document.createElement('h2');
         title.className = 'main-title item-infos';
@@ -318,36 +375,46 @@ class DOMBuilder {
       
         const itemContainer = document.createElement('div');
         itemContainer.className = 'item-container';
+
+        const imgDescBlock = document.createElement('div');
+        imgDescBlock.className = 'review-container';
       
         if (ticket.image) {
-          const itemBackground = document.createElement('div');
-          itemBackground.className = 'item-background';
-          itemBackground.style.backgroundImage = `url(${ticket.image})`;
-          itemContainer.appendChild(itemBackground);
+            const itemBackground = document.createElement('div');
+            itemBackground.classList.add('review-img', 'view-img-resize');
+            itemBackground.style.backgroundImage = `url(${ticket.image})`;
+            imgDescBlock.appendChild(itemBackground);
         }
       
         itemContainer.appendChild(this.generateTitleView(ticket, true));
       
+        const descriptionBlock = document.createElement('div');
+        descriptionBlock.className = "view-description-block";
+
         const description = document.createElement('p');
         description.innerText = ticket.description;
-        itemContainer.appendChild(description);
+
+        descriptionBlock.appendChild(description);
+        imgDescBlock.appendChild(descriptionBlock);
+        itemContainer.appendChild(imgDescBlock);
         
         if (ticket.tags.length > 0){
             const tagsContainer = document.createElement('div');
             tagsContainer.className = 'tag-container item-infos';
             const tags = ticket.tags.split(',');
             tags.forEach(tag => {
-              const tagDiv = document.createElement('div');
-              tagDiv.className = 'tag';
-              tagDiv.innerText = tag;
-              tagsContainer.appendChild(tagDiv);
+                if (!isNullOrWhitespace(tag)) {
+                    const tagDiv = document.createElement('div');
+                    tagDiv.className = 'tag';
+                    tagDiv.innerText = tag;
+                    tagsContainer.appendChild(tagDiv);}
             });
             itemContainer.appendChild(tagsContainer);
         }
     
         itemContainer.appendChild(this.generateInfos(ticket));
     
-        const ticketReviewsFilteredList = reviewsData.filter(r => r.ticket === ticket.id && r.isArchived.toLowerCase() === "false");
+        const ticketReviewsFilteredList = reviewsData.filter(r => r.ticket == ticket.id && (!r.isArchived || r.isArchived.toLowerCase() === "false"));
         const reviewsList = document.createElement('ul');
         reviewsList.className = 'item-infos reviews-list';
         if (ticketReviewsFilteredList.length > 0) {
@@ -404,13 +471,13 @@ class DOMBuilder {
     
         if (review.coverImage) {
             const backgroundDiv = document.createElement('div');
-            backgroundDiv.className = 'review-img';
+            backgroundDiv.classList.add('review-img', 'view-img-resize');
             backgroundDiv.style.backgroundImage = `url(${review.coverImage})`;
             itemContainer.appendChild(backgroundDiv);
         }
     
         const descriptionBlock = document.createElement('div');
-        descriptionBlock.className = "form";
+        descriptionBlock.className = "view-description-block";
     
         const reviewContent = document.createElement('p');
         reviewContent.className = 'item-infos';
@@ -470,9 +537,6 @@ class DOMBuilder {
 
         const ul = document.createElement('ul');
 
-        const blockedUsers = JSON.parse(document.getElementById('blocked-users-script').textContent);
-        const followingUsers = JSON.parse(document.getElementById('following-users-script').textContent);
-
         userList.forEach(user => {
             const listItem = document.createElement('li');
             listItem.className = 'profile-info';
@@ -484,28 +548,11 @@ class DOMBuilder {
                 userLink.href = `/user/${user.id}/`;
                 userLink.textContent = user.username;
                 userLink.classList.add(`colour-${Math.floor(Math.random() * 10)}`);
-    
-                const followButton = document.createElement('button');
-                followButton.className = 'follow-btn icon-hover-box';
-                followButton.dataset.userId = user.id;
-                followButton.dataset.url = `/toggle-follow/${user.id}/`;
-                followBtnListenerSetup(followButton, callbackMassFollow);
-        
-                const followIcon = document.createElement('i');
-                followIcon.className = followingUsers.includes(user.id) ? 'icon-user-minus' : 'icon-user-plus';
-                followButton.appendChild(followIcon);
-        
-                const blockButton = document.createElement('button');
-                blockButton.className = 'block-btn icon-hover-box';
-                blockButton.dataset.userId = user.id;
-                blockButton.dataset.url = `/toggle-block/${user.id}/`;
-                followBtnListenerSetup(blockButton, callbackMassBlock);
-        
-                const blockIcon = document.createElement('i');
-                blockIcon.className = blockedUsers.includes(user.id) ? 'icon-checkmark not-validation' : 'icon-blocked not-validation';
-                blockButton.appendChild(blockIcon);
-                listItem.appendChild(followButton);
-                listItem.appendChild(blockButton);
+
+                const followBlockBtns = this.generateFollowBlockBtns(user.id);
+
+                listItem.appendChild(followBlockBtns.followButton);
+                listItem.appendChild(followBlockBtns.blockButton);
             }
             else {
                 userLink.href = '/profile/';
@@ -519,6 +566,33 @@ class DOMBuilder {
         mainDiv.appendChild(h3);
         mainDiv.appendChild(ul);
         return mainDiv;
+    }
+
+    generateFollowBlockBtns = (userId) => {
+        const followButton = document.createElement('button');
+        followButton.className = 'follow-btn icon-hover-box';
+        followButton.dataset.userId = userId;
+        followButton.dataset.url = `/toggle-follow/${userId}/`;
+        followBtnListenerSetup(followButton, callbackMassFollow);
+
+        const followIcon = document.createElement('i');
+        followIcon.className = this.followingUsers.includes(userId) ? 'icon-user-minus' : 'icon-user-plus';
+        followButton.appendChild(followIcon);
+
+        const blockButton = document.createElement('button');
+        blockButton.className = 'block-btn icon-hover-box';
+        blockButton.dataset.userId = userId;
+        blockButton.dataset.url = `/toggle-block/${userId}/`;
+        followBtnListenerSetup(blockButton, callbackMassBlock);
+
+        const blockIcon = document.createElement('i');
+        blockIcon.className = this.blockedUsers.includes(userId) ? 'icon-checkmark not-validation' : 'icon-blocked not-validation';
+        blockButton.appendChild(blockIcon);
+
+        return {
+            followButton: followButton,
+            blockButton: blockButton
+        }
     }
     
     generateTitleView = (object, isTicket, isInList=false) => {  
@@ -568,17 +642,31 @@ class DOMBuilder {
     }
     
     generateInfos = (object, optionalClass="") => {
-        const infoBlock = document.createElement('p');
-        infoBlock.className = 'item-infos ' + optionalClass;
-        infoBlock.innerHTML = `<span>Posted on ${object.createdAt} by </span>`;
+        const infoBlock = document.createElement('div');
+        infoBlock.classList.add('item-infos', 'info-likes-block');
+
+        const authorP = document.createElement('p');
+        authorP.className = 'item-infos ' + optionalClass;
+        authorP.innerHTML = `<span>Posted on ${object.createdAt} by </span>`;
     
         const authorName = this.generateUserLink(object, false);
-        infoBlock.appendChild(authorName);
+        authorP.appendChild(authorName);
+
+        let likesBtn = null;
 
         if (object.author && object.author != jsUser.id) {    
-            const followButton = this.createFollowButton(object.author, `/toggle-follow/${object.author}/`, jsCsrfToken, object.isFollowing);
-            infoBlock.appendChild(followButton);
+            // const followButton = this.createFollowButton(object.author, `/toggle-follow/${object.author}/`, jsCsrfToken, object.isFollowing);
+            const followBlockBtns = this.generateFollowBlockBtns(object.author);
+
+            authorP.appendChild(followBlockBtns.followButton);
+            authorP.appendChild(followBlockBtns.blockButton);
+
+            likesBtn = this.generateLikeBlock();
         }
+
+        infoBlock.appendChild(authorP);
+        if (likesBtn) infoBlock.appendChild(likesBtn);
+
         return infoBlock;
     }
 
@@ -608,7 +696,6 @@ class DOMBuilder {
     }
 
     updateTicket = (ticketId, newImage, newTitle, newDescription, newTags) => {
-        console.log("withing upadate ticket");
         const ticket = document.getElementById(`ticket-${ticketId}`);
 
         if (newImage) {
@@ -638,7 +725,6 @@ class DOMBuilder {
         }
 
         if (newTags) {
-            console.log(newTags);
             const tagContainer = ticket.querySelector('.tag-container');
             tagContainer.innerHTML = '';
             newTags.forEach(tag => {
@@ -651,7 +737,6 @@ class DOMBuilder {
     }
 
     updateReview = (reviewId, newCoverImage, newTitle, newRating, newContent) => {
-        console.log("withing upadate review");
         const review = document.getElementById(`review-${reviewId}`);
   
         if (newCoverImage) {

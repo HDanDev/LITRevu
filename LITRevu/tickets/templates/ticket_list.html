@@ -7,13 +7,13 @@
 <link rel="stylesheet" href="{% static 'css/tickets_styles.css' %}">
 {% endblock %}
 {% block content_title %}
-Tickets
+<span class="colour-{{ col1 }}">Tickets</span> you might like
 {% endblock %}
 {% block content %}
 {% endblock %}
 
 {% block second_page_title %}
-<span class="colour-{{ col1 }}">Tickets</span> you might like
+Your friends' <span class="colour-{{ col5 }}">Tickets</span>
 {% endblock %}
 {% block second_page_content %}
   {% if request.user.is_authenticated %}
@@ -24,7 +24,7 @@ Tickets
     <div id="ticket-container">
       {% include "partial_ticket_list.html" %}
     </div>
-    <div id="loading" style="display: none;">Loading...</div>
+    <div id="loading" style="display: none;"><i class="icon-spinner8"></i></div>
   {% endif %}
 {% endblock %}
 {% block modals %}
@@ -322,7 +322,7 @@ Tickets
 </div>
 
 <div id="viewTicketModal" class="modal">
-  <div class="notepad margin-auto" method="post">
+  <div class="notepad view-modal margin-auto" method="post">
     <div class="page right">
       <div class="page-content" id="viewTicketContainer">
       </div>
@@ -333,7 +333,7 @@ Tickets
 </div>
 
 <div id="viewReviewModal" class="modal">
-  <div class="notepad margin-auto" method="post">
+  <div class="notepad view-modal margin-auto" method="post">
     <div class="page right">
       <div class="page-content" id="viewReviewContainer">
       </div>
@@ -344,7 +344,7 @@ Tickets
 </div>
 
 <div id="viewUserModal" class="modal">
-  <div class="notepad margin-auto" method="post">
+  <div class="notepad view-modal margin-auto" method="post">
     <div class="page right">
       <div class="page-content" id="viewUserContainer">
       </div>
@@ -375,7 +375,10 @@ Tickets
       author: "{{ ticket.author.pk }}",
       authorName: "{{ ticket.author }}",
       isFollowing: "{{ request.user|is_following:ticket.author }}",
-      createdAt: "{{ ticket.created_at }}"
+      createdAt: "{{ ticket.created_at }}",
+      likesCount: "{{ ticket.likes_count }}",            
+      dislikesCount: "{{ ticket.dislikes_count }}",
+      reviews: "{{ ticket.reviews.all }}"
   }{% if not forloop.last %},{% endif %}
   {% endfor %}
 ];
@@ -393,7 +396,9 @@ let reviewsData = [
     isFollowing: "{{ request.user|is_following:review.author }}",
     ticket: "{{ review.ticket.pk }}",
     createdAt: "{{ review.created_at }}",
-    isArchived: "{{ review.is_archived }}"
+    isArchived: "{{ review.is_archived }}",
+    likesCount: "{{ review.likes_count }}",            
+    dislikesCount: "{{ review.dislikes_count }}"
 },
 {% endfor %}
 {% endfor %}

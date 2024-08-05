@@ -1,5 +1,6 @@
 import random
 
+
 def generate_random_numbers(count=10, start=0, end=10):
     """Generate an array of random numbers for class rendering purpose.
 

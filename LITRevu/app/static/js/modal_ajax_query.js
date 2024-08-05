@@ -53,7 +53,6 @@ window.asyncSingleBtnModalFormInit = (btn, modal, validationBtn, callbackFunctio
     if (callbackFunction === null) callbackFunction = callbackCloseModal; 
     btn.addEventListener("click", () => {
         let action = autoFormFill(modal, btn, targetId, formType);
-        console.log(validationBtn, modalForm, callbackFunction, action);
         uniqueBtnListener(validationBtn, modalForm, callbackFunction, action);
     });
 }
@@ -163,7 +162,6 @@ window.openViewModal = (openModalViewButtons, generatingFunction, targetModal) =
 window.openViewModalSubscriber = (btn, generatingFunction, targetModal, directItemId=null) => {
     btn.onclick = async (event) => {
         event.preventDefault();
-        console.log('direct id : ', directItemId);
         directItemId ? generatingFunction(directItemId, await getUserFollows(directItemId)) : generatingFunction(btn.getAttribute("data-item-id"));
         openModal(targetModal);
     }
@@ -304,21 +302,17 @@ window.callbackMassFollow = (responseData, source) => {
 }
 
 window.callbackDeleteTicket = (formId, responseData) => {
-    console.log(responseData.id);
     DOMRemove(responseData.id, "ticket");
     callbackCloseModal(formId);
 }
 
 window.callbackDeleteReview = (formId, responseData) => {
-    console.log(responseData.id);
     DOMRemove(responseData.id, "review");
     callbackCloseModal(formId);
 }
 
 window.callbackCreateTicket = (formId, responseData) => {
-    console.log(responseData.id);
     const parentList = document.getElementById("tickets-list");
-    console.log(parentList);
     generateTicket(parentList, responseData.id, responseData.img, responseData.title, responseData.description, responseData.tags, responseData.creation_date);
     if (responseData.create_review){
         const ticket = document.getElementById(`ticket-${responseData.id}`);
@@ -329,7 +323,6 @@ window.callbackCreateTicket = (formId, responseData) => {
 }
 
 window.callbackCreateReview = (formId, responseData) => {
-    console.log(responseData.id);
     const ticket = document.getElementById(`ticket-${responseData.ticket}`);
     const parentList = ticket.querySelector('.reviews-list');
     generateReview(parentList, responseData.id, responseData.cover_image, responseData.title, responseData.content, responseData.rating, responseData.creation_date, responseData.ticket);
@@ -372,15 +365,14 @@ window.callbackGetUserFollows = (responseData, notRequiredSource) => {
 }
 
 window.callbackFeedFiller = (responseData, notRequiredSource) => {
-
     responseData.data.forEach(ticket => {
         const ticketList = document.getElementById("tickets-list");
-        generateTicket(ticketList, ticket.id, ticket.img, ticket.title, ticket.description, ticket.tags, ticket.creation_date, ticket.author);
+        generateTicket(ticketList, ticket.id, ticket.img, ticket.title, ticket.description, ticket.tags, ticket.creation_date, ticket.author, ticket.likes_count, ticket.dislikes_count, false);
         if (ticket.reviews && ticket.reviews.length > 0) {
             const targetTicket = document.getElementById(`ticket-${ticket.id}`);
             const reviewList = targetTicket.querySelector('.reviews-list');
             ticket.reviews.forEach(review => {
-                generateReview(reviewList, review.id, review.cover_image, review.title, review.content, review.rating, review.creation_date, ticket.id, review.author);
+                generateReview(reviewList, review.id, review.cover_image, review.title, review.content, review.rating, review.creation_date, ticket.id, review.author, review.likes_count, review.dislikes_count, false);
             });
         }
     });
@@ -402,7 +394,7 @@ window.iconSwitcher = (condition, source, trueIcon, falseIcon) => {
 
 window.massIconSwitcher = (targetClass, followedUserId, condition, trueIcon, falseIcon) => {
     let targetList = document.querySelectorAll(targetClass);
-    let concernedTargetList = Array.from(targetList).filter(i => i.getAttribute("data-user-id") == followedUserId);
+    let concernedTargetList = Array.from(targetList).filter(i => i.getAttribute("data-user-id") == followedUserId.toString());
     let innerHTMLIcon = condition ? `<i class="icon-${trueIcon}"></i>` : `<i class="icon-${falseIcon}"></i>`;
     concernedTargetList.forEach((l) => {
         l.innerHTML = innerHTMLIcon;
@@ -442,21 +434,15 @@ window.clearProfileFeedbacks = () => {
 
 window.likeListener = (likeBtns) => {
     likeBtns.forEach((btn) => {
-        btn.addEventListener("click", (event) => {
-            let form = btn.closest('form');
-            let url = btn.closest('form').action;
-            submitForm(event, form, handleVoteCallback, url);
-        });
+        likeEventSubscriber(btn);
     });
 }
 
-window.dislikeListener = (dislikeBtns) => {
-    dislikeBtns.forEach((btn) => {
-        btn.addEventListener("click", (event) => {
-            let form = btn.closest('form');
-            let url = btn.closest('form').action;
-            submitForm(event, form, handleVoteCallback, url);
-        });
+window.likeEventSubscriber = (btn) => {
+    btn.addEventListener("click", (event) => {
+        let form = btn.closest('form');
+        let url = btn.closest('form').action;
+        submitForm(event, form, handleVoteCallback, url);
     });
 }
 
@@ -476,8 +462,6 @@ window.manageRating = (stars, labels) => {
     Array.prototype.forEach.call(stars, (star, s) => {
         star.addEventListener("click", (event) => {
             let selectedStars = event.target;
-            // console.log(event.target.closest('form').id);
-            
             if (selectedStars == previousStar) {
                 let lastRadioButton = stars[stars.length - 1];
                 lastRadioButton.checked = true;
@@ -558,7 +542,6 @@ window.followBtnListenerSetup = (btn, callback) => {
         const userId = btn.getAttribute('data-user-id');
         const url = btn.getAttribute('data-url');
         const jsonBody = JSON.stringify({ user_id: userId });
-        console.log(btn, userId, url, jsonBody);
         ajaxCallPost(url, jsCsrfToken, jsonBody, callback, btn);
     });
 }
@@ -608,7 +591,6 @@ window.getUserFollowsBackend = async (id) => {
                     if (result) {
                         break;
                     }
-                    console.log(`Attempt ${attempt + 1} data not implemented yet...`);
                     await new Promise(resolve => setTimeout(resolve, delay));
                 }
                 if (!result) {

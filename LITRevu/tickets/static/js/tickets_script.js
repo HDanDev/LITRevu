@@ -95,6 +95,9 @@ document.addEventListener("DOMContentLoaded", () => {
     asyncMultipleBtnsModalFormInit(deleteReviewButtons, deleteReviewModal, deleteReviewConfirmButton, callbackDeleteReview, deleteReviewName, FormTypeEnum.DELETE_REVIEW);
     asyncModalFormCancel(deleteReviewCancelButton);
     
+    const blockedUsers = JSON.parse(document.getElementById('blocked-users-script').textContent);
+    const followingUsers = JSON.parse(document.getElementById('following-users-script').textContent);
+    
     const staticBuilder = new DOMBuilder();
     staticBuilder.createReviewModal = createReviewModal;
     staticBuilder.createReviewConfirmButton = createReviewConfirmButton;
@@ -116,6 +119,9 @@ document.addEventListener("DOMContentLoaded", () => {
     staticBuilder.deleteReviewName = deleteReviewName;
     staticBuilder.viewReviewModal = viewReviewModal;
     staticBuilder.viewUserModal = viewUserModal;
+    staticBuilder.csrfToken = jsCsrfToken;
+    staticBuilder.blockedUsers = blockedUsers;
+    staticBuilder.followingUsers = followingUsers;
 
     openViewModal(viewTicketButtons, (id) => staticBuilder.generateViewTicketModal(id), viewTicketModal);
     asyncModalFormCancel(viewTicketCancelButton);
@@ -127,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
     asyncModalFormCancel(viewUserCancelButton);
 
     likeListener(ticketsLikeBtns);
-    dislikeListener(ticketsDislikeBtns);
+    likeListener(ticketsDislikeBtns);
 
     manageRating(starCreateTicketReviewRating, labelCreateTicketReviewRating);
     manageRating(starCreateSingleRating, labelCreateSingleRating);
@@ -146,26 +152,26 @@ document.addEventListener("DOMContentLoaded", () => {
     setRandomColour(document.getElementById("rightPage"));
     brokenImgWatcher();
 
-    window.generateTicket = (targetList, ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate, ticketAuthor=null) => {
+    window.generateTicket = (targetList, ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate, ticketAuthor=null, ticketLikesCount=null, ticketDislikesCount=null, isPrepend=true) => {
         staticBuilder.review = null;
-        staticBuilder.ticket = addTicketsDataEntry(ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate, ticketAuthor=null);
+        staticBuilder.ticket = addTicketsDataEntry(ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate, ticketAuthor, ticketLikesCount, ticketDislikesCount);
         staticBuilder.generateTicket();
         setRandomColour(staticBuilder.li);
 
-        targetList.appendChild(staticBuilder.li);
+        isPrepend ? targetList.prepend(staticBuilder.li) : targetList.appendChild(staticBuilder.li);
     }
 
-    window.generateReview = (targetList, reviewId, reviewImg, reviewTitle, reviewDescription, reviewRating, reviewCreationDate, reviewTicket, reviewAuthor=null) => {
+    window.generateReview = (targetList, reviewId, reviewImg, reviewTitle, reviewDescription, reviewRating, reviewCreationDate, reviewTicket, reviewAuthor=null, ticketLikesCount=null, ticketDislikesCount=null, isPrepend=true) => {
         staticBuilder.ticket = null;
-        staticBuilder.review = addReviewsDataEntry(reviewId, reviewImg, reviewTitle, reviewDescription, reviewRating, reviewCreationDate, reviewTicket, reviewAuthor=null);
+        staticBuilder.review = addReviewsDataEntry(reviewId, reviewImg, reviewTitle, reviewDescription, reviewRating, reviewCreationDate, reviewTicket, reviewAuthor, ticketLikesCount, ticketDislikesCount);
         staticBuilder.generateReview();
         setRandomColour(staticBuilder.li);
 
-        targetList.appendChild(staticBuilder.li);
+        isPrepend ? targetList.prepend(staticBuilder.li) : targetList.appendChild(staticBuilder.li);
         staticBuilder.publicGenerateAddReviewBtn();
     }
 
-    window.addTicketsDataEntry = (ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate, ticketAuthor=null) => {
+    window.addTicketsDataEntry = (ticketId, ticketImg, ticketTitle, ticketDescription, ticketTags, ticketCreationDate, ticketAuthor=null, ticketLikesCount=null, ticketDislikesCount=null) => {
         let ticketString = ""
         ticketTags.forEach(tag => {
             ticketString += `${tag}, `;
@@ -181,13 +187,14 @@ document.addEventListener("DOMContentLoaded", () => {
             authorName: ticketAuthor.username,
             isFollowing: "false",
             createdAt: ticketCreationDate,
+            likesCount: ticketLikesCount,            
+            dislikesCount: ticketDislikesCount,
         };
-        
         ticketsData.push(newTicket);
         return newTicket;
     }
 
-    window.addReviewsDataEntry = (reviewId, reviewImg, reviewTitle, reviewDescription, reviewRating, reviewCreationDate, reviewTicket, reviewAuthor=null) => {
+    window.addReviewsDataEntry = (reviewId, reviewImg, reviewTitle, reviewDescription, reviewRating, reviewCreationDate, reviewTicket, reviewAuthor=null, reviewLikesCount=null, reviewDislikesCount=null) => {
         if (!reviewAuthor) reviewAuthor = jsUser;
         const newReview = {
             id: reviewId.toString(),
@@ -200,6 +207,8 @@ document.addEventListener("DOMContentLoaded", () => {
             isFollowing: "false",
             createdAt: reviewCreationDate,
             ticket: reviewTicket,
+            likesCount: reviewLikesCount,            
+            dislikesCount: reviewDislikesCount,
         };
         
         reviewsData.push(newReview);
@@ -208,7 +217,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.scrollFeedFillerManager = () => {
         if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10 && !isLoadingFeed && !activeModal && hasNotReachedSetsEnd) {
-            console.log('is scrolled');
             isLoadingFeed = true;
             ticketSet += 1;
             document.getElementById('loading').style.display = 'block';
@@ -217,5 +225,12 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     }
 
+    window.isPageScrollable = () => {
+        const contentHeight = document.documentElement.scrollHeight;
+        const viewportHeight = window.innerHeight;
+        return contentHeight > viewportHeight;
+    }
+
+    if (!isPageScrollable()) scrollFeedFillerManager();
     window.addEventListener('scroll', window.scrollFeedFillerManager);
 });

@@ -3,6 +3,7 @@ from users.models import CustomUser
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
+
 class LikeDislike(models.Model):
     LIKE = 1
     DISLIKE = -1
