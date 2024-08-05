@@ -375,7 +375,9 @@ Tickets
       author: "{{ ticket.author.pk }}",
       authorName: "{{ ticket.author }}",
       isFollowing: "{{ request.user|is_following:ticket.author }}",
-      createdAt: "{{ ticket.created_at }}"
+      createdAt: "{{ ticket.created_at }}",
+      likesCount: "{{ ticket.likes_count }}",            
+      dislikesCount: "{{ ticket.dislikes_count }}"
   }{% if not forloop.last %},{% endif %}
   {% endfor %}
 ];
@@ -393,7 +395,9 @@ let reviewsData = [
     isFollowing: "{{ request.user|is_following:review.author }}",
     ticket: "{{ review.ticket.pk }}",
     createdAt: "{{ review.created_at }}",
-    isArchived: "{{ review.is_archived }}"
+    isArchived: "{{ review.is_archived }}",
+    likesCount: "{{ review.likes_count }}",            
+    dislikesCount: "{{ review.dislikes_count }}"
 },
 {% endfor %}
 {% endfor %}

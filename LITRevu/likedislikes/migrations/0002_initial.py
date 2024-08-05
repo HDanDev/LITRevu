@@ -9,24 +9,20 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("tags", "0001_initial"),
-        ("tickets", "0001_initial"),
+        ("likedislikes", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="ticket",
-            name="author",
+            model_name="likedislike",
+            name="user",
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
             ),
         ),
-        migrations.AddField(
-            model_name="ticket",
-            name="tags",
-            field=models.ManyToManyField(
-                blank=True, related_name="reviews", to="tags.tag"
-            ),
+        migrations.AlterUniqueTogether(
+            name="likedislike",
+            unique_together={("user", "content_type", "object_id")},
         ),
     ]

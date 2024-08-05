@@ -58,8 +58,9 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
                 Ticket,
                 pk=self.kwargs['pk']
                 )
-            obj = self.object
-            cover_image_url = obj.cover_image.url if obj.cover_image else None
+            self.object = form.save(commit=False)
+            obj_img = self.object.cover_image
+            cover_image_url = obj_img.url if obj_img else None
             if form.is_valid():
                 super().form_valid(form)
                 return JsonResponse({

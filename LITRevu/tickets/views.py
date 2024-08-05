@@ -37,7 +37,7 @@ class TicketListView(LoginRequiredMixin, ListView):
         for ticket in tickets:
             ticket.likes_count = ticket.get_likes_count()
             ticket.dislikes_count = ticket.get_dislikes_count()
-            for review in ticket.reviews.filter(is_archived=False):
+            for review in ticket.reviews.all():
                 review.likes_count = review.get_likes_count()
                 review.dislikes_count = review.get_dislikes_count()
 
@@ -160,6 +160,8 @@ class TicketListView(LoginRequiredMixin, ListView):
                         'id': ticket.author.id,
                         'username': ticket.author.username,
                         } if ticket.author else None,
+                    'likes_count': ticket.likes_count,
+                    'dislikes_count': ticket.dislikes_count,
                     'reviews': [
                         {
                             'id': r.pk,
@@ -171,7 +173,9 @@ class TicketListView(LoginRequiredMixin, ListView):
                             'author': {
                                 'id': r.author.id,
                                 'username': r.author.username,
-                                } if r.author else None
+                                } if r.author else None,
+                            'likes_count': r.get_likes_count(),
+                            'dislikes_count': r.get_dislikes_count(),
                         } for r in ticket.reviews.filter(
                             is_archived=False
                             )

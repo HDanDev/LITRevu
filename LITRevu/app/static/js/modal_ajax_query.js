@@ -211,6 +211,11 @@ window.ajaxCallPost = async (url, token, jsonBody, callback, source=null) => {
 }
 
 window.ajaxCallGet = async (url, token, callback, source=null) => {
+    console.log('url:', url);
+    console.log('token:', token);
+    console.log('callback:', callback);
+    console.log('source:', source);
+
     let response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -222,6 +227,7 @@ window.ajaxCallGet = async (url, token, callback, source=null) => {
 }
 
 window.handleResponse = async (response, callback, form=null, source=null) => {
+    console.log('sofarsogood');
     if (!response.ok) {
         console.error('Network response was not ok', response.status, response.statusText);
         throw new Error('Network response was not ok');
@@ -372,15 +378,14 @@ window.callbackGetUserFollows = (responseData, notRequiredSource) => {
 }
 
 window.callbackFeedFiller = (responseData, notRequiredSource) => {
-
     responseData.data.forEach(ticket => {
         const ticketList = document.getElementById("tickets-list");
-        generateTicket(ticketList, ticket.id, ticket.img, ticket.title, ticket.description, ticket.tags, ticket.creation_date, ticket.author);
+        generateTicket(ticketList, ticket.id, ticket.img, ticket.title, ticket.description, ticket.tags, ticket.creation_date, ticket.author, ticket.likes_count, ticket.dislikes_count);
         if (ticket.reviews && ticket.reviews.length > 0) {
             const targetTicket = document.getElementById(`ticket-${ticket.id}`);
             const reviewList = targetTicket.querySelector('.reviews-list');
             ticket.reviews.forEach(review => {
-                generateReview(reviewList, review.id, review.cover_image, review.title, review.content, review.rating, review.creation_date, ticket.id, review.author);
+                generateReview(reviewList, review.id, review.cover_image, review.title, review.content, review.rating, review.creation_date, ticket.id, review.author, review.likes_count, review.dislikes_count);
             });
         }
     });
@@ -442,21 +447,15 @@ window.clearProfileFeedbacks = () => {
 
 window.likeListener = (likeBtns) => {
     likeBtns.forEach((btn) => {
-        btn.addEventListener("click", (event) => {
-            let form = btn.closest('form');
-            let url = btn.closest('form').action;
-            submitForm(event, form, handleVoteCallback, url);
-        });
+        likeEventSubscriber(btn);
     });
 }
 
-window.dislikeListener = (dislikeBtns) => {
-    dislikeBtns.forEach((btn) => {
-        btn.addEventListener("click", (event) => {
-            let form = btn.closest('form');
-            let url = btn.closest('form').action;
-            submitForm(event, form, handleVoteCallback, url);
-        });
+window.likeEventSubscriber = (btn) => {
+    btn.addEventListener("click", (event) => {
+        let form = btn.closest('form');
+        let url = btn.closest('form').action;
+        submitForm(event, form, handleVoteCallback, url);
     });
 }
 
