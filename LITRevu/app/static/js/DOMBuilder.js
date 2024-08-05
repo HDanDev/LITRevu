@@ -146,10 +146,12 @@ class DOMBuilder {
 
         infoParagraph.appendChild(authorLink);
             
-        const followBlockBtns = this.generateFollowBlockBtns(object.author);
-
-        infoParagraph.appendChild(followBlockBtns.followButton);
-        infoParagraph.appendChild(followBlockBtns.blockButton);
+        if (object.author != jsUser.id) {
+            const followBlockBtns = this.generateFollowBlockBtns(object.author);
+    
+            infoParagraph.appendChild(followBlockBtns.followButton);
+            infoParagraph.appendChild(followBlockBtns.blockButton);
+        } 
 
         infoLikesBlock.appendChild(infoParagraph);
 
