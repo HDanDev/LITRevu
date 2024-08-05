@@ -394,7 +394,7 @@ window.iconSwitcher = (condition, source, trueIcon, falseIcon) => {
 
 window.massIconSwitcher = (targetClass, followedUserId, condition, trueIcon, falseIcon) => {
     let targetList = document.querySelectorAll(targetClass);
-    let concernedTargetList = Array.from(targetList).filter(i => i.getAttribute("data-user-id") == followedUserId);
+    let concernedTargetList = Array.from(targetList).filter(i => i.getAttribute("data-user-id") == followedUserId.toString());
     let innerHTMLIcon = condition ? `<i class="icon-${trueIcon}"></i>` : `<i class="icon-${falseIcon}"></i>`;
     concernedTargetList.forEach((l) => {
         l.innerHTML = innerHTMLIcon;
