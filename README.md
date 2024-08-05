@@ -90,3 +90,16 @@ Welcome to LITRevu, a django web application that allows you to request or publi
    Access the application
 
    Open your browser and go to: http://localhost:8000
+
+   Feel free to use these credentials to login:
+   
+   - Username   
+   ```sh
+   EvaluateurOC
+   ```
+
+   - Password   
+   ```sh
+   OCp9->DHUserLogin
+   ```
+
