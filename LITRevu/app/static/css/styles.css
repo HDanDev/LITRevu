@@ -467,6 +467,19 @@ footer p {
     filter: grayscale(0.5);
 }
 
+.view-modal {
+    width: min-content;
+}
+
+.view-img-resize {
+    width: 20%;
+    max-width: 20%;
+}
+
+.view-description-block {
+    flex: 1;
+}
+
 .review-infos {
     flex: 1;
 }

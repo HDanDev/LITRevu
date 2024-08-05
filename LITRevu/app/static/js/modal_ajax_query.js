@@ -53,7 +53,6 @@ window.asyncSingleBtnModalFormInit = (btn, modal, validationBtn, callbackFunctio
     if (callbackFunction === null) callbackFunction = callbackCloseModal; 
     btn.addEventListener("click", () => {
         let action = autoFormFill(modal, btn, targetId, formType);
-        console.log(validationBtn, modalForm, callbackFunction, action);
         uniqueBtnListener(validationBtn, modalForm, callbackFunction, action);
     });
 }
@@ -163,7 +162,6 @@ window.openViewModal = (openModalViewButtons, generatingFunction, targetModal) =
 window.openViewModalSubscriber = (btn, generatingFunction, targetModal, directItemId=null) => {
     btn.onclick = async (event) => {
         event.preventDefault();
-        console.log('direct id : ', directItemId);
         directItemId ? generatingFunction(directItemId, await getUserFollows(directItemId)) : generatingFunction(btn.getAttribute("data-item-id"));
         openModal(targetModal);
     }
@@ -211,11 +209,6 @@ window.ajaxCallPost = async (url, token, jsonBody, callback, source=null) => {
 }
 
 window.ajaxCallGet = async (url, token, callback, source=null) => {
-    console.log('url:', url);
-    console.log('token:', token);
-    console.log('callback:', callback);
-    console.log('source:', source);
-
     let response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -227,7 +220,6 @@ window.ajaxCallGet = async (url, token, callback, source=null) => {
 }
 
 window.handleResponse = async (response, callback, form=null, source=null) => {
-    console.log('sofarsogood');
     if (!response.ok) {
         console.error('Network response was not ok', response.status, response.statusText);
         throw new Error('Network response was not ok');
@@ -310,21 +302,17 @@ window.callbackMassFollow = (responseData, source) => {
 }
 
 window.callbackDeleteTicket = (formId, responseData) => {
-    console.log(responseData.id);
     DOMRemove(responseData.id, "ticket");
     callbackCloseModal(formId);
 }
 
 window.callbackDeleteReview = (formId, responseData) => {
-    console.log(responseData.id);
     DOMRemove(responseData.id, "review");
     callbackCloseModal(formId);
 }
 
 window.callbackCreateTicket = (formId, responseData) => {
-    console.log(responseData.id);
     const parentList = document.getElementById("tickets-list");
-    console.log(parentList);
     generateTicket(parentList, responseData.id, responseData.img, responseData.title, responseData.description, responseData.tags, responseData.creation_date);
     if (responseData.create_review){
         const ticket = document.getElementById(`ticket-${responseData.id}`);
@@ -335,7 +323,6 @@ window.callbackCreateTicket = (formId, responseData) => {
 }
 
 window.callbackCreateReview = (formId, responseData) => {
-    console.log(responseData.id);
     const ticket = document.getElementById(`ticket-${responseData.ticket}`);
     const parentList = ticket.querySelector('.reviews-list');
     generateReview(parentList, responseData.id, responseData.cover_image, responseData.title, responseData.content, responseData.rating, responseData.creation_date, responseData.ticket);
@@ -475,8 +462,6 @@ window.manageRating = (stars, labels) => {
     Array.prototype.forEach.call(stars, (star, s) => {
         star.addEventListener("click", (event) => {
             let selectedStars = event.target;
-            // console.log(event.target.closest('form').id);
-            
             if (selectedStars == previousStar) {
                 let lastRadioButton = stars[stars.length - 1];
                 lastRadioButton.checked = true;
@@ -557,7 +542,6 @@ window.followBtnListenerSetup = (btn, callback) => {
         const userId = btn.getAttribute('data-user-id');
         const url = btn.getAttribute('data-url');
         const jsonBody = JSON.stringify({ user_id: userId });
-        console.log(btn, userId, url, jsonBody);
         ajaxCallPost(url, jsCsrfToken, jsonBody, callback, btn);
     });
 }
@@ -607,7 +591,6 @@ window.getUserFollowsBackend = async (id) => {
                     if (result) {
                         break;
                     }
-                    console.log(`Attempt ${attempt + 1} data not implemented yet...`);
                     await new Promise(resolve => setTimeout(resolve, delay));
                 }
                 if (!result) {

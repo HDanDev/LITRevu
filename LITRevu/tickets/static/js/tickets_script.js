@@ -190,7 +190,6 @@ document.addEventListener("DOMContentLoaded", () => {
             likesCount: ticketLikesCount,            
             dislikesCount: ticketDislikesCount,
         };
-        
         ticketsData.push(newTicket);
         return newTicket;
     }

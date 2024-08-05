@@ -190,9 +190,7 @@ class DOMBuilder {
         btn.innerHTML = `<i class="icon-heart${isLike ? '' : '-broken'}"></i>`;
         const count = document.createElement('span');
         count.classList.add(`${likeType}s-count`);
-        console.log(item);
         count.textContent = isLike ? item.likesCount : item.dislikesCount;
-        console.log( 'text cont ent : ', count.textContent)
 
         form.appendChild(btn);
         form.appendChild(count);
@@ -309,8 +307,8 @@ class DOMBuilder {
         const itemContainer = this.generateItemContainer(lowerCaseReviewString);
         li.appendChild(itemContainer);
     
-        if (this.review.cover_image) {
-            const itemBackground = this.generateImage("review-img", this.review.cover_image);
+        if (this.review.coverImage) {
+            const itemBackground = this.generateImage("review-img", this.review.coverImage);
             itemContainer.appendChild(itemBackground);
         }
         
@@ -368,7 +366,6 @@ class DOMBuilder {
     }
     
     generateViewTicketModal = (ticketId) => {
-        console.log(ticketId);
         const ticket = ticketsData.find(t => t.id === ticketId);
         const title = document.createElement('h2');
         title.className = 'main-title item-infos';
@@ -376,19 +373,28 @@ class DOMBuilder {
       
         const itemContainer = document.createElement('div');
         itemContainer.className = 'item-container';
+
+        const imgDescBlock = document.createElement('div');
+        imgDescBlock.className = 'review-container';
       
         if (ticket.image) {
-          const itemBackground = document.createElement('div');
-          itemBackground.className = 'item-background';
-          itemBackground.style.backgroundImage = `url(${ticket.image})`;
-          itemContainer.appendChild(itemBackground);
+            const itemBackground = document.createElement('div');
+            itemBackground.classList.add('review-img', 'view-img-resize');
+            itemBackground.style.backgroundImage = `url(${ticket.image})`;
+            imgDescBlock.appendChild(itemBackground);
         }
       
         itemContainer.appendChild(this.generateTitleView(ticket, true));
       
+        const descriptionBlock = document.createElement('div');
+        descriptionBlock.className = "view-description-block";
+
         const description = document.createElement('p');
         description.innerText = ticket.description;
-        itemContainer.appendChild(description);
+
+        descriptionBlock.appendChild(description);
+        imgDescBlock.appendChild(descriptionBlock);
+        itemContainer.appendChild(imgDescBlock);
         
         if (ticket.tags.length > 0){
             const tagsContainer = document.createElement('div');
@@ -406,7 +412,7 @@ class DOMBuilder {
     
         itemContainer.appendChild(this.generateInfos(ticket));
     
-        const ticketReviewsFilteredList = reviewsData.filter(r => r.ticket === ticket.id && r.isArchived.toLowerCase() === "false");
+        const ticketReviewsFilteredList = reviewsData.filter(r => r.ticket == ticket.id && (!r.isArchived || r.isArchived.toLowerCase() === "false"));
         const reviewsList = document.createElement('ul');
         reviewsList.className = 'item-infos reviews-list';
         if (ticketReviewsFilteredList.length > 0) {
@@ -463,13 +469,13 @@ class DOMBuilder {
     
         if (review.coverImage) {
             const backgroundDiv = document.createElement('div');
-            backgroundDiv.className = 'review-img';
+            backgroundDiv.classList.add('review-img', 'view-img-resize');
             backgroundDiv.style.backgroundImage = `url(${review.coverImage})`;
             itemContainer.appendChild(backgroundDiv);
         }
     
         const descriptionBlock = document.createElement('div');
-        descriptionBlock.className = "form";
+        descriptionBlock.className = "view-description-block";
     
         const reviewContent = document.createElement('p');
         reviewContent.className = 'item-infos';
@@ -688,7 +694,6 @@ class DOMBuilder {
     }
 
     updateTicket = (ticketId, newImage, newTitle, newDescription, newTags) => {
-        console.log("withing upadate ticket");
         const ticket = document.getElementById(`ticket-${ticketId}`);
 
         if (newImage) {
@@ -718,7 +723,6 @@ class DOMBuilder {
         }
 
         if (newTags) {
-            console.log(newTags);
             const tagContainer = ticket.querySelector('.tag-container');
             tagContainer.innerHTML = '';
             newTags.forEach(tag => {
@@ -731,7 +735,6 @@ class DOMBuilder {
     }
 
     updateReview = (reviewId, newCoverImage, newTitle, newRating, newContent) => {
-        console.log("withing upadate review");
         const review = document.getElementById(`review-${reviewId}`);
   
         if (newCoverImage) {
