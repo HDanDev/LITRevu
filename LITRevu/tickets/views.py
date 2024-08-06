@@ -95,6 +95,32 @@ class TicketListView(LoginRequiredMixin, ListView):
         context['users'] = self._context_users
         context['absolute_url'] = self.request.build_absolute_uri('/')
 
+        primary_queryset = self.get_queryset()
+        primary_ticket_ids = primary_queryset.values_list('id', flat=True)
+
+        suggested_tickets = Ticket.objects.filter(
+            is_archived=False
+        ).exclude(
+            id__in=primary_ticket_ids
+        ).prefetch_related('tags', 'reviews')
+
+        sorted_suggested_tickets = []
+        for ticket in suggested_tickets:
+            ticket.likes_count = ticket.get_likes_count()
+            ticket.dislikes_count = ticket.get_dislikes_count()
+            for review in ticket.reviews.all():
+                review.likes_count = review.get_likes_count()
+                review.dislikes_count = review.get_dislikes_count()
+
+        for ticket in suggested_tickets:
+            non_archived_reviews = ticket.reviews.filter(
+                is_archived=False
+                )
+            ticket.non_archived_reviews = non_archived_reviews
+            sorted_suggested_tickets.append(ticket)
+
+        context['suggested_tickets'] = sorted_suggested_tickets
+
         return context
 
     # def get(self, request, *args, **kwargs):
