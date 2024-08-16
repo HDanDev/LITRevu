@@ -12,7 +12,7 @@ from app.utils import generate_random_numbers
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.db.models import Case, When, BooleanField, Q
+from django.db.models import Case, When, BooleanField, Q, Prefetch
 from django.db import transaction
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
@@ -27,12 +27,25 @@ class TicketListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         followed_users = UserFollow.objects.filter(
             follower=self.request.user, status=True
-            ).values_list('followed', flat=True)
+        ).values_list('followed', flat=True)
+        
+        blocked_users_ids = UserBlock.objects.filter(
+            blocker=self.request.user
+        ).values_list('blocked', flat=True)
+        blocked_users = CustomUser.objects.filter(id__in=blocked_users_ids)
 
-        tickets = Ticket.objects.prefetch_related('tags', 'reviews').filter(
+        filtered_reviews = Review.objects.filter(
             Q(is_archived=False) &
-            (Q(author__in=followed_users) |
-            Q(author=self.request.user))
+            ~Q(author__in=blocked_users)
+        )
+
+        tickets = Ticket.objects.prefetch_related(
+            'tags',
+            Prefetch('reviews', queryset=filtered_reviews)
+        ).filter(
+            Q(is_archived=False) &
+            ~Q(author__in=blocked_users) &
+            (Q(author__in=followed_users) | Q(author=self.request.user))
         ).order_by('-created_at').distinct()
 
         for ticket in tickets:
@@ -45,11 +58,11 @@ class TicketListView(LoginRequiredMixin, ListView):
         ticket_authors = tickets.values_list('author', flat=True)
         review_authors = Review.objects.filter(
             ticket__in=tickets
-            ).values_list('author', flat=True)
+        ).values_list('author', flat=True)
         all_authors = set(ticket_authors).union(set(review_authors))
         self._context_users = CustomUser.objects.filter(
             id__in=all_authors
-            )
+        )
 
         return tickets
 
@@ -99,7 +112,8 @@ class TicketListView(LoginRequiredMixin, ListView):
         primary_ticket_ids = primary_queryset.values_list('id', flat=True)
 
         suggested_tickets = Ticket.objects.filter(
-            is_archived=False
+            Q(is_archived=False) &
+            ~Q(author__in=blocked_users)
         ).exclude(
             id__in=primary_ticket_ids
         ).prefetch_related('tags', 'reviews')
@@ -114,7 +128,8 @@ class TicketListView(LoginRequiredMixin, ListView):
 
         for ticket in suggested_tickets:
             non_archived_reviews = ticket.reviews.filter(
-                is_archived=False
+                Q(is_archived=False) &
+                ~Q(author__in=blocked_users)
                 )
             ticket.non_archived_reviews = non_archived_reviews
             sorted_suggested_tickets.append(ticket)
